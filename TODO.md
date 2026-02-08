@@ -8,37 +8,37 @@
 ## 1. MVP 범위 (전체 스코프)
 
 ### 1-1. 프로젝트 셋업
-- [ ] Vite + React + TypeScript 프로젝트 초기화
-- [ ] pnpm 패키지 매니저 설정
-- [ ] Tailwind CSS 설정
-- [ ] shadcn/ui 설정 및 커스텀 테마 적용
-- [ ] React Router v6 설정
-- [ ] React Query v5 설정
-- [ ] react-hook-form + zod 설정
-- [ ] 기본 폴더 구조 생성
+- [x] Vite + React + TypeScript 프로젝트 초기화
+- [x] pnpm 패키지 매니저 설정
+- [x] Tailwind CSS v4 설정
+- [x] shadcn/ui 설정 및 커스텀 테마 적용
+- [x] React Router v6 설정
+- [x] React Query v5 설정
+- [x] react-hook-form + zod 설정
+- [x] 기본 폴더 구조 생성
 
 ### 1-2. 인증 (Auth)
-- [ ] AuthLayout 컴포넌트
-- [ ] 로그인 페이지 UI
+- [x] AuthLayout 컴포넌트
+- [x] 로그인 페이지 UI (placeholder)
 - [ ] 로그인 폼 검증 (react-hook-form + zod)
 - [ ] 회원가입 Step 1: 기본 정보 (아이디, 비밀번호, 이름)
 - [ ] 회원가입 Step 2: 휴대폰 인증
 - [ ] 회원가입 Step 3: 승인코드 입력
 - [ ] 회원가입 Step 4: 역할/지역/추가정보
 - [ ] SignupStepper (진행률 표시)
-- [ ] 인증 상태 관리 (useAuth 훅)
-- [ ] ProtectedRoute 컴포넌트
-- [ ] 로그인 성공 후 대시보드 리다이렉트
+- [x] 인증 상태 관리 (useAuth 훅) - 기본 구조
+- [x] ProtectedRoute 컴포넌트
+- [x] 로그인 성공 후 대시보드 리다이렉트
 
 ### 1-3. 공통 레이아웃 & 네비게이션
-- [ ] RootLayout (사이드바 + 헤더 + 콘텐츠)
-- [ ] Sidebar 컴포넌트 (GNB)
-- [ ] Header 컴포넌트 (로고, 프로필/로그아웃)
+- [x] RootLayout (사이드바 + 헤더 + 콘텐츠)
+- [x] Sidebar 컴포넌트 (GNB)
+- [x] Header 컴포넌트 (로고, 프로필/로그아웃)
 - [ ] Breadcrumb 컴포넌트
 - [ ] 모바일 반응형 (햄버거 메뉴)
 
 ### 1-4. 대시보드 홈
-- [ ] DashboardPage 레이아웃
+- [x] DashboardPage 레이아웃 (placeholder)
 - [ ] ScheduleBanner (오늘의 일정)
 - [ ] DdayBadge (선거일 D-day)
 - [ ] RegionSummaryCard (지역분석 요약)
@@ -47,8 +47,8 @@
 - [ ] Empty State 처리
 
 ### 1-5. 지역분석
-- [ ] RegionPage (메인 - 지역/지표 선택)
-- [ ] RegionResultPage (결과)
+- [x] RegionPage (메인 - placeholder)
+- [x] RegionResultPage (결과 - placeholder)
 - [ ] RegionSelector 컴포넌트
 - [ ] IndicatorCategoryTabs (인구, 민원, 예산 등)
 - [ ] CurrentStatusSection (현재값, 전년 대비, 전국 평균)
@@ -59,7 +59,7 @@
 - [ ] 상세 리포트 CTA (비활성 버튼)
 
 ### 1-6. 정책개발
-- [ ] PolicyPage (탭 레이아웃)
+- [x] PolicyPage (탭 레이아웃 - placeholder)
 - [ ] PolicyTabs 컴포넌트
 - [ ] OverviewTab (개요 - 카테고리별 현황, CTA)
 - [ ] HistoryTab (역대공약분석 - 필터, 리스트, 통계)
@@ -67,13 +67,13 @@
 - [ ] AiRecommendTab (AI 추천 - 목업)
 - [ ] PolicyCard 컴포넌트
 - [ ] PolicyFilters 컴포넌트
-- [ ] PolicyFormPage (새 공약 작성/수정)
+- [x] PolicyFormPage (새 공약 작성/수정 - placeholder)
 - [ ] PolicyForm (react-hook-form + zod)
 
 ### 1-7. 공통 UI 컴포넌트 (shadcn/ui 기반)
-- [ ] Button
-- [ ] Input
-- [ ] Card
+- [x] Button
+- [x] Input
+- [x] Card
 - [ ] Tabs
 - [ ] Select
 - [ ] Modal (Dialog)
@@ -88,86 +88,84 @@
 > 목표: 프로젝트 기본 구조 완성 + 로그인/회원가입 플로우 구현
 
 ### 셋업
-- [ ] Vite + React + TypeScript 프로젝트 생성
-- [ ] pnpm 설정 확인
-- [ ] Tailwind CSS 설치 및 설정
-- [ ] shadcn/ui 초기화 및 테마 커스터마이징
-- [ ] React Router v6 설치 및 router.tsx 작성
-- [ ] React Query v5 설치 및 Provider 설정
-- [ ] react-hook-form + zod 설치
-- [ ] 폴더 구조 생성 (app, features, components, hooks, lib, types)
+- [x] Vite + React + TypeScript 프로젝트 생성
+- [x] pnpm 설정 확인
+- [x] Tailwind CSS v4 설치 및 설정 (@tailwindcss/vite)
+- [x] shadcn/ui 초기화 및 테마 커스터마이징
+- [x] React Router v6 설치 및 router.tsx 작성
+- [x] React Query v5 설치 및 Provider 설정
+- [x] react-hook-form + zod 설치
+- [x] 폴더 구조 생성 (app, features, components, hooks, lib, types)
 - [ ] API 클라이언트 기본 구조 (lib/api/client.ts)
-- [ ] 유틸리티 함수 (lib/utils/cn.ts)
+- [x] 유틸리티 함수 (lib/utils.ts - shadcn 자동 생성)
 
 ### 레이아웃
-- [ ] AuthLayout 컴포넌트 (중앙 정렬 폼)
-- [ ] RootLayout 컴포넌트 (사이드바 + 헤더)
-- [ ] Sidebar 컴포넌트 (네비게이션 메뉴)
-- [ ] Header 컴포넌트
-- [ ] ProtectedRoute 컴포넌트
+- [x] AuthLayout 컴포넌트 (중앙 정렬 폼)
+- [x] RootLayout 컴포넌트 (사이드바 + 헤더)
+- [x] Sidebar 컴포넌트 (네비게이션 메뉴)
+- [x] Header 컴포넌트
+- [x] ProtectedRoute 컴포넌트
 
 ### 인증 기능
-- [ ] LoginPage UI
+- [x] LoginPage UI (placeholder)
 - [ ] LoginForm 컴포넌트 (react-hook-form + zod)
-- [ ] SignupPage UI
+- [x] SignupPage UI (placeholder)
 - [ ] SignupStepper 컴포넌트 (Step indicator)
 - [ ] SignupStep1 (기본 정보)
 - [ ] SignupStep2 (휴대폰 인증)
 - [ ] SignupStep3 (승인코드)
 - [ ] SignupStep4 (역할/지역)
-- [ ] useAuth 훅 (로그인 상태 관리)
+- [x] useAuth 훅 (로그인 상태 관리) - 기본 구조
 - [ ] 인증 관련 타입 정의 (features/auth/types.ts)
 
 ### 라우팅 연결
-- [ ] /login → LoginPage
-- [ ] /signup → SignupPage
-- [ ] / → DashboardPage (placeholder)
-- [ ] 404 → NotFoundPage
+- [x] /login → LoginPage
+- [x] /signup → SignupPage
+- [x] / → DashboardPage (placeholder)
+- [x] 404 → NotFoundPage
 
 ---
 
 ## 3. 일별 할 일
 
-### Day 1: 프로젝트 초기화 & 기본 설정
-- [ ] `pnpm create vite@latest democrasee --template react-ts`
-- [ ] Tailwind CSS 설치 (`pnpm add -D tailwindcss postcss autoprefixer`)
-- [ ] tailwind.config.js 설정
-- [ ] globals.css에 Tailwind directives 추가
-- [ ] shadcn/ui 초기화 (`pnpm dlx shadcn-ui@latest init`)
-- [ ] 커스텀 테마 색상/폰트 설정
-- [ ] 폴더 구조 생성 (빈 폴더 + index.ts)
-- [ ] ESLint/Prettier 설정 확인
+### Day 1: 프로젝트 초기화 & 기본 설정 ✅
+- [x] Vite + React + TypeScript 프로젝트 생성
+- [x] Tailwind CSS v4 설치 (@tailwindcss/vite)
+- [x] vite.config.ts에 Tailwind 플러그인 설정
+- [x] src/index.css에 Tailwind import
+- [x] shadcn/ui 초기화 (`pnpm dlx shadcn@latest init`)
+- [x] 기본 테마 색상 설정 (shadcn 자동 생성)
+- [x] 폴더 구조 생성 (app, features, components, hooks, lib, types)
+- [x] TypeScript path alias 설정 (@/)
 
-### Day 2: 라우팅 & 레이아웃
-- [ ] react-router-dom 설치
-- [ ] router.tsx 작성 (전체 라우트 구조)
-- [ ] App.tsx에 RouterProvider 연결
-- [ ] AuthLayout 컴포넌트 구현
-- [ ] RootLayout 컴포넌트 구현 (기본 구조)
-- [ ] Sidebar 컴포넌트 구현
-- [ ] Header 컴포넌트 구현
-- [ ] NotFoundPage 구현
+### Day 2: 라우팅 & 레이아웃 ✅
+- [x] react-router-dom 설치
+- [x] router.tsx 작성 (전체 라우트 구조)
+- [x] main.tsx에 RouterProvider + QueryClientProvider 연결
+- [x] AuthLayout 컴포넌트 구현
+- [x] RootLayout 컴포넌트 구현
+- [x] Sidebar 컴포넌트 구현
+- [x] Header 컴포넌트 구현
+- [x] NotFoundPage 구현
+- [x] 모든 페이지 placeholder 구현
 
 ### Day 3: 공통 UI & 유틸리티
-- [ ] shadcn/ui 컴포넌트 추가 (Button, Input, Card)
-- [ ] lib/utils/cn.ts (clsx + tailwind-merge)
-- [ ] React Query 설치 및 Provider 설정
-- [ ] react-hook-form + zod 설치
+- [x] shadcn/ui 컴포넌트 추가 (Button, Input, Card)
+- [x] lib/utils.ts (clsx + tailwind-merge) - shadcn 자동 생성
+- [x] React Query 설치 및 Provider 설정
+- [x] react-hook-form + zod 설치
 - [ ] lib/api/client.ts 기본 구조
 - [ ] types/common.ts, types/api.ts 기본 타입
 
 ### Day 4: 로그인 구현
-- [ ] LoginPage 레이아웃
 - [ ] LoginForm 컴포넌트
 - [ ] 로그인 스키마 (zod)
 - [ ] 로그인 폼 UI (아이디, 비밀번호, 버튼)
 - [ ] 에러 메시지 표시
 - [ ] 로딩 상태 (버튼 스피너)
-- [ ] useAuth 훅 기본 구조
-- [ ] Mock 로그인 처리 (API 연동 전)
+- [ ] Mock 로그인 처리 개선
 
 ### Day 5: 회원가입 Step 1-2
-- [ ] SignupPage 레이아웃
 - [ ] SignupStepper 컴포넌트 (1/4, 2/4... 표시)
 - [ ] SignupStep1 (기본 정보 폼)
 - [ ] Step1 스키마 (zod: 아이디, 비밀번호, 비밀번호 확인, 이름)
@@ -183,7 +181,6 @@
 - [ ] 역할 선택 UI (후보자, 사무장, 회계책임자, 사무원)
 - [ ] 지역 선택 UI (시도 → 시군구 → 행정동 cascading)
 - [ ] 가입 완료 → 환영 메시지 → 대시보드 리다이렉트
-- [ ] ProtectedRoute 구현
 
 ### Day 7: 통합 테스트 & 정리
 - [ ] 전체 플로우 테스트 (로그인 → 대시보드)
@@ -205,7 +202,8 @@
 | 2026-02-09 | 패키지 매니저: pnpm 확정 |
 | 2026-02-09 | 차트: Recharts 확정 |
 | 2026-02-09 | 폼 검증: react-hook-form + zod 확정 |
-| 2026-02-09 | UI 컴포넌트: shadcn/ui 도입 확정 (완전 커스터마이즈 가능) |
+| 2026-02-09 | UI 컴포넌트: shadcn/ui 도입 확정 |
+| 2026-02-09 | Tailwind v4 + @tailwindcss/vite 사용 |
 
 ---
 
@@ -219,6 +217,15 @@
 
 ## 이번 턴에서 완료한 작업
 
-- [x] 디렉토리 구조 및 라우팅 설계 Plan 작성
-- [x] 기술 스택 확정 (pnpm, Recharts, react-hook-form+zod, shadcn/ui)
-- [x] TODO.md 구조 개편 (MVP 범위 / 스프린트 / 일별 할 일)
+- [x] Vite + React + TypeScript 프로젝트 초기화
+- [x] Tailwind CSS v4 + @tailwindcss/vite 설정
+- [x] shadcn/ui 초기화 (Button, Input, Card 추가)
+- [x] React Router v6, React Query v5, react-hook-form, zod 설치
+- [x] 폴더 구조 생성 (app, features, components, hooks, lib, types)
+- [x] router.tsx 작성 (전체 라우트 구조)
+- [x] 레이아웃 컴포넌트 (AuthLayout, RootLayout, ProtectedRoute)
+- [x] 공통 컴포넌트 (Sidebar, Header)
+- [x] 모든 페이지 placeholder 구현
+- [x] useAuth 훅 기본 구조
+- [x] TypeScript 타입 체크 통과
+- [x] 개발 서버 정상 작동 확인
