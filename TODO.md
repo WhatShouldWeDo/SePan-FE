@@ -20,7 +20,7 @@
 ### 1-2. 인증 (Auth)
 - [x] AuthLayout 컴포넌트
 - [x] 로그인 페이지 UI (placeholder)
-- [ ] 로그인 폼 검증 (react-hook-form + zod)
+- [x] 로그인 폼 검증 (react-hook-form + zod)
 - [ ] 회원가입 Step 1: 기본 정보 (아이디, 비밀번호, 이름)
 - [ ] 회원가입 Step 2: 휴대폰 인증
 - [ ] 회원가입 Step 3: 승인코드 입력
@@ -78,7 +78,7 @@
 - [ ] Select
 - [ ] Modal (Dialog)
 - [ ] Skeleton
-- [ ] Spinner
+- [x] Spinner
 - [ ] Badge
 
 ---
@@ -96,7 +96,7 @@
 - [x] React Query v5 설치 및 Provider 설정
 - [x] react-hook-form + zod 설치
 - [x] 폴더 구조 생성 (app, features, components, hooks, lib, types)
-- [ ] API 클라이언트 기본 구조 (lib/api/client.ts)
+- [x] API 클라이언트 기본 구조 (lib/api/client.ts)
 - [x] 유틸리티 함수 (lib/utils.ts - shadcn 자동 생성)
 
 ### 레이아웃
@@ -108,7 +108,7 @@
 
 ### 인증 기능
 - [x] LoginPage UI (placeholder)
-- [ ] LoginForm 컴포넌트 (react-hook-form + zod)
+- [x] LoginForm 컴포넌트 (react-hook-form + zod)
 - [x] SignupPage UI (placeholder)
 - [ ] SignupStepper 컴포넌트 (Step indicator)
 - [ ] SignupStep1 (기본 정보)
@@ -154,16 +154,16 @@
 - [x] lib/utils.ts (clsx + tailwind-merge) - shadcn 자동 생성
 - [x] React Query 설치 및 Provider 설정
 - [x] react-hook-form + zod 설치
-- [ ] lib/api/client.ts 기본 구조
-- [ ] types/common.ts, types/api.ts 기본 타입
+- [x] lib/api/client.ts 기본 구조
+- [x] types/common.ts, types/api.ts 기본 타입
 
-### Day 4: 로그인 구현
-- [ ] LoginForm 컴포넌트
-- [ ] 로그인 스키마 (zod)
-- [ ] 로그인 폼 UI (아이디, 비밀번호, 버튼)
-- [ ] 에러 메시지 표시
-- [ ] 로딩 상태 (버튼 스피너)
-- [ ] Mock 로그인 처리 개선
+### Day 4: 로그인 구현 ✅
+- [x] LoginForm 컴포넌트
+- [x] 로그인 스키마 (zod)
+- [x] 로그인 폼 UI (아이디, 비밀번호, 버튼)
+- [x] 에러 메시지 표시
+- [x] 로딩 상태 (버튼 스피너)
+- [x] Mock 로그인 처리 개선
 
 ### Day 5: 회원가입 Step 1-2
 - [ ] SignupStepper 컴포넌트 (1/4, 2/4... 표시)
@@ -217,6 +217,20 @@
 
 ## 이번 턴에서 완료한 작업
 
+### Day 3-4 (2026-02-09)
+- [x] lib/api/client.ts - fetch 기반 API 클라이언트 (토큰 자동 첨부, ApiClientError)
+- [x] components/ui/spinner.tsx - 로딩 스피너 컴포넌트
+- [x] components/ui/label.tsx - shadcn/ui Label 추가
+- [x] features/auth/schemas/loginSchema.ts - zod 로그인 폼 검증
+- [x] features/auth/api/authApi.ts - Mock 인증 API (test/test1234)
+- [x] features/auth/components/LoginForm.tsx - 로그인 폼 (에러 표시, 로딩 스피너)
+- [x] features/auth/hooks/useAuth.ts - User 타입 통일, error 상태, 개선된 login 함수
+- [x] app/routes/LoginPage.tsx - LoginForm 통합
+- [x] types/api.ts - ApiResponse 타입 개선 (success/error 구분)
+- [x] TypeScript 타입 체크 통과
+- [x] 개발 서버 정상 작동 확인
+
+### 이전 작업
 - [x] Vite + React + TypeScript 프로젝트 초기화
 - [x] Tailwind CSS v4 + @tailwindcss/vite 설정
 - [x] shadcn/ui 초기화 (Button, Input, Card 추가)
@@ -227,5 +241,3 @@
 - [x] 공통 컴포넌트 (Sidebar, Header)
 - [x] 모든 페이지 placeholder 구현
 - [x] useAuth 훅 기본 구조
-- [x] TypeScript 타입 체크 통과
-- [x] 개발 서버 정상 작동 확인
