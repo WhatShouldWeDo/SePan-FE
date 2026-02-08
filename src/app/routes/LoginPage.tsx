@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { LoginForm } from "@/features/auth/components/LoginForm"
 
 export function LoginPage() {
   return (
@@ -11,10 +12,7 @@ export function LoginPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {/* TODO: LoginForm 컴포넌트 추가 */}
-        <p className="text-center text-muted-foreground">
-          로그인 폼이 여기에 표시됩니다
-        </p>
+        <LoginForm />
         <div className="mt-4 text-center text-sm">
           계정이 없으신가요?{" "}
           <Link to="/signup" className="text-primary hover:underline">

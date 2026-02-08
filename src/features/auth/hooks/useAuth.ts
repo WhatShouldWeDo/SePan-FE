@@ -1,25 +1,18 @@
 import { useState, useCallback, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-
-interface User {
-  id: string
-  name: string
-  email: string
-  role: "candidate" | "manager" | "accountant" | "staff"
-}
+import type { User } from "@/types/common"
+import * as authApi from "../api/authApi"
 
 interface AuthState {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
+  error: string | null
 }
 
-// TODO: 실제 API 연동 시 교체
-const MOCK_USER: User = {
-  id: "1",
-  name: "홍길동",
-  email: "hong@example.com",
-  role: "candidate",
+interface LoginResult {
+  success: boolean
+  error?: string
 }
 
 export function useAuth() {
@@ -28,54 +21,90 @@ export function useAuth() {
     user: null,
     isAuthenticated: false,
     isLoading: true,
+    error: null,
   })
 
   // 초기 인증 상태 확인
   useEffect(() => {
-    const token = localStorage.getItem("auth_token")
-    if (token) {
-      // TODO: 토큰 유효성 검증 API 호출
-      setState({
-        user: MOCK_USER,
-        isAuthenticated: true,
-        isLoading: false,
-      })
-    } else {
-      setState({
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
-      })
+    const checkAuth = async () => {
+      const token = localStorage.getItem("auth_token")
+      if (!token) {
+        setState({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: null,
+        })
+        return
+      }
+
+      const result = await authApi.getMe()
+      if (result.success) {
+        setState({
+          user: result.data,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
+        })
+      } else {
+        localStorage.removeItem("auth_token")
+        setState({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: null,
+        })
+      }
     }
+
+    checkAuth()
   }, [])
 
-  const login = useCallback(async (username: string, password: string) => {
-    // TODO: 실제 로그인 API 호출
-    console.log("Login attempt:", { username, password })
+  const login = useCallback(
+    async (username: string, password: string): Promise<LoginResult> => {
+      setState((prev) => ({ ...prev, error: null }))
 
-    // Mock 로그인
-    localStorage.setItem("auth_token", "mock_token")
-    setState({
-      user: MOCK_USER,
-      isAuthenticated: true,
-      isLoading: false,
-    })
-    navigate("/")
-  }, [navigate])
+      const result = await authApi.login({ username, password })
 
-  const logout = useCallback(() => {
+      if (result.success) {
+        localStorage.setItem("auth_token", result.data.token)
+        setState({
+          user: result.data.user,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
+        })
+        navigate("/")
+        return { success: true }
+      }
+
+      const errorMessage = result.error.message
+      setState((prev) => ({ ...prev, error: errorMessage }))
+      return { success: false, error: errorMessage }
+    },
+    [navigate]
+  )
+
+  const logout = useCallback(async () => {
+    await authApi.logout()
     localStorage.removeItem("auth_token")
     setState({
       user: null,
       isAuthenticated: false,
       isLoading: false,
+      error: null,
     })
     navigate("/login")
   }, [navigate])
+
+  const clearError = useCallback(() => {
+    setState((prev) => ({ ...prev, error: null }))
+  }, [])
 
   return {
     ...state,
     login,
     logout,
+    clearError,
   }
 }
