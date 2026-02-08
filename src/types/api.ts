@@ -1,11 +1,22 @@
 // API 응답 타입 정의
 
-export interface ApiResponse<T> {
-  success: boolean
+export interface ApiSuccessResponse<T> {
+  success: true
   data: T
-  message?: string
 }
 
+export interface ApiErrorResponse {
+  success: false
+  error: {
+    code: string
+    message: string
+    errors?: Record<string, string[]>
+  }
+}
+
+export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse
+
+// 레거시 호환용 (점진적 마이그레이션)
 export interface ApiError {
   success: false
   message: string
