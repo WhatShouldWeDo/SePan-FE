@@ -94,15 +94,15 @@
 > **의존 방향 (순환 없음)**: API 유틸리티 → 공통 UI → 차트/맵 → 대시보드 카드 → 지역분석 → 정책개발
 
 ### 2-1. API 클라이언트 & 유틸리티 확장 ⭐ 최우선
-- [ ] 에러 핸들링 유틸리티 (toastError, parseApiError)
-- [ ] React Query 커스텀 훅 패턴 정립 (useQuery/useMutation wrapper)
-- [ ] API 타입 제네릭 활용 가이드 (ApiResponse<T> 예시)
+- [ x ] 에러 핸들링 유틸리티 (toastError, parseApiError)
+- [ x ] React Query 커스텀 훅 패턴 정립 (useQuery/useMutation wrapper)
+- [ x ] API 타입 제네릭 활용 가이드 (ApiResponse<T> 예시)
 
 ### 2-2. 공통 UI 컴포넌트 (shadcn/ui) ⭐ 최우선
-- [ ] Tabs 컴포넌트 추가
-- [ ] Dialog (Modal) 컴포넌트 추가
-- [ ] Skeleton 컴포넌트 추가
-- [ ] Badge 컴포넌트 추가
+- [x] Tabs 컴포넌트 추가
+- [x] Dialog (Modal) 컴포넌트 추가
+- [x] Skeleton 컴포넌트 추가
+- [x] Badge 컴포넌트 추가
 
 ### 2-3. 차트/시각화 추상화 ⭐ 최우선
 - [ ] 차트 공통 타입 정의 (ChartData, ChartConfig)
@@ -317,6 +317,53 @@
 ---
 
 ## 이번 턴에서 완료한 작업
+
+### Phase 1.2 - Phase 4: Badge 컴포넌트 (2026-02-10)
+- [x] components/ui/badge.tsx - shadcn/ui Badge 컴포넌트 설치 (pnpm dlx shadcn@latest add badge)
+- [x] components/ui/badge.tsx - badgeVariants에 size variant 추가 (sm, md, lg)
+  - `sm`: text-xs px-2 py-0.5 + svg:size-3
+  - `md`: text-sm px-2.5 py-0.5 + svg:size-3.5 (기본값)
+  - `lg`: text-base px-3 py-1 + svg:size-4
+- [x] components/DdayBadge.tsx - D-day 배지 컴포넌트 작성
+  - 선거일까지 남은 일수 자동 계산 (Math.ceil)
+  - 30일 이하: destructive variant (빨강)
+  - 30일 초과: default variant (파랑)
+  - Date 객체 또는 ISO 문자열 지원
+  - 접근성: aria-label 추가
+- [x] components/PolicyStatusBadge.tsx - 공약 상태 배지 컴포넌트 작성
+  - draft (작성중): secondary variant (회색)
+  - confirmed (확정): default variant (파랑)
+  - published (발표): outline variant (외곽선)
+  - PolicyStatus 타입 export
+- [x] app/routes/PolicyPage.tsx - PolicyStatusBadge 적용
+  - "확정공약" 탭에 3개 목업 카드 추가 (확정/작성중/발표 상태 예시)
+  - Card 레이아웃: 제목 + 배지 + 설명
+- [x] app/routes/DashboardPage.tsx - DdayBadge 적용
+  - 첫 번째 카드(선거일 카드)에 DdayBadge 추가
+  - 선거일: 2026-04-01 (하드코딩, 추후 API 연동)
+- [x] TypeScript 타입 체크 통과 (npx tsc --noEmit)
+- [x] TODO.md - Phase 1.2의 2-2 항목 업데이트 (Badge 완료 표시)
+
+### Phase 1.2 - Phase 2: Dialog 컴포넌트 (2026-02-10)
+- [x] components/ui/dialog.tsx - shadcn/ui Dialog 컴포넌트 설치 (pnpm dlx shadcn@latest add dialog)
+- [x] components/ConfirmDialog.tsx - 확인/취소 모달 wrapper 컴포넌트 작성
+  - size variant 지원 (sm, md, lg, xl)
+  - variant 지원 (default, destructive)
+  - 접근성: ESC 키, 배경 클릭으로 닫기, focus trap (radix-ui 기본 제공)
+  - 모바일 최적화: max-w-[calc(100%-2rem)] (좌우 여백 유지)
+- [x] TODO.md - Phase 1.2의 2-2 항목 업데이트 (Dialog 완료 표시)
+
+### Phase 1.2 - Phase 3: Skeleton 컴포넌트 (2026-02-10)
+- [x] components/ui/skeleton.tsx - shadcn/ui Skeleton 컴포넌트 설치 (pnpm dlx shadcn@latest add skeleton)
+- [x] components/DashboardCardSkeleton.tsx - 조합 Skeleton 컴포넌트 작성
+  - DashboardCardSkeleton: 일반 카드 로딩 (제목, 부제목, 텍스트 라인)
+  - ChartCardSkeleton: 차트 카드 로딩 (300px 높이 차트 영역)
+  - StatCardSkeleton: 통계 카드 로딩 (큰 숫자 + 레이블)
+- [x] app/routes/DashboardPage.tsx - Skeleton 로딩 상태 적용
+  - useState로 로딩 상태 시뮬레이션 (2초 타이머)
+  - isLoading 분기: Skeleton vs 실제 콘텐츠
+  - 6개 카드 레이아웃 (통계 3개 + 일반 2개 + 차트 1개)
+- [x] TODO.md - Phase 1.2의 2-2 항목 업데이트 (Skeleton 완료 표시)
 
 ### Day 7 (2026-02-09)
 - [x] features/auth/api/authApi.ts - console.log 4개 제거, phone 파라미터 eslint-disable
