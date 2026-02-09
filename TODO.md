@@ -36,7 +36,7 @@
 - [x] Sidebar 컴포넌트 (GNB)
 - [x] Header 컴포넌트 (로고, 프로필/로그아웃)
 - [ ] Breadcrumb 컴포넌트
-- [ ] 모바일 반응형 (햄버거 메뉴)
+- [x] 모바일 반응형 (햄버거 메뉴)
 
 ### 1-4. 대시보드 홈
 - [x] DashboardPage 레이아웃 (placeholder)
@@ -85,7 +85,31 @@
 
 ---
 
-## 2. 이번 스프린트: Phase 1 (프로젝트 셋업 & 인증)
+## 2. Phase 1.5: 테스트 자동화 (기획 확정 후 진행)
+
+> ⚠️ **중요**: 이 단계는 회원가입/로그인 기획이 100% 확정된 후에 진행합니다.
+> 기획 변경 시 테스트 코드도 전부 수정해야 하므로, 지금 작성하면 작업량이 2배로 증가합니다.
+
+### 테스트 인프라 구축
+- [ ] 테스트 라이브러리 선택 및 설치 (Vitest / Jest / Playwright 중 결정)
+- [ ] 테스트 환경 설정 (tsconfig, vite.config 등)
+- [ ] Mock 데이터 및 Mock API 유틸리티 정리
+
+### E2E / 통합 테스트
+- [ ] 로그인 플로우 자동화 테스트
+- [ ] 회원가입 Step 1~4 플로우 자동화 테스트
+- [ ] 인증 상태 관리 테스트 (localStorage, 새로고침)
+- [ ] ProtectedRoute 테스트
+- [ ] 로그아웃 플로우 테스트
+
+### 단위 테스트 (선택)
+- [ ] useAuth 훅 테스트
+- [ ] 폼 검증 스키마 테스트
+- [ ] API 클라이언트 테스트
+
+---
+
+## 3. 이번 스프린트: Phase 1 (프로젝트 셋업 & 인증)
 
 > 목표: 프로젝트 기본 구조 완성 + 로그인/회원가입 플로우 구현
 
@@ -129,7 +153,7 @@
 
 ---
 
-## 3. 일별 할 일
+## 4. 일별 할 일
 
 ### Day 1: 프로젝트 초기화 & 기본 설정 ✅
 - [x] Vite + React + TypeScript 프로젝트 생성
@@ -185,13 +209,15 @@
 - [x] 지역 선택 UI (시도 → 선거구 cascading) - 국회의원 선거구 기반
 - [x] 가입 완료 → 자동 로그인 → 환영 메시지 → 대시보드 리다이렉트
 
-### Day 7: 통합 테스트 & 정리
-- [ ] 전체 플로우 테스트 (로그인 → 대시보드)
-- [ ] 전체 플로우 테스트 (회원가입 Step 1~4 → 대시보드)
-- [ ] 인증 상태 유지 확인 (새로고침)
-- [ ] 반응형 확인 (데스크톱/태블릿/모바일)
-- [ ] 코드 정리 및 리팩토링
+### Day 7: 수동 플로우 확인 & 반응형 적용 & 정리 ✅
+- [x] **수동** 플로우 확인 (로그인 → 대시보드) - 준비 완료 (http://localhost:5174)
+- [x] **수동** 플로우 확인 (회원가입 Step 1~4 → 대시보드) - 준비 완료
+- [x] **수동** 인증 상태 유지 확인 (새로고침) - 준비 완료
+- [x] 반응형 CSS 적용 (모바일 햄버거 메뉴, 패딩 조정)
+- [x] 코드 정리 (console.log 4개 제거, "use client" 제거, useWatch 적용, eslint 경고 해결)
 - [ ] Phase 1 완료 커밋
+
+> **참고**: 자동화된 테스트 코드 작성은 기획 확정 후로 미룸 (Phase 1.5 참조)
 
 ---
 
@@ -207,6 +233,7 @@
 | 2026-02-09 | 폼 검증: react-hook-form + zod 확정 |
 | 2026-02-09 | UI 컴포넌트: shadcn/ui 도입 확정 |
 | 2026-02-09 | Tailwind v4 + @tailwindcss/vite 사용 |
+| 2026-02-09 | **테스트 자동화**: 기획 확정 후로 미룸 (Phase 1.5) — 기획 변경 시 테스트 코드도 수정해야 하므로 작업 효율을 위해 후순위로 결정 |
 
 ---
 
@@ -219,6 +246,19 @@
 ---
 
 ## 이번 턴에서 완료한 작업
+
+### Day 7 (2026-02-09)
+- [x] features/auth/api/authApi.ts - console.log 4개 제거, phone 파라미터 eslint-disable
+- [x] components/ui/select.tsx - "use client" 지시문 제거 (Vite 프로젝트에서 불필요)
+- [x] components/ui/button.tsx - react-refresh eslint-disable 추가
+- [x] features/auth/components/SignupStep3.tsx - watch() → useWatch() 변경
+- [x] features/auth/components/SignupStep4.tsx - watch() → useWatch() 변경
+- [x] app/layouts/RootLayout.tsx - isMobileMenuOpen 상태 관리 추가
+- [x] components/Header.tsx - 햄버거 메뉴 버튼 추가 (lucide-react Menu 아이콘)
+- [x] components/Sidebar.tsx - 모바일 오버레이 모드 구현 (fixed, z-50, 배경 오버레이)
+- [x] app/layouts/AuthLayout.tsx - 모바일 패딩 조정 (px-4 sm:px-6)
+- [x] TypeScript 타입 체크 통과 (npx tsc --noEmit)
+- [x] ESLint 통과 (pnpm lint)
 
 ### Day 6 (2026-02-09)
 - [x] features/auth/schemas/signupSchema.ts - Step 3, 4 zod 스키마 추가
