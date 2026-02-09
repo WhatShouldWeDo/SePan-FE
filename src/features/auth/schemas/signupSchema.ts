@@ -53,16 +53,46 @@ export const step2Schema = z.object({
 
 export type Step2FormData = z.infer<typeof step2Schema>;
 
+// Step 3: 승인코드 입력 스키마
+export const step3Schema = z.object({
+	approvalCode: z
+		.string()
+		.min(1, "승인코드를 입력해주세요")
+		.min(8, "승인코드는 8자 이상입니다")
+		.max(20, "승인코드는 20자 이하입니다")
+		.regex(/^[A-Z0-9]+$/, "영문 대문자와 숫자만 사용할 수 있습니다"),
+});
+
+export type Step3FormData = z.infer<typeof step3Schema>;
+
+// Step 4: 역할/지역 선택 스키마
+export const step4Schema = z.object({
+	role: z.enum(
+		["candidate", "manager", "accountant", "staff"],
+		"역할을 선택해주세요",
+	),
+	sidoId: z.string().min(1, "시/도를 선택해주세요"),
+	constituencyId: z.string().min(1, "선거구를 선택해주세요"),
+	additionalInfo: z.string().optional(),
+});
+
+export type Step4FormData = z.infer<typeof step4Schema>;
+
 // 전체 회원가입 데이터 타입
 export interface SignupFormData {
+	// Step 1
 	username: string;
 	password: string;
 	passwordConfirm: string;
 	name: string;
+	// Step 2
 	phone: string;
 	verificationCode: string;
-	// Step 3, 4 필드는 Day 6에서 추가 예정
-	approvalCode?: string;
-	role?: string;
-	region?: string;
+	// Step 3
+	approvalCode: string;
+	// Step 4
+	role: "candidate" | "manager" | "accountant" | "staff";
+	sidoId: string;
+	constituencyId: string;
+	additionalInfo?: string;
 }

@@ -23,12 +23,13 @@
 - [x] 로그인 폼 검증 (react-hook-form + zod)
 - [x] 회원가입 Step 1: 기본 정보 (아이디, 비밀번호, 이름)
 - [x] 회원가입 Step 2: 휴대폰 인증
-- [ ] 회원가입 Step 3: 승인코드 입력
-- [ ] 회원가입 Step 4: 역할/지역/추가정보
+- [x] 회원가입 Step 3: 승인코드 입력
+- [x] 회원가입 Step 4: 역할/지역/추가정보
 - [x] SignupStepper (진행률 표시)
 - [x] 인증 상태 관리 (useAuth 훅) - 기본 구조
 - [x] ProtectedRoute 컴포넌트
 - [x] 로그인 성공 후 대시보드 리다이렉트
+- [x] 가입 완료 → 자동 로그인 → 대시보드 리다이렉트
 
 ### 1-3. 공통 레이아웃 & 네비게이션
 - [x] RootLayout (사이드바 + 헤더 + 콘텐츠)
@@ -75,7 +76,8 @@
 - [x] Input
 - [x] Card
 - [ ] Tabs
-- [ ] Select
+- [x] Select
+- [x] RadioGroup
 - [ ] Modal (Dialog)
 - [ ] Skeleton
 - [x] Spinner
@@ -113,8 +115,9 @@
 - [x] SignupStepper 컴포넌트 (Step indicator)
 - [x] SignupStep1 (기본 정보)
 - [x] SignupStep2 (휴대폰 인증)
-- [ ] SignupStep3 (승인코드)
-- [ ] SignupStep4 (역할/지역)
+- [x] SignupStep3 (승인코드)
+- [x] SignupStep4 (역할/지역)
+- [x] SignupComplete (가입 완료 화면)
 - [x] useAuth 훅 (로그인 상태 관리) - 기본 구조
 - [ ] 인증 관련 타입 정의 (features/auth/types.ts)
 
@@ -173,14 +176,14 @@
 - [x] Step2 스키마 (zod: 휴대폰 번호, 인증번호)
 - [x] Step 간 상태 유지 (useState)
 
-### Day 6: 회원가입 Step 3-4 & 완료
-- [ ] SignupStep3 (승인코드 입력)
-- [ ] Step3 스키마 (zod)
-- [ ] SignupStep4 (역할/지역 선택)
-- [ ] Step4 스키마 (zod)
-- [ ] 역할 선택 UI (후보자, 사무장, 회계책임자, 사무원)
-- [ ] 지역 선택 UI (시도 → 시군구 → 행정동 cascading)
-- [ ] 가입 완료 → 환영 메시지 → 대시보드 리다이렉트
+### Day 6: 회원가입 Step 3-4 & 완료 ✅
+- [x] SignupStep3 (승인코드 입력)
+- [x] Step3 스키마 (zod)
+- [x] SignupStep4 (역할/지역 선택)
+- [x] Step4 스키마 (zod)
+- [x] 역할 선택 UI (후보자, 사무장, 회계책임자, 사무원)
+- [x] 지역 선택 UI (시도 → 선거구 cascading) - 국회의원 선거구 기반
+- [x] 가입 완료 → 자동 로그인 → 환영 메시지 → 대시보드 리다이렉트
 
 ### Day 7: 통합 테스트 & 정리
 - [ ] 전체 플로우 테스트 (로그인 → 대시보드)
@@ -216,6 +219,20 @@
 ---
 
 ## 이번 턴에서 완료한 작업
+
+### Day 6 (2026-02-09)
+- [x] features/auth/schemas/signupSchema.ts - Step 3, 4 zod 스키마 추가
+- [x] features/auth/api/authApi.ts - verifyApprovalCode, signup Mock API 추가
+- [x] features/auth/data/mockConstituencies.ts - 17개 시도 + 국회의원 선거구 Mock 데이터
+- [x] features/auth/components/SignupStep3.tsx - 승인코드 입력 폼 (대문자 자동 변환)
+- [x] features/auth/components/SignupStep4.tsx - 역할(RadioGroup) + 지역(Cascading Select) 선택
+- [x] features/auth/components/SignupComplete.tsx - 가입 완료 화면 (3초 자동 리다이렉트)
+- [x] app/routes/SignupPage.tsx - Step 3-4 통합 + 가입 완료 로직
+- [x] components/ui/radio-group.tsx - shadcn/ui RadioGroup 추가
+- [x] components/ui/select.tsx - shadcn/ui Select 추가
+- [x] SignupStep3Placeholder.tsx 제거 (불필요 파일 정리)
+- [x] TypeScript 타입 체크 통과
+- [x] 개발 서버 정상 작동 확인
 
 ### Day 5 (2026-02-09)
 - [x] features/auth/schemas/signupSchema.ts - Step 1, 2 zod 스키마
