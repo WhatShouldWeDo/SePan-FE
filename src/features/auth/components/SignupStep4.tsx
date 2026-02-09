@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -60,7 +60,6 @@ export function SignupStep4({
 	const {
 		control,
 		handleSubmit,
-		watch,
 		setValue,
 		formState: { errors, isSubmitting },
 	} = useForm<Step4FormData>({
@@ -74,7 +73,7 @@ export function SignupStep4({
 		},
 	});
 
-	const selectedSidoId = watch("sidoId");
+	const selectedSidoId = useWatch({ control, name: "sidoId" });
 	const constituencyList: Constituency[] = selectedSidoId
 		? getConstituenciesBySido(selectedSidoId)
 		: [];
