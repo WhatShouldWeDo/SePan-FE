@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { step2Schema, type Step2FormData } from "../schemas/signupSchema";
 import { sendVerification, verifyPhone } from "../api/authApi";
+import { useApiMutation } from "@/lib/api/hooks";
 
 interface SignupStep2Props {
 	defaultValues?: Partial<Step2FormData>;
@@ -22,14 +23,12 @@ export function SignupStep2({
 	onBack,
 }: SignupStep2Props) {
 	const [isCodeSent, setIsCodeSent] = useState(false);
-	const [isSending, setIsSending] = useState(false);
 	const [timer, setTimer] = useState(0);
-	const [serverError, setServerError] = useState<string | null>(null);
 
 	const {
 		register,
 		handleSubmit,
-		formState: { errors, isSubmitting },
+		formState: { errors },
 		getValues,
 		trigger,
 	} = useForm<Step2FormData>({
@@ -38,6 +37,24 @@ export function SignupStep2({
 		defaultValues: {
 			phone: defaultValues?.phone ?? "",
 			verificationCode: defaultValues?.verificationCode ?? "",
+		},
+	});
+
+	// 인증번호 발송 Mutation
+	const { mutate: sendCode, isPending: isSending } = useApiMutation({
+		mutationFn: (phone: string) => sendVerification(phone),
+		onSuccess: () => {
+			setIsCodeSent(true);
+			setTimer(TIMER_DURATION);
+		},
+	});
+
+	// 인증번호 확인 Mutation
+	const { mutate: verifyCode, isPending: isVerifying } = useApiMutation({
+		mutationFn: (data: Step2FormData) =>
+			verifyPhone(data.phone, data.verificationCode),
+		onSuccess: (_, variables) => {
+			onComplete(variables);
 		},
 	});
 
@@ -67,47 +84,18 @@ export function SignupStep2({
 		const isValid = await trigger("phone");
 		if (!isValid) return;
 
-		setIsSending(true);
-		setServerError(null);
-
-		const result = await sendVerification(phone);
-
-		setIsSending(false);
-
-		if (result.success) {
-			setIsCodeSent(true);
-			setTimer(TIMER_DURATION);
-		} else {
-			setServerError(result.error?.message ?? "인증번호 발송에 실패했습니다");
-		}
+		sendCode(phone);
 	};
 
 	// 폼 제출 (인증번호 확인)
-	const onSubmit = async (data: Step2FormData) => {
-		setServerError(null);
-
-		const result = await verifyPhone(data.phone, data.verificationCode);
-
-		if (result.success) {
-			onComplete(data);
-		} else {
-			setServerError(result.error?.message ?? "인증에 실패했습니다");
-		}
+	const onSubmit = (data: Step2FormData) => {
+		verifyCode(data);
 	};
 
 	const isTimerExpired = isCodeSent && timer <= 0;
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-			{serverError && (
-				<div
-					role="alert"
-					className="rounded-md bg-destructive/10 p-3 text-sm text-destructive"
-				>
-					{serverError}
-				</div>
-			)}
-
 			{/* 휴대폰 번호 */}
 			<div className="space-y-2">
 				<Label htmlFor="phone">휴대폰 번호</Label>
@@ -117,7 +105,7 @@ export function SignupStep2({
 						type="tel"
 						placeholder="010-XXXX-XXXX"
 						autoComplete="tel"
-						disabled={isSubmitting || isCodeSent}
+						disabled={isVerifying || isCodeSent}
 						aria-invalid={!!errors.phone}
 						aria-describedby={errors.phone ? "phone-error" : undefined}
 						className="flex-1"
@@ -161,7 +149,7 @@ export function SignupStep2({
 						inputMode="numeric"
 						placeholder="6자리 인증번호"
 						maxLength={6}
-						disabled={isSubmitting || isTimerExpired}
+						disabled={isVerifying || isTimerExpired}
 						aria-invalid={!!errors.verificationCode}
 						aria-describedby={
 							errors.verificationCode ? "verificationCode-error" : undefined
@@ -190,17 +178,17 @@ export function SignupStep2({
 					type="button"
 					variant="outline"
 					onClick={onBack}
-					disabled={isSubmitting}
+					disabled={isVerifying}
 					className="h-12 flex-1 text-base"
 				>
 					이전
 				</Button>
 				<Button
 					type="submit"
-					disabled={isSubmitting || !isCodeSent || isTimerExpired}
+					disabled={isVerifying || !isCodeSent || isTimerExpired}
 					className="h-12 flex-1 text-base"
 				>
-					{isSubmitting ? (
+					{isVerifying ? (
 						<>
 							<Spinner size="sm" className="mr-2" />
 							확인 중...

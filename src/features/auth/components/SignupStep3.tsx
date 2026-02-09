@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Info } from "lucide-react";
@@ -8,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { step3Schema, type Step3FormData } from "../schemas/signupSchema";
 import { verifyApprovalCode } from "../api/authApi";
+import { useApiMutation } from "@/lib/api/hooks";
+import { toast } from "@/lib/toast/toast";
 
 interface SignupStep3Props {
 	defaultValues?: Partial<Step3FormData>;
@@ -20,12 +21,10 @@ export function SignupStep3({
 	onComplete,
 	onBack,
 }: SignupStep3Props) {
-	const [serverError, setServerError] = useState<string | null>(null);
-
 	const {
 		register,
 		handleSubmit,
-		formState: { errors, isSubmitting },
+		formState: { errors },
 		setValue,
 		control,
 	} = useForm<Step3FormData>({
@@ -38,6 +37,18 @@ export function SignupStep3({
 
 	const approvalCodeValue = useWatch({ control, name: "approvalCode" });
 
+	// 승인코드 검증 Mutation
+	const { mutate: verifyCode, isPending } = useApiMutation({
+		mutationFn: (code: string) => verifyApprovalCode(code),
+		onSuccess: (data, variables) => {
+			if (data.valid) {
+				onComplete({ approvalCode: variables });
+			} else {
+				toast.error("승인코드가 유효하지 않습니다");
+			}
+		},
+	});
+
 	// 입력 시 대문자로 자동 변환
 	const handleApprovalCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const upperCaseValue = e.target.value.toUpperCase();
@@ -45,33 +56,12 @@ export function SignupStep3({
 	};
 
 	// 폼 제출 (승인코드 검증)
-	const onSubmit = async (data: Step3FormData) => {
-		setServerError(null);
-
-		const result = await verifyApprovalCode(data.approvalCode);
-
-		if (result.success) {
-			if (result.data.valid) {
-				onComplete(data);
-			} else {
-				setServerError("승인코드가 유효하지 않습니다");
-			}
-		} else {
-			setServerError(result.error.message ?? "승인코드 검증에 실패했습니다");
-		}
+	const onSubmit = (data: Step3FormData) => {
+		verifyCode(data.approvalCode);
 	};
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-			{serverError && (
-				<div
-					role="alert"
-					className="rounded-md bg-destructive/10 p-3 text-sm text-destructive"
-				>
-					{serverError}
-				</div>
-			)}
-
 			{/* 안내 문구 */}
 			<div className="rounded-md bg-muted p-4 text-sm text-muted-foreground">
 				<p>관리자로부터 받은 승인코드를 입력해주세요.</p>
@@ -86,7 +76,7 @@ export function SignupStep3({
 					type="text"
 					placeholder="예: CAMP2026ABC"
 					maxLength={20}
-					disabled={isSubmitting}
+					disabled={isPending}
 					aria-invalid={!!errors.approvalCode}
 					aria-describedby={
 						errors.approvalCode ? "approvalCode-error" : undefined
@@ -121,17 +111,17 @@ export function SignupStep3({
 					type="button"
 					variant="outline"
 					onClick={onBack}
-					disabled={isSubmitting}
+					disabled={isPending}
 					className="h-12 flex-1 text-base"
 				>
 					이전
 				</Button>
 				<Button
 					type="submit"
-					disabled={isSubmitting}
+					disabled={isPending}
 					className="h-12 flex-1 text-base"
 				>
-					{isSubmitting ? (
+					{isPending ? (
 						<>
 							<Spinner size="sm" className="mr-2" />
 							확인 중...
