@@ -21,11 +21,11 @@
 - [x] AuthLayout 컴포넌트
 - [x] 로그인 페이지 UI (placeholder)
 - [x] 로그인 폼 검증 (react-hook-form + zod)
-- [ ] 회원가입 Step 1: 기본 정보 (아이디, 비밀번호, 이름)
-- [ ] 회원가입 Step 2: 휴대폰 인증
+- [x] 회원가입 Step 1: 기본 정보 (아이디, 비밀번호, 이름)
+- [x] 회원가입 Step 2: 휴대폰 인증
 - [ ] 회원가입 Step 3: 승인코드 입력
 - [ ] 회원가입 Step 4: 역할/지역/추가정보
-- [ ] SignupStepper (진행률 표시)
+- [x] SignupStepper (진행률 표시)
 - [x] 인증 상태 관리 (useAuth 훅) - 기본 구조
 - [x] ProtectedRoute 컴포넌트
 - [x] 로그인 성공 후 대시보드 리다이렉트
@@ -110,9 +110,9 @@
 - [x] LoginPage UI (placeholder)
 - [x] LoginForm 컴포넌트 (react-hook-form + zod)
 - [x] SignupPage UI (placeholder)
-- [ ] SignupStepper 컴포넌트 (Step indicator)
-- [ ] SignupStep1 (기본 정보)
-- [ ] SignupStep2 (휴대폰 인증)
+- [x] SignupStepper 컴포넌트 (Step indicator)
+- [x] SignupStep1 (기본 정보)
+- [x] SignupStep2 (휴대폰 인증)
 - [ ] SignupStep3 (승인코드)
 - [ ] SignupStep4 (역할/지역)
 - [x] useAuth 훅 (로그인 상태 관리) - 기본 구조
@@ -165,13 +165,13 @@
 - [x] 로딩 상태 (버튼 스피너)
 - [x] Mock 로그인 처리 개선
 
-### Day 5: 회원가입 Step 1-2
-- [ ] SignupStepper 컴포넌트 (1/4, 2/4... 표시)
-- [ ] SignupStep1 (기본 정보 폼)
-- [ ] Step1 스키마 (zod: 아이디, 비밀번호, 비밀번호 확인, 이름)
-- [ ] SignupStep2 (휴대폰 인증 폼)
-- [ ] Step2 스키마 (zod: 휴대폰 번호, 인증번호)
-- [ ] Step 간 상태 유지 (useState or useReducer)
+### Day 5: 회원가입 Step 1-2 ✅
+- [x] SignupStepper 컴포넌트 (1/4, 2/4... 표시)
+- [x] SignupStep1 (기본 정보 폼)
+- [x] Step1 스키마 (zod: 아이디, 비밀번호, 비밀번호 확인, 이름)
+- [x] SignupStep2 (휴대폰 인증 폼)
+- [x] Step2 스키마 (zod: 휴대폰 번호, 인증번호)
+- [x] Step 간 상태 유지 (useState)
 
 ### Day 6: 회원가입 Step 3-4 & 완료
 - [ ] SignupStep3 (승인코드 입력)
@@ -216,6 +216,16 @@
 ---
 
 ## 이번 턴에서 완료한 작업
+
+### Day 5 (2026-02-09)
+- [x] features/auth/schemas/signupSchema.ts - Step 1, 2 zod 스키마
+- [x] features/auth/api/authApi.ts - checkUsername, sendVerification, verifyPhone Mock 함수 추가
+- [x] features/auth/components/SignupStepper.tsx - 4단계 진행률 표시 (완료/현재/미완료 스타일)
+- [x] features/auth/components/SignupStep1.tsx - 기본 정보 폼 + blur 아이디 중복 체크
+- [x] features/auth/components/SignupStep2.tsx - 휴대폰 인증 폼 + 3분 타이머
+- [x] features/auth/components/SignupStep3Placeholder.tsx - 준비 중 안내
+- [x] app/routes/SignupPage.tsx - Step 상태 관리 + 컴포넌트 통합
+- [x] TypeScript 타입 체크 통과
 
 ### Day 3-4 (2026-02-09)
 - [x] lib/api/client.ts - fetch 기반 API 클라이언트 (토큰 자동 첨부, ApiClientError)
