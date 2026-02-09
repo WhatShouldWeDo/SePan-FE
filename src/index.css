@@ -118,7 +118,13 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html, body {
+    @apply overscroll-none;
+  }
   body {
     @apply bg-background text-foreground;
+    /* 모바일 터치 제스처 최적화 */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 }
