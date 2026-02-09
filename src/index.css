@@ -43,6 +43,11 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-map-fill: var(--map-fill);
+  --color-map-fill-hover: var(--map-fill-hover);
+  --color-map-fill-selected: var(--map-fill-selected);
+  --color-map-stroke: var(--map-stroke);
+  --color-map-label: var(--map-label);
 }
 
 :root {
@@ -78,6 +83,11 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --map-fill: 0.92 0.02 250;
+  --map-fill-hover: 0.75 0.10 250;
+  --map-fill-selected: 0.65 0.15 250;
+  --map-stroke: 0.98 0 0;
+  --map-label: 0.30 0 0;
 }
 
 .dark {
@@ -112,6 +122,11 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --map-fill: 0.35 0.05 250;
+  --map-fill-hover: 0.55 0.12 250;
+  --map-fill-selected: 0.65 0.15 250;
+  --map-stroke: 0.25 0 0;
+  --map-label: 0.85 0 0;
 }
 
 @layer base {
