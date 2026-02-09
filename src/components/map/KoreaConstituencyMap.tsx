@@ -26,6 +26,12 @@ export interface KoreaConstituencyMapProps {
 const TOPOJSON_OBJECT_KEY = "2024_22_Elec_simplify";
 
 /**
+ * geoArea() 기본 임계값 (스테라디안 단위)
+ * 이 값 이하인 폴리곤은 라벨을 숨기고 hover 툴팁으로 대체한다.
+ */
+const DEFAULT_LABEL_AREA_THRESHOLD = 5e-7;
+
+/**
  * 22대 국회의원 254개 선거구 폴리곤 지도
  *
  * @description
@@ -61,7 +67,10 @@ export function KoreaConstituencyMap({
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const featureCollection = useMemo(() => {
 		const topology = topojsonData as any;
-		const geojson = topojson.feature(topology, topology.objects[TOPOJSON_OBJECT_KEY]);
+		const geojson = topojson.feature(
+			topology,
+			topology.objects[TOPOJSON_OBJECT_KEY],
+		);
 		// feature()가 GeometryCollection을 받으면 FeatureCollection을 반환
 		return geojson as unknown as GeoJSON.FeatureCollection;
 	}, []);
@@ -95,9 +104,7 @@ export function KoreaConstituencyMap({
 					} satisfies MapRegion,
 					showLabel:
 						showLabels &&
-						(labelAreaThreshold != null
-							? geoArea(f) > labelAreaThreshold
-							: true),
+						geoArea(f) > (labelAreaThreshold ?? DEFAULT_LABEL_AREA_THRESHOLD),
 				};
 			}),
 		[featureCollection, pathGenerator, showLabels, labelAreaThreshold],
