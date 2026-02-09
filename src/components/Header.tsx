@@ -1,13 +1,26 @@
+import { Menu } from "lucide-react"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick: () => void
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const { user, logout } = useAuth()
 
   return (
-    <header className="h-16 border-b px-6 flex items-center justify-between bg-background">
+    <header className="h-16 border-b px-4 md:px-6 flex items-center justify-between bg-background">
       <div className="md:hidden">
-        {/* TODO: 모바일 메뉴 버튼 */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onMenuClick}
+          aria-label="메뉴 열기"
+          className="size-11"
+        >
+          <Menu className="size-6" />
+        </Button>
       </div>
       <div className="flex-1" />
       <div className="flex items-center gap-4">

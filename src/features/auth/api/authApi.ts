@@ -95,13 +95,12 @@ export async function checkUsername(
 
 // 인증번호 발송 (회원가입 Step 2)
 export async function sendVerification(
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	phone: string,
 ): Promise<ApiResponse<void>> {
 	await delay(800);
 
-	// Mock: 항상 성공
-	console.log(`[Mock] 인증번호 발송: ${phone}`);
-
+	// Mock: 항상 성공 (실제 API에서는 phone으로 SMS 발송)
 	return {
 		success: true,
 		data: undefined,
@@ -117,7 +116,6 @@ export async function verifyPhone(
 
 	// Mock: code가 "123456"이면 성공
 	if (code === "123456") {
-		console.log(`[Mock] 인증 성공: ${phone}`);
 		return {
 			success: true,
 			data: undefined,
@@ -143,7 +141,6 @@ export async function verifyApprovalCode(
 	const valid = code.startsWith("CAMP2026");
 
 	if (valid) {
-		console.log(`[Mock] 승인코드 유효: ${code}`);
 		return {
 			success: true,
 			data: { valid: true },
@@ -186,7 +183,6 @@ export async function signup(
 	await delay(1000);
 
 	// Mock: 항상 성공
-	console.log("[Mock] 회원가입 완료:", data);
 
 	const newUser: User = {
 		id: `user_${Date.now()}`,

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ export function SignupStep3({
 		handleSubmit,
 		formState: { errors, isSubmitting },
 		setValue,
-		watch,
+		control,
 	} = useForm<Step3FormData>({
 		resolver: zodResolver(step3Schema),
 		mode: "onBlur",
@@ -36,7 +36,7 @@ export function SignupStep3({
 		},
 	});
 
-	const approvalCodeValue = watch("approvalCode");
+	const approvalCodeValue = useWatch({ control, name: "approvalCode" });
 
 	// 입력 시 대문자로 자동 변환
 	const handleApprovalCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
