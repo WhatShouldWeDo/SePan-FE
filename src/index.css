@@ -43,6 +43,97 @@
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
+
+	/* ── Figma Semantic Color Tokens ──
+	 * 사용법: bg-{token}, text-{token}, border-{token}
+	 * 예: <button className="bg-primary-strong text-label-inverse">
+	 */
+	--color-primary-strong: var(--primary-strong);
+	--color-primary-heavy: var(--primary-heavy);
+	--color-label-strong: var(--label-strong);
+	--color-label-normal: var(--label-normal);
+	--color-label-neutral: var(--label-neutral);
+	--color-label-alternative: var(--label-alternative);
+	--color-label-assistive: var(--label-assistive);
+	--color-label-disabled: var(--label-disabled);
+	--color-label-inverse: var(--label-inverse);
+	--color-background-alt: var(--background-alt);
+	--color-line-normal: var(--line-normal);
+	--color-line-neutral: var(--line-neutral);
+	--color-line-alt: var(--line-alt);
+	--color-fill-normal: var(--fill-normal);
+	--color-fill-strong: var(--fill-strong);
+	--color-fill-alt: var(--fill-alt);
+	--color-fill-disabled: var(--fill-disabled);
+	--color-interaction-inactive: var(--interaction-inactive);
+	--color-interaction-disabled: var(--interaction-disabled);
+	--color-status-negative: var(--status-negative);
+	--color-status-negative-bg: var(--status-negative-bg);
+	--color-status-cautionary: var(--status-cautionary);
+	--color-status-cautionary-bg: var(--status-cautionary-bg);
+	--color-status-positive: var(--status-positive);
+	--color-status-positive-bg: var(--status-positive-bg);
+	--color-material-dimmer: var(--material-dimmer);
+	--color-party-dpk: var(--party-dpk);
+	--color-party-ppp: var(--party-ppp);
+
+	--font-sans: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+
+	/* ── Typography: Figma "Typography" layer 기반 ──
+	 * 사용법: text-{category}-{level} + font-{weight}
+	 * 예: <h1 className="text-heading-1 font-bold">
+	 *     <p className="text-body-2 font-medium">
+	 */
+
+	/* Display — 히어로, 대형 타이틀 */
+	--font-size-display-1: 3.5rem;
+	--line-height-display-1: 1.3;
+	--font-size-display-2: 2.5rem;
+	--line-height-display-2: 1.3;
+
+	/* Heading — 섹션 제목 */
+	--font-size-heading-1: 1.875rem;
+	--line-height-heading-1: 1.3;
+	--font-size-heading-2: 1.75rem;
+	--line-height-heading-2: 1.3;
+	--font-size-heading-3: 1.5rem;
+	--line-height-heading-3: 1.3;
+
+	/* Title — 카드/패널 제목 */
+	--font-size-title-1: 1.375rem;
+	--line-height-title-1: 1.4;
+	--font-size-title-2: 1.25rem;
+	--line-height-title-2: 1.4;
+	--font-size-title-3: 1.125rem;
+	--line-height-title-3: 1.4;
+	--font-size-title-4: 1rem;
+	--line-height-title-4: 1.4;
+
+	/* Body — 본문 (line-height 1.5로 가독성 확보) */
+	--font-size-body-1: 1.125rem;
+	--line-height-body-1: 1.5;
+	--font-size-body-2: 1rem;
+	--line-height-body-2: 1.5;
+	--font-size-body-3: 0.875rem;
+	--line-height-body-3: 1.5;
+
+	/* Label — 폼 라벨, 버튼 텍스트 */
+	--font-size-label-1: 1.25rem;
+	--line-height-label-1: 1.3;
+	--font-size-label-2: 1.125rem;
+	--line-height-label-2: 1.3;
+	--font-size-label-3: 1rem;
+	--line-height-label-3: 1.3;
+	--font-size-label-4: 0.875rem;
+	--line-height-label-4: 1.3;
+
+	/* Caption — 보조 텍스트, 각주 */
+	--font-size-caption-1: 0.875rem;
+	--line-height-caption-1: 1.3;
+	--font-size-caption-2: 0.75rem;
+	--line-height-caption-2: 1.3;
+	--font-size-caption-3: 0.6875rem;
+	--line-height-caption-3: 1.3;
 	--color-map-fill: var(--map-fill);
 	--color-map-fill-hover: var(--map-fill-hover);
 	--color-map-fill-selected: var(--map-fill-selected);
@@ -53,37 +144,89 @@
 
 :root {
 	--radius: 0.625rem;
-	--background: oklch(1 0 0);
-	--foreground: oklch(0.145 0 0);
-	--card: oklch(1 0 0);
-	--card-foreground: oklch(0.145 0 0);
-	--popover: oklch(1 0 0);
-	--popover-foreground: oklch(0.145 0 0);
-	--primary: oklch(0.205 0 0);
-	--primary-foreground: oklch(0.985 0 0);
-	--secondary: oklch(0.97 0 0);
-	--secondary-foreground: oklch(0.205 0 0);
-	--muted: oklch(0.97 0 0);
-	--muted-foreground: oklch(0.556 0 0);
-	--accent: oklch(0.97 0 0);
-	--accent-foreground: oklch(0.205 0 0);
-	--destructive: oklch(0.577 0.245 27.325);
-	--border: oklch(0.922 0 0);
-	--input: oklch(0.922 0 0);
-	--ring: oklch(0.708 0 0);
-	--chart-1: oklch(0.646 0.222 41.116);
-	--chart-2: oklch(0.6 0.118 184.704);
-	--chart-3: oklch(0.398 0.07 227.392);
-	--chart-4: oklch(0.828 0.189 84.429);
-	--chart-5: oklch(0.769 0.188 70.08);
-	--sidebar: oklch(0.985 0 0);
-	--sidebar-foreground: oklch(0.145 0 0);
-	--sidebar-primary: oklch(0.205 0 0);
-	--sidebar-primary-foreground: oklch(0.985 0 0);
-	--sidebar-accent: oklch(0.97 0 0);
-	--sidebar-accent-foreground: oklch(0.205 0 0);
-	--sidebar-border: oklch(0.922 0 0);
-	--sidebar-ring: oklch(0.708 0 0);
+
+	/* ── shadcn 호환 변수 (Figma 값으로 매핑) ── */
+	--background: #FFFFFF;                       /* Background/Normal */
+	--foreground: #111827;                       /* Label/Strong */
+	--card: #FFFFFF;                             /* Background/Normal */
+	--card-foreground: #111827;                  /* Label/Strong */
+	--popover: #FFFFFF;                          /* Background/Normal */
+	--popover-foreground: #111827;               /* Label/Strong */
+	--primary: #6B5CFF;                          /* Primary/Normal (Violet/500) */
+	--primary-foreground: #FFFFFF;               /* Static/White */
+	--secondary: #F1F3F7;                        /* Background/Alternative */
+	--secondary-foreground: #111827;             /* Label/Strong */
+	--muted: #F1F3F7;                            /* Background/Alternative */
+	--muted-foreground: #6B7280;                 /* Label/Neutral */
+	--accent: #F1F3F7;                           /* Background/Alternative */
+	--accent-foreground: #111827;                /* Label/Strong */
+	--destructive: #FF4242;                      /* Status/Negative */
+	--border: rgba(107, 114, 128, 0.22);         /* Line/Normal */
+	--input: rgba(107, 114, 128, 0.16);          /* Line/Neutral */
+	--ring: #6B5CFF;                             /* Primary/Normal */
+	--chart-1: #6B5CFF;                          /* Primary/Normal */
+	--chart-2: #0065F4;                          /* Party/DPK */
+	--chart-3: #FF2B3A;                          /* Party/PPP */
+	--chart-4: #FF9200;                          /* Status/Cautionary */
+	--chart-5: #00BF40;                          /* Status/Positive */
+	--sidebar: #FFFFFF;                          /* Background/Normal */
+	--sidebar-foreground: #111827;               /* Label/Strong */
+	--sidebar-primary: #6B5CFF;                  /* Primary/Normal */
+	--sidebar-primary-foreground: #FFFFFF;       /* Static/White */
+	--sidebar-accent: #F1F3F7;                   /* Background/Alternative */
+	--sidebar-accent-foreground: #111827;        /* Label/Strong */
+	--sidebar-border: rgba(107, 114, 128, 0.16); /* Line/Neutral */
+	--sidebar-ring: #6B5CFF;                     /* Primary/Normal */
+
+	/* ── Figma Semantic Tokens ── */
+
+	/* Primary 변형 */
+	--primary-strong: #5736F5;                   /* Violet/600 */
+	--primary-heavy: #4B2AD8;                    /* Violet/700 */
+
+	/* Label (텍스트 색상 계층) */
+	--label-strong: #111827;                     /* Cool Neutral/100 */
+	--label-normal: #374151;                     /* Cool Neutral/80 */
+	--label-neutral: #6B7280;                    /* Cool Neutral/60 */
+	--label-alternative: #9CA3AF;                /* Cool Neutral/50 */
+	--label-assistive: #C2C7D2;                  /* Cool Neutral/40 */
+	--label-disabled: #D1D5DB;                   /* Cool Neutral/30 */
+	--label-inverse: #FFFFFF;                    /* Cool Neutral/0 */
+
+	/* Background */
+	--background-alt: #F1F3F7;                   /* Cool Neutral/10 */
+
+	/* Line (구분선) */
+	--line-normal: rgba(107, 114, 128, 0.22);    /* #6B7280 @ 22% */
+	--line-neutral: rgba(107, 114, 128, 0.16);   /* #6B7280 @ 16% */
+	--line-alt: rgba(107, 114, 128, 0.08);       /* #6B7280 @ 8% */
+
+	/* Fill (표면 채움) */
+	--fill-normal: rgba(107, 114, 128, 0.08);    /* #6B7280 @ 8% */
+	--fill-strong: rgba(107, 114, 128, 0.16);    /* #6B7280 @ 16% */
+	--fill-alt: rgba(107, 114, 128, 0.05);       /* #6B7280 @ 5% */
+	--fill-disabled: #f7f8fa;                    /* Disabled Background */
+
+	/* Interaction */
+	--interaction-inactive: #9CA3AF;             /* Cool Neutral/50 */
+	--interaction-disabled: #F1F3F7;             /* Cool Neutral/10 */
+
+	/* Status */
+	--status-negative: #FF4242;
+	--status-negative-bg: #FFECEC;
+	--status-cautionary: #FF9200;
+	--status-cautionary-bg: #FFF4E5;
+	--status-positive: #00BF40;
+	--status-positive-bg: #E5F9EC;
+
+	/* Material */
+	--material-dimmer: rgba(17, 24, 39, 0.5);   /* #111827 @ 50% */
+
+	/* Party (정당 컬러) */
+	--party-dpk: #0065F4;                        /* DPK/500 — 더불어민주당 */
+	--party-ppp: #FF2B3A;                        /* PPP/500 — 국민의힘 */
+
+	/* Map (지도 전용 — oklch) */
 	--map-fill: 0.92 0.02 250;
 	--map-fill-hover: 0.75 0.1 250;
 	--map-fill-selected: 0.65 0.15 250;
@@ -104,26 +247,27 @@
 	--secondary: oklch(0.269 0 0);
 	--secondary-foreground: oklch(0.985 0 0);
 	--muted: oklch(0.269 0 0);
-	--muted-foreground: oklch(0.708 0 0);
+	--muted-foreground: oklch(0.715 0 0);
 	--accent: oklch(0.269 0 0);
 	--accent-foreground: oklch(0.985 0 0);
-	--destructive: oklch(0.704 0.191 22.216);
-	--border: oklch(1 0 0 / 10%);
-	--input: oklch(1 0 0 / 15%);
+	--destructive: oklch(0.577 0.215 27.325);
+	--border: oklch(0.269 0 0);
+	--input: oklch(0.321 0 0);
 	--ring: oklch(0.556 0 0);
-	--chart-1: oklch(0.488 0.243 264.376);
-	--chart-2: oklch(0.696 0.17 162.48);
-	--chart-3: oklch(0.769 0.188 70.08);
-	--chart-4: oklch(0.627 0.265 303.9);
-	--chart-5: oklch(0.645 0.246 16.439);
+	--chart-1: oklch(0.623 0.188 259.815);
+	--chart-2: oklch(0.773 0.153 163.223);
+	--chart-3: oklch(0.781 0.127 57.856);
+	--chart-4: oklch(0.709 0.159 293.541);
+	--chart-5: oklch(0.711 0.166 22.216);
 	--sidebar: oklch(0.205 0 0);
 	--sidebar-foreground: oklch(0.985 0 0);
-	--sidebar-primary: oklch(0.488 0.243 264.376);
+	--sidebar-primary: oklch(0.623 0.188 259.815);
 	--sidebar-primary-foreground: oklch(0.985 0 0);
 	--sidebar-accent: oklch(0.269 0 0);
 	--sidebar-accent-foreground: oklch(0.985 0 0);
-	--sidebar-border: oklch(1 0 0 / 10%);
+	--sidebar-border: oklch(0.269 0 0);
 	--sidebar-ring: oklch(0.556 0 0);
+
 	--map-fill: 0.35 0.05 250;
 	--map-fill-hover: 0.55 0.12 250;
 	--map-fill-selected: 0.65 0.15 250;
