@@ -4,11 +4,16 @@ import * as topojson from "topojson-client";
 /** TopoJSON 오브젝트명 (시도/선거구 모두 동일) */
 const TOPOJSON_OBJECT_KEY = "2024_22_Elec_simplify";
 
+/** 읍면동 TopoJSON 오브젝트명 */
+const EMD_TOPOJSON_OBJECT_KEY = "emd";
+
 interface TopoJsonDataState {
 	/** 시도 GeoJSON FeatureCollection */
 	sidoFeatures: GeoJSON.FeatureCollection | null;
 	/** 선거구 GeoJSON FeatureCollection */
 	constituencyFeatures: GeoJSON.FeatureCollection | null;
+	/** 읍면동 GeoJSON FeatureCollection */
+	emdFeatures: GeoJSON.FeatureCollection | null;
 	/** 로딩 중 여부 */
 	isLoading: boolean;
 	/** 에러 메시지 */
@@ -19,14 +24,16 @@ interface TopoJsonDataState {
  * TopoJSON 데이터를 동적 import로 지연 로딩하는 훅
  *
  * @description
- * - 초기 번들에서 ~307KB(시도+선거구 TopoJSON)를 제거
+ * - 초기 번들에서 TopoJSON 데이터를 제거
  * - Vite의 dynamic import → 별도 chunk로 분리
  * - 한 번 로드 후 모듈 캐시에 유지 (재요청 없음)
+ * - Phase 4: 읍면동 데이터 추가 (3파일 동시 로딩)
  */
 export function useTopoJsonData(): TopoJsonDataState {
 	const [state, setState] = useState<TopoJsonDataState>({
 		sidoFeatures: null,
 		constituencyFeatures: null,
+		emdFeatures: null,
 		isLoading: true,
 		error: null,
 	});
@@ -36,12 +43,14 @@ export function useTopoJsonData(): TopoJsonDataState {
 
 		async function load() {
 			try {
-				const [sidoModule, constituencyModule] = await Promise.all([
-					import("@/features/region/data/sido.topojson.json"),
-					import(
-						"@/features/region/data/constituencies.topojson.json"
-					),
-				]);
+				const [sidoModule, constituencyModule, emdModule] =
+					await Promise.all([
+						import("@/features/region/data/sido.topojson.json"),
+						import(
+							"@/features/region/data/constituencies.topojson.json"
+						),
+						import("@/features/region/data/emd.topojson.json"),
+					]);
 
 				if (cancelled) return;
 
@@ -49,6 +58,8 @@ export function useTopoJsonData(): TopoJsonDataState {
 				const sidoTopo = sidoModule.default as any;
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				const constituencyTopo = constituencyModule.default as any;
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				const emdTopo = emdModule.default as any;
 
 				const sidoFeatures = topojson.feature(
 					sidoTopo,
@@ -60,9 +71,15 @@ export function useTopoJsonData(): TopoJsonDataState {
 					constituencyTopo.objects[TOPOJSON_OBJECT_KEY],
 				) as unknown as GeoJSON.FeatureCollection;
 
+				const emdFeatures = topojson.feature(
+					emdTopo,
+					emdTopo.objects[EMD_TOPOJSON_OBJECT_KEY],
+				) as unknown as GeoJSON.FeatureCollection;
+
 				setState({
 					sidoFeatures,
 					constituencyFeatures,
+					emdFeatures,
 					isLoading: false,
 					error: null,
 				});
@@ -71,6 +88,7 @@ export function useTopoJsonData(): TopoJsonDataState {
 				setState({
 					sidoFeatures: null,
 					constituencyFeatures: null,
+					emdFeatures: null,
 					isLoading: false,
 					error:
 						err instanceof Error

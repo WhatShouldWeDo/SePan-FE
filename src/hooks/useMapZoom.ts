@@ -1,6 +1,7 @@
 import { useRef, useEffect, useCallback, useState } from "react";
 import { zoom, zoomIdentity, type ZoomBehavior } from "d3-zoom";
 import { select } from "d3-selection";
+import "d3-transition"; // Selection.prototype.transition() 활성화
 
 /** 줌 범위 제한 */
 const MIN_ZOOM = 1;
@@ -8,6 +9,9 @@ const MAX_ZOOM = 8;
 
 /** 줌 버튼 클릭 시 확대/축소 비율 */
 const ZOOM_STEP = 1.5;
+
+/** 줌 리셋 smooth 전환 시간 (ms) */
+const SMOOTH_ZOOM_DURATION = 400;
 
 interface UseMapZoomReturn {
 	/** SVG 요소에 연결할 callback ref */
@@ -20,8 +24,10 @@ interface UseMapZoomReturn {
 	zoomIn: () => void;
 	/** 축소 */
 	zoomOut: () => void;
-	/** 줌 리셋 (1x) */
+	/** 줌 리셋 (1x, 즉시) */
 	zoomReset: () => void;
+	/** 줌 리셋 (1x, 부드러운 전환) */
+	smoothZoomReset: () => void;
 }
 
 /**
@@ -84,20 +90,34 @@ export function useMapZoom(enabled: boolean = true): UseMapZoomReturn {
 		};
 	}, [enabled, svgNode]);
 
-	// 뷰포트 중심 기준 확대 — d3-zoom의 scaleBy가 자동으로 중심점 계산
+	// 뷰포트 중심 기준 확대 — smooth transition 적용
 	const zoomIn = useCallback(() => {
 		if (!svgNode || !zoomBehaviorRef.current) return;
-		zoomBehaviorRef.current.scaleBy(select(svgNode), ZOOM_STEP);
+		select(svgNode)
+			.transition()
+			.duration(SMOOTH_ZOOM_DURATION)
+			.call(zoomBehaviorRef.current.scaleBy, ZOOM_STEP);
 	}, [svgNode]);
 
 	const zoomOut = useCallback(() => {
 		if (!svgNode || !zoomBehaviorRef.current) return;
-		zoomBehaviorRef.current.scaleBy(select(svgNode), 1 / ZOOM_STEP);
+		select(svgNode)
+			.transition()
+			.duration(SMOOTH_ZOOM_DURATION)
+			.call(zoomBehaviorRef.current.scaleBy, 1 / ZOOM_STEP);
 	}, [svgNode]);
 
 	const zoomReset = useCallback(() => {
 		if (!svgNode || !zoomBehaviorRef.current) return;
 		zoomBehaviorRef.current.transform(select(svgNode), zoomIdentity);
+	}, [svgNode]);
+
+	const smoothZoomReset = useCallback(() => {
+		if (!svgNode || !zoomBehaviorRef.current) return;
+		select(svgNode)
+			.transition()
+			.duration(SMOOTH_ZOOM_DURATION)
+			.call(zoomBehaviorRef.current.transform, zoomIdentity);
 	}, [svgNode]);
 
 	return {
@@ -107,5 +127,6 @@ export function useMapZoom(enabled: boolean = true): UseMapZoomReturn {
 		zoomIn,
 		zoomOut,
 		zoomReset,
+		smoothZoomReset,
 	};
 }
