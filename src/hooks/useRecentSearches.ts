@@ -10,6 +10,8 @@ interface RecentSearch {
 	sido: string;
 	/** 선거구 코드 (시도만이면 null) */
 	constituencyCode: string | null;
+	/** 읍면동 코드 (읍면동까지 선택된 경우) */
+	emdCode?: string | null;
 }
 
 function loadFromStorage(): RecentSearch[] {
@@ -46,11 +48,12 @@ export function useRecentSearches() {
 
 	const addRecentSearch = useCallback((item: RecentSearch) => {
 		setRecentSearches((prev) => {
-			// 중복 제거 (sido + constituencyCode 기준)
+			// 중복 제거 (sido + constituencyCode + emdCode 기준)
 			const filtered = prev.filter(
 				(s) =>
 					s.sido !== item.sido ||
-					s.constituencyCode !== item.constituencyCode,
+					s.constituencyCode !== item.constituencyCode ||
+					s.emdCode !== item.emdCode,
 			);
 			const updated = [item, ...filtered].slice(0, MAX_ITEMS);
 			saveToStorage(updated);

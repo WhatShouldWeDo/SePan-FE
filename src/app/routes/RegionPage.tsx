@@ -16,7 +16,7 @@ export function RegionPage() {
 		useState<SearchSelectedRegion | null>(null);
 
 	// 동적 로딩된 데이터를 RegionSearch에도 전달
-	const { constituencyFeatures } = useTopoJsonData();
+	const { constituencyFeatures, emdFeatures } = useTopoJsonData();
 
 	const handleRegionSelect = useCallback((region: MapRegion) => {
 		setSelected(region);
@@ -48,6 +48,7 @@ export function RegionPage() {
 					<RegionSearch
 						onSelect={handleSearchSelect}
 						constituencyFeatures={constituencyFeatures}
+						emdFeatures={emdFeatures}
 					/>
 
 					{/* 반응형: max-width 제한 + 중앙 정렬, SVG viewBox로 비율 유지 */}
