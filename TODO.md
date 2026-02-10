@@ -50,13 +50,15 @@
 ### 1-5. 지역분석
 - [x] RegionPage (메인 - placeholder)
 - [x] RegionResultPage (결과 - placeholder)
+- [x] KoreaConstituencyMap (3단계 폴리곤 지도: 시도 → 선거구 → 읍면동)
+  - **Phase 1.2~4 완료** (2-4 섹션 참조)
+  - 드릴다운 + 검색 + Choropleth + 줌/팬 + 모바일 터치 + 전환 애니메이션
 - [ ] RegionSelector 컴포넌트
 - [ ] IndicatorCategoryTabs (인구, 민원, 예산 등)
 - [ ] CurrentStatusSection (현재값, 전년 대비, 전국 평균)
 - [ ] TrendChart (Recharts 연도별 추이)
 - [ ] AdjacentComparisonSection (인접 지역 비교 테이블 + 바 차트)
 - [ ] AiInsightSection (목업)
-- [ ] MapView 추상화 인터페이스 (목업)
 - [ ] 상세 리포트 CTA (비활성 버튼)
 
 ### 1-6. 정책개발
@@ -109,11 +111,54 @@
 - [ ] LineChart 컴포넌트 인터페이스 정의 (data, xLabel, yLabel)
 - [ ] BarChart 컴포넌트 인터페이스 정의 (data, horizontal)
 - [ ] Recharts wrapper 구현 (실제 렌더링)
+> **참고**: 지도 컴포넌트는 Phase 1.2~4에서 완료되었습니다 (섹션 2-4 참조)
 
-### 2-4. 맵 컴포넌트 추상화 ⭐ 최우선
-- [ ] Region 타입 정의 (id, name, coordinates)
-- [ ] MapView 컴포넌트 인터페이스 정의 (regions, selectedRegion, onRegionSelect)
-- [ ] MapView 목업 구현 (실제 폴리곤 없이 리스트/카드 형태)
+### 2-4. 맵 컴포넌트 (Phase 1.2~4 완료) ⭐ 최우선
+#### Phase 1.2: 폴리곤 지도 기본 구현 (2026-02-10)
+- [x] 패키지 설치 (d3-geo, topojson-client, mapshaper)
+- [x] 22대 선거구 TopoJSON 데이터 준비 (254개, constituencies.topojson.json)
+- [x] 맵 타입 정의 (MapRegion, MapConfig, HoveredRegion) - src/types/map.ts
+- [x] 맵 테마 정의 (map-theme.ts, CSS 변수)
+- [x] useProjection 훅 (D3 geoMercator + fitExtent)
+- [x] RegionPolygon 컴포넌트 (개별 폴리곤, React.memo)
+- [x] MapTooltip 컴포넌트 (hover 툴팁)
+- [x] MapSkeleton 컴포넌트 (로딩 스켈레톤)
+- [x] KoreaConstituencyMap 컴포넌트 (메인 지도)
+- [x] RegionPage에 KoreaConstituencyMap 적용
+
+#### Phase 2: 드릴다운 + 검색 (2026-02-10)
+- [x] 시도 TopoJSON 생성 (17개, mapshaper dissolve) - sido.topojson.json
+- [x] 타입 확장 (MapLevel, SearchSelectedRegion, enableDrillDown)
+- [x] sido-utils.ts (시도 이름 매핑)
+- [x] useMapDrillDown 훅 (시도→선거구 2단계 상태 관리)
+- [x] useRecentSearches 훅 (localStorage 최근 검색어)
+- [x] MapBreadcrumb 컴포넌트 (드릴다운 내비게이션)
+- [x] RegionSearch 컴포넌트 (이름 기반 검색)
+- [x] KoreaConstituencyMap 드릴다운 통합
+
+#### Phase 3: 지도 고도화 (2026-02-10)
+- [x] useTopoJsonData 훅 (동적 로딩, 번들 분리)
+- [x] hangul-utils.ts (초성 검색)
+- [x] choropleth-utils.ts (OKLCH 보간, 색상 스케일)
+- [x] MapLegend 컴포넌트 (Choropleth 범례)
+- [x] useMapZoom 훅 (d3-zoom, 줌/팬)
+- [x] MapZoomControls 컴포넌트 (줌 UI)
+- [x] useLongPress 훅 (모바일 롱프레스)
+- [x] RegionPolygon pointer 이벤트 + touch-action 적용
+- [x] 패키지 추가 (d3-zoom, d3-selection)
+
+#### Phase 4: 읍면동 3단계 + 애니메이션 (2026-02-10)
+- [x] 읍면동 TopoJSON 준비 (3,558개, 1.1MB, emd.topojson.json)
+- [x] 선거구 코드 공간 조인 (mapshaper largest-overlap)
+- [x] 타입 확장 (MapLevel + eupMyeonDong, SearchSelectedRegion + emdCode)
+- [x] useTopoJsonData 확장 (emdFeatures 로딩)
+- [x] useMapDrillDown 확장 (3단계 상태, EMD 필터링)
+- [x] useMapTransition 훅 (fade 애니메이션)
+- [x] useMapZoom smoothZoomReset 추가
+- [x] MapBreadcrumb 3단계 확장
+- [x] RegionSearch 읍면동 검색 추가
+- [x] KoreaConstituencyMap 3단계 통합 + 전환 애니메이션
+- [x] 패키지 추가 (d3-transition)
 
 ### 2-5. 대시보드 카드 시스템 (일부만 선행 개발)
 - [ ] SummaryCard 컴포넌트 (title, value, subtitle, trend, icon)
@@ -135,6 +180,20 @@
 - [ ] ~~PolicyCard 컴포넌트~~ → 기획 확정 후
 - [ ] ~~PolicyList 컴포넌트~~ → 기획 확정 후
 - [ ] ~~PolicyFilters 컴포넌트~~ → 기획 확정 후
+
+### 2-8. 디자인 토큰 파이프라인 (Figma → 코드)
+- [x] design-tokens/ 디렉터리 구조 생성
+- [x] 샘플 tokens.json 작성 (Tokens Studio 포맷)
+- [x] design-tokens/transform.mjs 변환 스크립트 작성 (hex → oklch)
+- [x] culori, @svgr/cli devDependency 설치
+- [x] npm scripts 등록 (tokens:transform, icons:generate)
+- [x] src/index.css 토큰 변환 적용 (색상 oklch + 타이포그래피 변수)
+- [x] 커스텀 아이콘 시스템 구조 생성 (src/components/icons/)
+- [x] design-tokens/README.md 토큰 업데이트 가이드 작성
+- [ ] Figma Tokens Studio 설정 (디자이너 작업)
+- [ ] 실제 Figma 디자인 시스템 토큰으로 tokens.json 교체
+- [ ] 컴포넌트 매핑표 작성 (Figma ↔ 코드)
+- [ ] Figma와 코드 시각적 차이 감사(Audit)
 
 ---
 
@@ -305,6 +364,12 @@
 | 2026-02-09 | UI 컴포넌트: shadcn/ui 도입 확정 |
 | 2026-02-09 | Tailwind v4 + @tailwindcss/vite 사용 |
 | 2026-02-09 | **테스트 자동화**: 기획 확정 후로 미룸 (Phase 1.5) — 기획 변경 시 테스트 코드도 수정해야 하므로 작업 효율을 위해 후순위로 결정 |
+| 2026-02-10 | **지도 라이브러리**: D3 Geo + TopoJSON 확정 (폴리곤 렌더링) |
+| 2026-02-10 | **지역 계층**: 시도(17) → 선거구(254) → 읍면동(3,558) 3단계 드릴다운 |
+| 2026-02-10 | **색상 체계**: OKLCH 색상 공간 사용 (CSS oklch() 호환, Choropleth 보간) |
+| 2026-02-10 | **검색**: 초성 검색 + 최근 검색어 (외부 라이브러리 없이 직접 구현) |
+| 2026-02-10 | **애니메이션**: Fade 전환 (400ms) — Path morphing 배제 (1:N 폴리곤 매핑 복잡성) |
+| 2026-02-10 | **d3-transition**: Phase 3에서 미설치 → Phase 4에서 도입 (레벨 전환 애니메이션 필요) |
 
 ---
 
@@ -317,6 +382,41 @@
 ---
 
 ## 이번 턴에서 완료한 작업
+
+### 디자인 토큰 파이프라인 구축 (2026-02-10)
+- [x] design-tokens/ 디렉터리 생성 (tokens.json, transform.mjs, README.md, icons/)
+- [x] Tokens Studio 포맷 샘플 tokens.json 작성 (light/dark 테마 색상, 타이포그래피, 간격, borderRadius)
+- [x] transform.mjs 변환 스크립트 작성
+  - hex → oklch 색상 변환 (culori 라이브러리)
+  - 타이포그래피 변수 생성 (--font-size-*, --line-height-*, --font-weight-*)
+  - --font-sans 폰트 패밀리 변수 추가 (Pretendard)
+  - 기존 --map-* 변수 보존 로직
+  - @layer base 블록 보존 로직
+- [x] culori, @svgr/cli devDependency 설치
+- [x] package.json에 npm scripts 추가 (tokens:transform, icons:generate)
+- [x] src/index.css 토큰 변환 적용 (28개 라이트 색상 + 28개 다크 색상 + 타이포그래피)
+- [x] src/components/icons/ 구조 생성 (index.ts barrel 파일)
+- [x] TypeScript 타입 체크 통과 (npx tsc --noEmit)
+- [x] 개발 서버 정상 작동 확인
+
+### Phase 1.2~4: 지도 컴포넌트 완료 (2026-02-10)
+- [x] Phase 1.2: 폴리곤 지도 기본 구현 (22대 선거구 254개)
+  - d3-geo, topojson-client, mapshaper 도입
+  - MapRegion, MapConfig, HoveredRegion 타입 정의
+  - useProjection 훅, RegionPolygon, MapTooltip, MapSkeleton, KoreaConstituencyMap 구현
+- [x] Phase 2: 시도→선거구 2단계 드릴다운 + 검색
+  - 시도 17개 dissolve, MapLevel/SearchSelectedRegion 타입 확장
+  - useMapDrillDown, MapBreadcrumb, RegionSearch, useRecentSearches 구현
+- [x] Phase 3: 지도 기능 고도화
+  - useTopoJsonData (동적 로딩), hangul-utils (초성 검색)
+  - choropleth-utils + MapLegend (데이터 시각화)
+  - d3-zoom, useMapZoom, MapZoomControls (줌/팬)
+  - useLongPress, pointer 이벤트 (모바일 터치)
+- [x] Phase 4: 읍면동 3단계 + 레벨 전환 애니메이션
+  - 읍면동 3,558개 TopoJSON (1.1MB, 공간 조인)
+  - 3단계 드릴다운 (시도→선거구→읍면동)
+  - d3-transition, useMapTransition (fade 400ms)
+  - smoothZoomReset (부드러운 줌 복귀)
 
 ### Phase 1.2 - Phase 4: Badge 컴포넌트 (2026-02-10)
 - [x] components/ui/badge.tsx - shadcn/ui Badge 컴포넌트 설치 (pnpm dlx shadcn@latest add badge)
