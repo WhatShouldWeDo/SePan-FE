@@ -1,23 +1,29 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
-import * as topojson from "topojson-client";
 import { geoArea } from "d3-geo";
 import { useProjection } from "@/hooks/useProjection";
 import {
 	useMapDrillDown,
 	sidoPropsToMapRegion,
 } from "@/hooks/useMapDrillDown";
+import { useTopoJsonData } from "@/hooks/useTopoJsonData";
+import { useMapZoom } from "@/hooks/useMapZoom";
+import { useLongPress } from "@/hooks/useLongPress";
 import { RegionPolygon } from "./RegionPolygon";
 import { MapTooltip } from "./MapTooltip";
 import { MapSkeleton } from "./MapSkeleton";
 import { MapBreadcrumb } from "./MapBreadcrumb";
+import { MapZoomControls } from "./MapZoomControls";
 import { cn } from "@/lib/utils";
+import { getChoroplethColor, buildLegendItems } from "@/lib/choropleth-utils";
+import { MapLegend } from "./MapLegend";
 import type {
 	MapRegion,
 	MapConfig,
 	HoveredRegion,
 	SearchSelectedRegion,
+	ChoroplethData,
+	ChoroplethConfig,
 } from "@/types/map";
-import topojsonData from "@/features/region/data/constituencies.topojson.json";
 
 export interface KoreaConstituencyMapProps {
 	/** 지도 설정 */
@@ -28,14 +34,15 @@ export interface KoreaConstituencyMapProps {
 	onRegionSelect?: (region: MapRegion) => void;
 	/** 검색 결과로 특정 지역으로 네비게이트 */
 	searchNavigation?: SearchSelectedRegion | null;
-	/** 로딩 상태 */
+	/** Choropleth 데이터 (Phase 3-C) */
+	choroplethData?: ChoroplethData | null;
+	/** Choropleth 설정 (Phase 3-C) */
+	choroplethConfig?: ChoroplethConfig | null;
+	/** 로딩 상태 (외부 데이터) */
 	isLoading?: boolean;
 	/** 추가 className */
 	className?: string;
 }
-
-/** TopoJSON 오브젝트명 */
-const TOPOJSON_OBJECT_KEY = "2024_22_Elec_simplify";
 
 /** 시도 레벨 라벨 면적 임계값 (시도는 크므로 거의 모두 표시) */
 const SIDO_LABEL_AREA_THRESHOLD = 1e-5;
@@ -43,18 +50,26 @@ const SIDO_LABEL_AREA_THRESHOLD = 1e-5;
 /** 선거구 레벨 라벨 면적 임계값 */
 const CONSTITUENCY_LABEL_AREA_THRESHOLD = 5e-7;
 
+/** 줌 레벨 2x 이상에서만 선거구 라벨 표시 (작은 폴리곤) */
+const ZOOM_LABEL_THRESHOLD = 2;
+
 /**
- * 22대 국회의원 선거구 폴리곤 지도 (시도 드릴다운 지원)
+ * 22대 국회의원 선거구 폴리곤 지도 (시도 드릴다운 + 줌/팬 지원)
  *
  * @description
  * - enableDrillDown=true (기본): 시도 → 선거구 2단계 드릴다운
  * - enableDrillDown=false: Phase 1.2 호환 단일 뷰
+ * - Phase 3-A: TopoJSON 동적 import로 초기 번들 ~307KB 감소
+ * - Phase 3-C: Choropleth 색상 매핑 + 범례
+ * - Phase 3-D: d3-zoom 기반 줌/팬 (1x~8x)
  */
 export function KoreaConstituencyMap({
 	config,
 	selectedCode,
 	onRegionSelect,
 	searchNavigation,
+	choroplethData = null,
+	choroplethConfig = null,
 	isLoading = false,
 	className,
 }: KoreaConstituencyMapProps) {
@@ -67,6 +82,14 @@ export function KoreaConstituencyMap({
 		enableDrillDown = true,
 	} = config ?? {};
 
+	// --- TopoJSON 동적 로딩 ---
+	const {
+		sidoFeatures,
+		constituencyFeatures,
+		isLoading: isDataLoading,
+		error: dataError,
+	} = useTopoJsonData();
+
 	// --- 드릴다운 모드 ---
 	const {
 		level,
@@ -75,7 +98,11 @@ export function KoreaConstituencyMap({
 		handleSidoSelect,
 		handleBackToNational,
 		navigateToSearchResult,
-	} = useMapDrillDown();
+	} = useMapDrillDown(sidoFeatures, constituencyFeatures);
+
+	// --- 줌/팬 (Phase 3-D) ---
+	const { svgRef, gRef, zoomLevel, zoomIn, zoomOut, zoomReset } =
+		useMapZoom();
 
 	// 검색 네비게이션 처리
 	useEffect(() => {
@@ -84,21 +111,22 @@ export function KoreaConstituencyMap({
 		}
 	}, [searchNavigation, enableDrillDown, navigateToSearchResult]);
 
+	// 레벨 전환 시 줌 리셋
+	useEffect(() => {
+		zoomReset();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [level, selectedSido]);
+
 	// --- 레거시 모드 (enableDrillDown=false) ---
 	const legacyFeatureCollection = useMemo(() => {
-		if (enableDrillDown) return null;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const topology = topojsonData as any;
-		return topojson.feature(
-			topology,
-			topology.objects[TOPOJSON_OBJECT_KEY],
-		) as unknown as GeoJSON.FeatureCollection;
-	}, [enableDrillDown]);
+		if (enableDrillDown || !constituencyFeatures) return null;
+		return constituencyFeatures;
+	}, [enableDrillDown, constituencyFeatures]);
 
 	// 현재 표시할 featureCollection
 	const featureCollection = enableDrillDown
 		? drillDownFeatureCollection
-		: legacyFeatureCollection!;
+		: (legacyFeatureCollection ?? drillDownFeatureCollection);
 
 	// 현재 레벨 (레거시 모드는 항상 constituency)
 	const currentLevel = enableDrillDown ? level : "constituency";
@@ -135,12 +163,14 @@ export function KoreaConstituencyMap({
 								fullName: props.SIDO_SGG,
 							};
 
+				const area = geoArea(f);
+
 				return {
 					pathD: pathGenerator(f) ?? "",
 					centroid: pathGenerator.centroid(f) as [number, number],
 					region,
-					showLabel:
-						showLabels && geoArea(f) > effectiveThreshold,
+					area,
+					showLabel: showLabels && area > effectiveThreshold,
 				};
 			}),
 		[
@@ -157,7 +187,6 @@ export function KoreaConstituencyMap({
 	const [tooltip, setTooltip] = useState<HoveredRegion | null>(null);
 
 	// 레벨 전환 시 hover 상태 초기화 (렌더 중 상태 조정 패턴)
-	// https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
 	const viewKey = `${currentLevel}-${selectedSido}`;
 	const [prevViewKey, setPrevViewKey] = useState(viewKey);
 	if (prevViewKey !== viewKey) {
@@ -167,7 +196,10 @@ export function KoreaConstituencyMap({
 	}
 
 	const handleHover = useCallback(
-		(region: MapRegion | null, e: React.MouseEvent) => {
+		(region: MapRegion | null, e: React.PointerEvent) => {
+			// 터치에서는 hover 무시 (longpress로 대체, Phase 3-E)
+			if (e.pointerType === "touch") return;
+
 			if (!region) {
 				setHoveredCode(null);
 				setTooltip(null);
@@ -178,6 +210,31 @@ export function KoreaConstituencyMap({
 		},
 		[],
 	);
+
+	// 롱프레스로 터치 툴팁 표시 (Phase 3-E)
+	const handleLongPressCallback = useCallback(
+		(x: number, y: number) => {
+			const elem = document.elementFromPoint(x, y);
+			if (!elem) return;
+
+			const pathElem = elem.closest("path");
+			if (!pathElem) return;
+
+			const d = pathElem.getAttribute("d") ?? "";
+			const matched = regionData.find((r) => r.pathD === d);
+			if (matched) {
+				setTooltip({
+					region: matched.region,
+					position: { x, y },
+				});
+				// 3초 후 자동 닫기
+				setTimeout(() => setTooltip(null), 3000);
+			}
+		},
+		[regionData],
+	);
+
+	const longPress = useLongPress(handleLongPressCallback);
 
 	const handleClick = useCallback(
 		(region: MapRegion) => {
@@ -190,6 +247,27 @@ export function KoreaConstituencyMap({
 		[enableDrillDown, currentLevel, handleSidoSelect, onRegionSelect],
 	);
 
+	// Choropleth 색상 맵 (Phase 3-C)
+	const choroplethColorMap = useMemo(() => {
+		if (!choroplethData || !choroplethConfig) return null;
+		const map: Record<string, string> = {};
+		for (const code of Object.keys(choroplethData.values)) {
+			const color = getChoroplethColor(
+				code,
+				choroplethData,
+				choroplethConfig,
+			);
+			if (color) map[code] = color;
+		}
+		return map;
+	}, [choroplethData, choroplethConfig]);
+
+	// Choropleth 범례 항목
+	const legendItems = useMemo(() => {
+		if (!choroplethData || !choroplethConfig) return [];
+		return buildLegendItems(choroplethData, choroplethConfig);
+	}, [choroplethData, choroplethConfig]);
+
 	// 검색 결과 하이라이트 코드
 	const searchHighlightCode =
 		enableDrillDown &&
@@ -198,9 +276,18 @@ export function KoreaConstituencyMap({
 			? searchNavigation.constituencyCode
 			: null;
 
-	// 로딩 상태
-	if (isLoading) {
+	// 로딩 상태 (외부 + 데이터 로딩)
+	if (isLoading || isDataLoading) {
 		return <MapSkeleton width={width} height={height} />;
+	}
+
+	// 에러 상태
+	if (dataError) {
+		return (
+			<div className="flex items-center justify-center rounded-lg border border-destructive/20 bg-destructive/5 p-8 text-base text-destructive">
+				지도 데이터를 불러오지 못했습니다: {dataError}
+			</div>
+		);
 	}
 
 	const ariaLabel =
@@ -218,29 +305,73 @@ export function KoreaConstituencyMap({
 				/>
 			)}
 			<svg
+				ref={svgRef}
 				width={width}
 				height={height}
 				viewBox={`0 0 ${width} ${height}`}
 				role="img"
 				aria-label={ariaLabel}
+				style={{ cursor: zoomLevel > 1 ? "grab" : undefined }}
+				onPointerDown={longPress.onPointerDown}
+				onPointerMove={longPress.onPointerMove}
+				onPointerUp={longPress.onPointerUp}
+				onPointerCancel={longPress.onPointerUp}
 			>
-				{regionData.map(({ region, pathD, centroid, showLabel }) => (
-					<RegionPolygon
-						key={region.code}
-						pathD={pathD}
-						centroid={centroid}
-						region={region}
-						isHovered={hoveredCode === region.code}
-						isSelected={
-							selectedCode === region.code ||
-							searchHighlightCode === region.code
-						}
-						showLabel={showLabel}
-						onHover={handleHover}
-						onClick={handleClick}
-					/>
-				))}
+				<g ref={gRef}>
+					{regionData.map(
+						({ region, pathD, centroid, showLabel, area }) => {
+							// 줌 레벨에 따른 라벨 표시 조정:
+							// - 기본적으로 숨겨진 작은 폴리곤도 줌 2x 이상이면 표시
+							const zoomAdjustedShowLabel =
+								showLabel ||
+								(showLabels &&
+									zoomLevel >= ZOOM_LABEL_THRESHOLD &&
+									area >
+										effectiveThreshold /
+											(zoomLevel * zoomLevel));
+
+							return (
+								<RegionPolygon
+									key={region.code}
+									pathD={pathD}
+									centroid={centroid}
+									region={region}
+									isHovered={hoveredCode === region.code}
+									isSelected={
+										selectedCode === region.code ||
+										searchHighlightCode === region.code
+									}
+									showLabel={zoomAdjustedShowLabel}
+									fillOverride={
+										choroplethColorMap?.[region.code] ??
+										null
+									}
+									onHover={handleHover}
+									onClick={handleClick}
+								/>
+							);
+						},
+					)}
+				</g>
 			</svg>
+			{/* 줌 컨트롤 (Phase 3-D) */}
+			<div className="absolute bottom-4 left-4">
+				<MapZoomControls
+					onZoomIn={zoomIn}
+					onZoomOut={zoomOut}
+					onZoomReset={zoomReset}
+					zoomLevel={zoomLevel}
+				/>
+			</div>
+			{/* Choropleth 범례 (Phase 3-C) */}
+			{choroplethConfig && legendItems.length > 0 && (
+				<div className="absolute bottom-4 right-4">
+					<MapLegend
+						title={choroplethConfig.legendTitle}
+						items={legendItems}
+					/>
+				</div>
+			)}
 			<MapTooltip hovered={tooltip} />
 		</div>
 	);

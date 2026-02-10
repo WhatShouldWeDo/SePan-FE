@@ -1,12 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
-import * as topojson from "topojson-client";
 import type { MapLevel, SearchSelectedRegion } from "@/types/map";
-import sidoTopojsonData from "@/features/region/data/sido.topojson.json";
-import constituencyTopojsonData from "@/features/region/data/constituencies.topojson.json";
 import { getSidoFullName } from "@/lib/sido-utils";
-
-/** TopoJSON 오브젝트명 (시도/선거구 모두 동일) */
-const TOPOJSON_OBJECT_KEY = "2024_22_Elec_simplify";
 
 export interface UseMapDrillDownReturn {
 	level: MapLevel;
@@ -17,6 +11,12 @@ export interface UseMapDrillDownReturn {
 	navigateToSearchResult: (result: SearchSelectedRegion) => void;
 }
 
+/** 빈 FeatureCollection (데이터 로딩 전 폴백) */
+const EMPTY_FC: GeoJSON.FeatureCollection = {
+	type: "FeatureCollection",
+	features: [],
+};
+
 /**
  * 시도 ↔ 선거구 드릴다운 상태 관리 훅
  *
@@ -24,47 +24,35 @@ export interface UseMapDrillDownReturn {
  * - 시도 뷰: 17개 시도 폴리곤 (dissolve 결과)
  * - 선거구 뷰: 선택된 시도의 선거구만 필터링
  * - useProjection이 featureCollection에 자동 fitExtent하므로 별도 뷰포트 계산 불필요
+ * - Phase 3-A: 데이터를 외부에서 주입받아 동적 import와 호환
+ *
+ * @param sidoFeatures - 시도 GeoJSON (null이면 빈 컬렉션 사용)
+ * @param constituencyFeatures - 선거구 GeoJSON (null이면 빈 컬렉션 사용)
  */
-export function useMapDrillDown(): UseMapDrillDownReturn {
+export function useMapDrillDown(
+	sidoFeatures: GeoJSON.FeatureCollection | null,
+	constituencyFeatures: GeoJSON.FeatureCollection | null,
+): UseMapDrillDownReturn {
 	const [level, setLevel] = useState<MapLevel>("sido");
 	const [selectedSido, setSelectedSido] = useState<string | null>(null);
 
-	// 시도 GeoJSON (한 번만 변환)
-	const sidoFeatureCollection = useMemo(() => {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const topology = sidoTopojsonData as any;
-		return topojson.feature(
-			topology,
-			topology.objects[TOPOJSON_OBJECT_KEY],
-		) as unknown as GeoJSON.FeatureCollection;
-	}, []);
-
-	// 선거구 전체 GeoJSON (한 번만 변환)
-	const allConstituencyFeatureCollection = useMemo(() => {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const topology = constituencyTopojsonData as any;
-		return topojson.feature(
-			topology,
-			topology.objects[TOPOJSON_OBJECT_KEY],
-		) as unknown as GeoJSON.FeatureCollection;
-	}, []);
+	const sidoFC = sidoFeatures ?? EMPTY_FC;
+	const allConstituencyFC = constituencyFeatures ?? EMPTY_FC;
 
 	// 선택된 시도의 선거구만 필터링
 	const filteredConstituencyFeatureCollection = useMemo(() => {
-		if (!selectedSido) return allConstituencyFeatureCollection;
+		if (!selectedSido) return allConstituencyFC;
 		return {
 			type: "FeatureCollection" as const,
-			features: allConstituencyFeatureCollection.features.filter(
+			features: allConstituencyFC.features.filter(
 				(f) => f.properties?.SIDO === selectedSido,
 			),
 		};
-	}, [allConstituencyFeatureCollection, selectedSido]);
+	}, [allConstituencyFC, selectedSido]);
 
 	// 현재 레벨에 따른 featureCollection
 	const featureCollection =
-		level === "sido"
-			? sidoFeatureCollection
-			: filteredConstituencyFeatureCollection;
+		level === "sido" ? sidoFC : filteredConstituencyFeatureCollection;
 
 	const handleSidoSelect = useCallback((sido: string) => {
 		setSelectedSido(sido);
