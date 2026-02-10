@@ -54,3 +54,37 @@ export interface HoveredRegion {
 	region: MapRegion;
 	position: { x: number; y: number };
 }
+
+// --- Choropleth (Phase 3-C) ---
+
+/** Choropleth 지도에 사용할 데이터 */
+export interface ChoroplethData {
+	/** 지역 코드 → 수치 값 매핑 */
+	values: Record<string, number>;
+	/** 데이터 최솟값 (자동 계산 대신 직접 지정 가능) */
+	min?: number;
+	/** 데이터 최댓값 (자동 계산 대신 직접 지정 가능) */
+	max?: number;
+}
+
+/** Choropleth 색상 설정 */
+export interface ChoroplethConfig {
+	/** 최솟값 색상 (oklch 형식, 예: "0.95 0.02 250") */
+	colorMin: string;
+	/** 최댓값 색상 (oklch 형식, 예: "0.45 0.2 250") */
+	colorMax: string;
+	/** 범례 제목 */
+	legendTitle: string;
+	/** 범례 단위 (예: "명", "%") */
+	legendUnit: string;
+	/** 범례 단계 수 (기본값: 5) */
+	legendSteps?: number;
+}
+
+/** 범례 한 단계 */
+export interface LegendItem {
+	/** 표시할 색상 */
+	color: string;
+	/** 해당 단계의 라벨 (예: "0~20%") */
+	label: string;
+}

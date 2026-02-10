@@ -8,3 +8,5 @@ export { MapTooltip } from "./MapTooltip";
 export { MapSkeleton } from "./MapSkeleton";
 export { MapBreadcrumb } from "./MapBreadcrumb";
 export { RegionSearch } from "./RegionSearch";
+export { MapLegend } from "./MapLegend";
+export { MapZoomControls } from "./MapZoomControls";

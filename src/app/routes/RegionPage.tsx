@@ -7,12 +7,16 @@ import {
 	CardContent,
 } from "@/components/ui/card";
 import { KoreaConstituencyMap, RegionSearch } from "@/components/map";
+import { useTopoJsonData } from "@/hooks/useTopoJsonData";
 import type { MapRegion, SearchSelectedRegion } from "@/types/map";
 
 export function RegionPage() {
 	const [selected, setSelected] = useState<MapRegion | null>(null);
 	const [searchNavigation, setSearchNavigation] =
 		useState<SearchSelectedRegion | null>(null);
+
+	// 동적 로딩된 데이터를 RegionSearch에도 전달
+	const { constituencyFeatures } = useTopoJsonData();
 
 	const handleRegionSelect = useCallback((region: MapRegion) => {
 		setSelected(region);
@@ -41,7 +45,10 @@ export function RegionPage() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
-					<RegionSearch onSelect={handleSearchSelect} />
+					<RegionSearch
+						onSelect={handleSearchSelect}
+						constituencyFeatures={constituencyFeatures}
+					/>
 
 					{/* 반응형: max-width 제한 + 중앙 정렬, SVG viewBox로 비율 유지 */}
 					<div className="mx-auto w-full max-w-[600px]">
