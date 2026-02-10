@@ -15,8 +15,10 @@ interface RegionPolygonProps {
 	isSelected: boolean;
 	/** 라벨 표시 여부 */
 	showLabel: boolean;
-	/** hover 이벤트 */
-	onHover: (region: MapRegion | null, event: React.MouseEvent) => void;
+	/** Choropleth 색상 오버라이드 (Phase 3-C) */
+	fillOverride?: string | null;
+	/** hover 이벤트 (pointer 이벤트로 마이그레이션, Phase 3-E) */
+	onHover: (region: MapRegion | null, event: React.PointerEvent) => void;
 	/** 클릭 이벤트 */
 	onClick: (region: MapRegion) => void;
 }
@@ -34,7 +36,8 @@ function arePropsEqual(prev: RegionPolygonProps, next: RegionPolygonProps) {
 		prev.region.code === next.region.code &&
 		prev.isHovered === next.isHovered &&
 		prev.isSelected === next.isSelected &&
-		prev.showLabel === next.showLabel
+		prev.showLabel === next.showLabel &&
+		prev.fillOverride === next.fillOverride
 	);
 }
 
@@ -45,15 +48,16 @@ export const RegionPolygon = React.memo(function RegionPolygon({
 	isHovered,
 	isSelected,
 	showLabel,
+	fillOverride,
 	onHover,
 	onClick,
 }: RegionPolygonProps) {
-	// fill 우선순위: selected > hovered > default
+	// fill 우선순위: selected > hovered > fillOverride > default
 	const fill = isSelected
 		? mapColors.fillSelected
 		: isHovered
 			? mapColors.fillHover
-			: mapColors.fill;
+			: (fillOverride ?? mapColors.fill);
 
 	return (
 		<g>
@@ -62,11 +66,12 @@ export const RegionPolygon = React.memo(function RegionPolygon({
 				fill={fill}
 				stroke={mapColors.stroke}
 				strokeWidth={0.5}
+				vectorEffect="non-scaling-stroke"
 				cursor="pointer"
 				style={{ transition: "fill 150ms ease-out" }}
-				onMouseEnter={(e) => onHover(region, e)}
-				onMouseMove={(e) => onHover(region, e)}
-				onMouseLeave={(e) => onHover(null, e)}
+				onPointerEnter={(e) => onHover(region, e)}
+				onPointerMove={(e) => onHover(region, e)}
+				onPointerLeave={(e) => onHover(null, e)}
 				onClick={() => onClick(region)}
 			/>
 			{showLabel && (
