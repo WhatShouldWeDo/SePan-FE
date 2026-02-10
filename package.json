@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "icons:generate": "svgr --out-dir src/components/icons --typescript --no-dimensions --replace-attr-values '#000=currentColor' -- design-tokens/icons"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@svgr/cli": "^8.1.0",
     "@types/d3-geo": "^3.1.0",
     "@types/d3-selection": "^3.0.11",
     "@types/d3-transition": "^3.0.9",
