@@ -14,6 +14,7 @@ interface SearchableRegion {
 	sido: string;
 	constituencyCode: string | null;
 	constituencyName: string | null;
+	emdCode: string | null;
 	displayName: string;
 	searchText: string;
 }
@@ -22,11 +23,14 @@ interface RegionSearchProps {
 	onSelect: (result: SearchSelectedRegion) => void;
 	/** 선거구 GeoJSON (동적 로딩 데이터) — null이면 시도만 검색 */
 	constituencyFeatures?: GeoJSON.FeatureCollection | null;
+	/** 읍면동 GeoJSON (동적 로딩 데이터) — null이면 읍면동 검색 비활성 */
+	emdFeatures?: GeoJSON.FeatureCollection | null;
 }
 
-/** 검색 가능한 시도 + 선거구 목록 빌드 */
+/** 검색 가능한 시도 + 선거구 + 읍면동 목록 빌드 */
 function buildSearchData(
 	constituencyFeatures: GeoJSON.FeatureCollection | null,
+	emdFeatures: GeoJSON.FeatureCollection | null,
 ): SearchableRegion[] {
 	const items: SearchableRegion[] = [];
 
@@ -36,6 +40,7 @@ function buildSearchData(
 			sido: short,
 			constituencyCode: null,
 			constituencyName: null,
+			emdCode: null,
 			displayName: full,
 			searchText: `${short} ${full}`,
 		});
@@ -49,8 +54,27 @@ function buildSearchData(
 				sido: props.SIDO,
 				constituencyCode: props.SGG_Code,
 				constituencyName: props.SGG,
+				emdCode: null,
 				displayName: props.SIDO_SGG,
 				searchText: `${props.SIDO} ${getSidoFullName(props.SIDO)} ${props.SGG} ${props.SIDO_SGG}`,
+			});
+		}
+	}
+
+	// 읍면동 (데이터가 로드된 경우에만)
+	if (emdFeatures) {
+		for (const f of emdFeatures.features) {
+			const props = f.properties as Record<string, string>;
+			// EMD_KOR_NM: "서울특별시 종로구 사직동" → 동 이름 추출
+			const parts = props.EMD_KOR_NM.split(" ");
+			const dongName = parts[parts.length - 1];
+			items.push({
+				sido: props.SIDO,
+				constituencyCode: props.SGG_Code,
+				constituencyName: null,
+				emdCode: props.EMD_CD,
+				displayName: props.EMD_KOR_NM,
+				searchText: `${props.SIDO} ${props.EMD_KOR_NM} ${dongName}`,
 			});
 		}
 	}
@@ -73,6 +97,7 @@ function buildSearchData(
 export function RegionSearch({
 	onSelect,
 	constituencyFeatures = null,
+	emdFeatures = null,
 }: RegionSearchProps) {
 	const [query, setQuery] = useState("");
 	const [isOpen, setIsOpen] = useState(false);
@@ -84,8 +109,8 @@ export function RegionSearch({
 		useRecentSearches();
 
 	const searchData = useMemo(
-		() => buildSearchData(constituencyFeatures),
-		[constituencyFeatures],
+		() => buildSearchData(constituencyFeatures, emdFeatures),
+		[constituencyFeatures, emdFeatures],
 	);
 
 	const results = useMemo(() => {
@@ -121,11 +146,13 @@ export function RegionSearch({
 				displayName: item.displayName,
 				sido: item.sido,
 				constituencyCode: item.constituencyCode,
+				emdCode: item.emdCode,
 			});
 
 			onSelect({
 				sido: item.sido,
 				constituencyCode: item.constituencyCode,
+				emdCode: item.emdCode,
 			});
 			setQuery("");
 			setIsOpen(false);
@@ -140,6 +167,7 @@ export function RegionSearch({
 			onSelect({
 				sido: item.sido,
 				constituencyCode: item.constituencyCode,
+				emdCode: item.emdCode,
 			});
 			// 선택한 항목을 최근 검색 맨 앞으로
 			addRecentSearch(item);
@@ -340,6 +368,7 @@ export function RegionSearch({
 						results.map((item, index) => (
 							<li
 								key={
+									item.emdCode ??
 									item.constituencyCode ??
 									`sido-${item.sido}`
 								}
@@ -360,11 +389,15 @@ export function RegionSearch({
 								<span className="font-medium">
 									{item.displayName}
 								</span>
-								{item.constituencyCode && (
+								{item.emdCode ? (
+									<span className="text-sm text-muted-foreground">
+										읍면동
+									</span>
+								) : item.constituencyCode ? (
 									<span className="text-sm text-muted-foreground">
 										{getSidoFullName(item.sido)}
 									</span>
-								)}
+								) : null}
 							</li>
 						))}
 				</ul>

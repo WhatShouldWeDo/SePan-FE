@@ -1,7 +1,7 @@
 // 지도 공통 타입 정의
 
 /** 지도 드릴다운 레벨 */
-export type MapLevel = "sido" | "constituency";
+export type MapLevel = "sido" | "constituency" | "eupMyeonDong";
 
 /** 검색으로 선택된 지역 (드릴다운 네비게이션용) */
 export interface SearchSelectedRegion {
@@ -9,6 +9,8 @@ export interface SearchSelectedRegion {
 	sido: string;
 	/** 선거구 코드 (하이라이트용, 시도만 선택 시 null) */
 	constituencyCode: string | null;
+	/** 읍면동 코드 (읍면동 하이라이트용, 선거구까지만 선택 시 null) */
+	emdCode?: string | null;
 }
 
 /**

@@ -5,22 +5,27 @@ import { getSidoFullName } from "@/lib/sido-utils";
 interface MapBreadcrumbProps {
 	level: MapLevel;
 	selectedSido: string | null;
+	selectedConstituencyName: string | null;
 	onBackToNational: () => void;
+	onBackToSido: () => void;
 }
 
 /**
- * 지도 드릴다운 내비게이션 브레드크럼
+ * 지도 드릴다운 내비게이션 브레드크럼 (3단계)
  *
  * @description
  * - sido 레벨: "전국" (비활성 텍스트)
  * - constituency 레벨: "전국 > 서울특별시" (전국은 클릭 가능)
+ * - eupMyeonDong 레벨: "전국 > 서울특별시 > 종로" (전국/시도 클릭 가능)
  * - 44px 최소 터치 타겟 (CLAUDE.md 4-1)
  * - text-base 16px 장년층 가독성
  */
 export function MapBreadcrumb({
 	level,
 	selectedSido,
+	selectedConstituencyName,
 	onBackToNational,
+	onBackToSido,
 }: MapBreadcrumbProps) {
 	return (
 		<nav
@@ -44,9 +49,32 @@ export function MapBreadcrumb({
 						className="h-4 w-4 shrink-0 text-muted-foreground"
 						aria-hidden="true"
 					/>
-					<span className="inline-flex min-h-[44px] items-center px-2 font-medium text-foreground">
-						{selectedSido ? getSidoFullName(selectedSido) : ""}
-					</span>
+					{level === "constituency" ? (
+						<span className="inline-flex min-h-[44px] items-center px-2 font-medium text-foreground">
+							{selectedSido
+								? getSidoFullName(selectedSido)
+								: ""}
+						</span>
+					) : (
+						<>
+							<button
+								type="button"
+								onClick={onBackToSido}
+								className="inline-flex min-h-[44px] min-w-[44px] items-center rounded-md px-2 font-medium text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+							>
+								{selectedSido
+									? getSidoFullName(selectedSido)
+									: ""}
+							</button>
+							<ChevronRight
+								className="h-4 w-4 shrink-0 text-muted-foreground"
+								aria-hidden="true"
+							/>
+							<span className="inline-flex min-h-[44px] items-center px-2 font-medium text-foreground">
+								{selectedConstituencyName ?? ""}
+							</span>
+						</>
+					)}
 				</>
 			)}
 		</nav>

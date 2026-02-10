@@ -4,9 +4,11 @@ import { useProjection } from "@/hooks/useProjection";
 import {
 	useMapDrillDown,
 	sidoPropsToMapRegion,
+	emdPropsToMapRegion,
 } from "@/hooks/useMapDrillDown";
 import { useTopoJsonData } from "@/hooks/useTopoJsonData";
 import { useMapZoom } from "@/hooks/useMapZoom";
+import { useMapTransition } from "@/hooks/useMapTransition";
 import { useLongPress } from "@/hooks/useLongPress";
 import { RegionPolygon } from "./RegionPolygon";
 import { MapTooltip } from "./MapTooltip";
@@ -50,18 +52,22 @@ const SIDO_LABEL_AREA_THRESHOLD = 1e-5;
 /** 선거구 레벨 라벨 면적 임계값 */
 const CONSTITUENCY_LABEL_AREA_THRESHOLD = 5e-7;
 
-/** 줌 레벨 2x 이상에서만 선거구 라벨 표시 (작은 폴리곤) */
+/** 읍면동 레벨 라벨 면적 임계값 */
+const EMD_LABEL_AREA_THRESHOLD = 1e-7;
+
+/** 줌 레벨 2x 이상에서만 작은 라벨 표시 */
 const ZOOM_LABEL_THRESHOLD = 2;
 
 /**
- * 22대 국회의원 선거구 폴리곤 지도 (시도 드릴다운 + 줌/팬 지원)
+ * 22대 국회의원 선거구 폴리곤 지도 (시도 → 선거구 → 읍면동 3단계 드릴다운)
  *
  * @description
- * - enableDrillDown=true (기본): 시도 → 선거구 2단계 드릴다운
+ * - enableDrillDown=true (기본): 시도 → 선거구 → 읍면동 3단계 드릴다운
  * - enableDrillDown=false: Phase 1.2 호환 단일 뷰
- * - Phase 3-A: TopoJSON 동적 import로 초기 번들 ~307KB 감소
+ * - Phase 3-A: TopoJSON 동적 import로 초기 번들 감소
  * - Phase 3-C: Choropleth 색상 매핑 + 범례
  * - Phase 3-D: d3-zoom 기반 줌/팬 (1x~8x)
+ * - Phase 4: 읍면동 3단계 드릴다운
  */
 export function KoreaConstituencyMap({
 	config,
@@ -86,23 +92,46 @@ export function KoreaConstituencyMap({
 	const {
 		sidoFeatures,
 		constituencyFeatures,
+		emdFeatures,
 		isLoading: isDataLoading,
 		error: dataError,
 	} = useTopoJsonData();
 
-	// --- 드릴다운 모드 ---
+	// --- 드릴다운 모드 (3단계) ---
 	const {
 		level,
 		selectedSido,
+		selectedConstituency,
+		selectedConstituencyName,
 		featureCollection: drillDownFeatureCollection,
 		handleSidoSelect,
+		handleConstituencySelect,
 		handleBackToNational,
+		handleBackToSido,
 		navigateToSearchResult,
-	} = useMapDrillDown(sidoFeatures, constituencyFeatures);
+	} = useMapDrillDown(sidoFeatures, constituencyFeatures, emdFeatures);
 
 	// --- 줌/팬 (Phase 3-D) ---
-	const { svgRef, gRef, zoomLevel, zoomIn, zoomOut, zoomReset } =
+	const { svgRef, gRef, zoomLevel, zoomIn, zoomOut, smoothZoomReset } =
 		useMapZoom();
+
+	// --- 전환 애니메이션 (Phase 4-D) ---
+	const { isTransitioning, triggerTransition } = useMapTransition();
+
+	// 브레드크럼 뒤로가기 (애니메이션 포함)
+	const handleAnimatedBackToNational = useCallback(() => {
+		if (isTransitioning) return;
+		triggerTransition(gRef.current, () => {
+			handleBackToNational();
+		});
+	}, [isTransitioning, triggerTransition, gRef, handleBackToNational]);
+
+	const handleAnimatedBackToSido = useCallback(() => {
+		if (isTransitioning) return;
+		triggerTransition(gRef.current, () => {
+			handleBackToSido();
+		});
+	}, [isTransitioning, triggerTransition, gRef, handleBackToSido]);
 
 	// 검색 네비게이션 처리
 	useEffect(() => {
@@ -111,11 +140,11 @@ export function KoreaConstituencyMap({
 		}
 	}, [searchNavigation, enableDrillDown, navigateToSearchResult]);
 
-	// 레벨 전환 시 줌 리셋
+	// 레벨 전환 시 줌 리셋 (부드러운 전환)
 	useEffect(() => {
-		zoomReset();
+		smoothZoomReset();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [level, selectedSido]);
+	}, [level, selectedSido, selectedConstituency]);
 
 	// --- 레거시 모드 (enableDrillDown=false) ---
 	const legacyFeatureCollection = useMemo(() => {
@@ -136,7 +165,9 @@ export function KoreaConstituencyMap({
 		labelAreaThreshold ??
 		(currentLevel === "sido"
 			? SIDO_LABEL_AREA_THRESHOLD
-			: CONSTITUENCY_LABEL_AREA_THRESHOLD);
+			: currentLevel === "constituency"
+				? CONSTITUENCY_LABEL_AREA_THRESHOLD
+				: EMD_LABEL_AREA_THRESHOLD);
 
 	// D3 projection + path generator
 	const { pathGenerator } = useProjection(
@@ -152,16 +183,24 @@ export function KoreaConstituencyMap({
 			featureCollection.features.map((f) => {
 				const props = f.properties as Record<string, string>;
 
-				// 시도 레벨 vs 선거구 레벨 분기
-				const region: MapRegion =
-					currentLevel === "sido"
-						? sidoPropsToMapRegion({ SIDO: props.SIDO })
-						: {
-								code: props.SGG_Code,
-								sido: props.SIDO,
-								name: props.SGG,
-								fullName: props.SIDO_SGG,
-							};
+				// 시도 / 선거구 / 읍면동 레벨 분기
+				let region: MapRegion;
+				if (currentLevel === "sido") {
+					region = sidoPropsToMapRegion({ SIDO: props.SIDO });
+				} else if (currentLevel === "eupMyeonDong") {
+					region = emdPropsToMapRegion({
+						EMD_CD: props.EMD_CD,
+						EMD_KOR_NM: props.EMD_KOR_NM,
+						SIDO: props.SIDO,
+					});
+				} else {
+					region = {
+						code: props.SGG_Code,
+						sido: props.SIDO,
+						name: props.SGG,
+						fullName: props.SIDO_SGG,
+					};
+				}
 
 				const area = geoArea(f);
 
@@ -187,7 +226,7 @@ export function KoreaConstituencyMap({
 	const [tooltip, setTooltip] = useState<HoveredRegion | null>(null);
 
 	// 레벨 전환 시 hover 상태 초기화 (렌더 중 상태 조정 패턴)
-	const viewKey = `${currentLevel}-${selectedSido}`;
+	const viewKey = `${currentLevel}-${selectedSido}-${selectedConstituency}`;
 	const [prevViewKey, setPrevViewKey] = useState(viewKey);
 	if (prevViewKey !== viewKey) {
 		setPrevViewKey(viewKey);
@@ -238,13 +277,36 @@ export function KoreaConstituencyMap({
 
 	const handleClick = useCallback(
 		(region: MapRegion) => {
-			if (enableDrillDown && currentLevel === "sido") {
-				handleSidoSelect(region.sido);
+			if (isTransitioning) return;
+
+			if (!enableDrillDown) {
+				onRegionSelect?.(region);
+				return;
+			}
+
+			if (currentLevel === "sido") {
+				triggerTransition(gRef.current, () => {
+					handleSidoSelect(region.sido);
+				});
+			} else if (currentLevel === "constituency") {
+				triggerTransition(gRef.current, () => {
+					handleConstituencySelect(region.code, region.name);
+				});
 			} else {
+				// 읍면동 레벨 — 외부 콜백으로 전달
 				onRegionSelect?.(region);
 			}
 		},
-		[enableDrillDown, currentLevel, handleSidoSelect, onRegionSelect],
+		[
+			isTransitioning,
+			enableDrillDown,
+			currentLevel,
+			handleSidoSelect,
+			handleConstituencySelect,
+			onRegionSelect,
+			triggerTransition,
+			gRef,
+		],
 	);
 
 	// Choropleth 색상 맵 (Phase 3-C)
@@ -269,12 +331,22 @@ export function KoreaConstituencyMap({
 	}, [choroplethData, choroplethConfig]);
 
 	// 검색 결과 하이라이트 코드
-	const searchHighlightCode =
-		enableDrillDown &&
-		currentLevel === "constituency" &&
-		searchNavigation?.constituencyCode
-			? searchNavigation.constituencyCode
-			: null;
+	const searchHighlightCode = useMemo(() => {
+		if (!enableDrillDown || !searchNavigation) return null;
+		if (
+			currentLevel === "eupMyeonDong" &&
+			searchNavigation.emdCode
+		) {
+			return searchNavigation.emdCode;
+		}
+		if (
+			currentLevel === "constituency" &&
+			searchNavigation.constituencyCode
+		) {
+			return searchNavigation.constituencyCode;
+		}
+		return null;
+	}, [enableDrillDown, currentLevel, searchNavigation]);
 
 	// 로딩 상태 (외부 + 데이터 로딩)
 	if (isLoading || isDataLoading) {
@@ -293,7 +365,9 @@ export function KoreaConstituencyMap({
 	const ariaLabel =
 		currentLevel === "sido"
 			? "시도별 대한민국 지도"
-			: `${selectedSido ?? ""} 선거구 지도`;
+			: currentLevel === "constituency"
+				? `${selectedSido ?? ""} 선거구 지도`
+				: `${selectedConstituencyName ?? ""} 읍면동 지도`;
 
 	return (
 		<div className={cn("relative", className)}>
@@ -301,7 +375,9 @@ export function KoreaConstituencyMap({
 				<MapBreadcrumb
 					level={level}
 					selectedSido={selectedSido}
-					onBackToNational={handleBackToNational}
+					selectedConstituencyName={selectedConstituencyName}
+					onBackToNational={handleAnimatedBackToNational}
+					onBackToSido={handleAnimatedBackToSido}
 				/>
 			)}
 			<svg
@@ -359,7 +435,7 @@ export function KoreaConstituencyMap({
 				<MapZoomControls
 					onZoomIn={zoomIn}
 					onZoomOut={zoomOut}
-					onZoomReset={zoomReset}
+					onZoomReset={smoothZoomReset}
 					zoomLevel={zoomLevel}
 				/>
 			</div>
