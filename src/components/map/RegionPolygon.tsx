@@ -22,10 +22,22 @@ interface RegionPolygonProps {
 }
 
 /**
- * 개별 선거구 폴리곤
- * @description React.memo로 감싸서 hover된 폴리곤만 re-render.
- *   pathD와 centroid는 부모에서 미리 계산하여 memo 효과를 극대화한다.
+ * 커스텀 비교 함수: onHover/onClick 콜백은 비교에서 제외하여
+ * hover 상태 변경 시 관련 없는 폴리곤의 re-render를 방지한다.
+ * 부모에서 useCallback으로 안정된 참조를 보장하므로 안전하다.
  */
+function arePropsEqual(prev: RegionPolygonProps, next: RegionPolygonProps) {
+	return (
+		prev.pathD === next.pathD &&
+		prev.centroid[0] === next.centroid[0] &&
+		prev.centroid[1] === next.centroid[1] &&
+		prev.region.code === next.region.code &&
+		prev.isHovered === next.isHovered &&
+		prev.isSelected === next.isSelected &&
+		prev.showLabel === next.showLabel
+	);
+}
+
 export const RegionPolygon = React.memo(function RegionPolygon({
 	pathD,
 	centroid,
@@ -51,6 +63,7 @@ export const RegionPolygon = React.memo(function RegionPolygon({
 				stroke={mapColors.stroke}
 				strokeWidth={0.5}
 				cursor="pointer"
+				style={{ transition: "fill 150ms ease-out" }}
 				onMouseEnter={(e) => onHover(region, e)}
 				onMouseMove={(e) => onHover(region, e)}
 				onMouseLeave={(e) => onHover(null, e)}
@@ -71,4 +84,4 @@ export const RegionPolygon = React.memo(function RegionPolygon({
 			)}
 		</g>
 	);
-});
+}, arePropsEqual);
