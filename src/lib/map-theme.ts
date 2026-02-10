@@ -15,4 +15,6 @@ export const mapColors = {
 	stroke: "oklch(var(--map-stroke))",
 	/** 라벨 텍스트 */
 	label: "oklch(var(--map-label))",
+	/** 검색 결과 하이라이트 */
+	fillSearchHighlight: "oklch(var(--map-fill-search-highlight))",
 } as const;

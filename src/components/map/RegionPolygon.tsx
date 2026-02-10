@@ -63,6 +63,7 @@ export const RegionPolygon = React.memo(function RegionPolygon({
 				stroke={mapColors.stroke}
 				strokeWidth={0.5}
 				cursor="pointer"
+				style={{ transition: "fill 150ms ease-out" }}
 				onMouseEnter={(e) => onHover(region, e)}
 				onMouseMove={(e) => onHover(region, e)}
 				onMouseLeave={(e) => onHover(null, e)}
