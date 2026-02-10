@@ -2,8 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { TextField } from "@/components/ui/text-field";
 import { Spinner } from "@/components/ui/spinner";
 import { loginSchema, type LoginFormData } from "../schemas/loginSchema";
 import { login } from "../api/authApi";
@@ -37,43 +36,28 @@ export function LoginForm() {
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-			<div className="space-y-2">
-				<Label htmlFor="username">아이디</Label>
-				<Input
-					id="username"
-					type="text"
-					placeholder="아이디를 입력하세요"
-					autoComplete="username"
-					disabled={isPending}
-					aria-invalid={!!errors.username}
-					aria-describedby={errors.username ? "username-error" : undefined}
-					{...register("username")}
-				/>
-				{errors.username && (
-					<p id="username-error" className="text-sm text-destructive">
-						{errors.username.message}
-					</p>
-				)}
-			</div>
+			<TextField
+				label="아이디"
+				placeholder="아이디를 입력하세요"
+				autoComplete="username"
+				disabled={isPending}
+				status={errors.username ? "error" : "default"}
+				helperText={errors.username?.message}
+				clearable={false}
+				{...register("username")}
+			/>
 
-			<div className="space-y-2">
-				<Label htmlFor="password">비밀번호</Label>
-				<Input
-					id="password"
-					type="password"
-					placeholder="비밀번호를 입력하세요"
-					autoComplete="current-password"
-					disabled={isPending}
-					aria-invalid={!!errors.password}
-					aria-describedby={errors.password ? "password-error" : undefined}
-					{...register("password")}
-				/>
-				{errors.password && (
-					<p id="password-error" className="text-sm text-destructive">
-						{errors.password.message}
-					</p>
-				)}
-			</div>
+			<TextField
+				label="비밀번호"
+				type="password"
+				placeholder="비밀번호를 입력하세요"
+				autoComplete="current-password"
+				disabled={isPending}
+				status={errors.password ? "error" : "default"}
+				helperText={errors.password?.message}
+				clearable={false}
+			  {...register("password")}
+			/>
 
 			<Button
 				type="submit"
