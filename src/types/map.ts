@@ -1,5 +1,16 @@
 // 지도 공통 타입 정의
 
+/** 지도 드릴다운 레벨 */
+export type MapLevel = "sido" | "constituency";
+
+/** 검색으로 선택된 지역 (드릴다운 네비게이션용) */
+export interface SearchSelectedRegion {
+	/** 시도 약칭 (드릴다운 네비게이션용) */
+	sido: string;
+	/** 선거구 코드 (하이라이트용, 시도만 선택 시 null) */
+	constituencyCode: string | null;
+}
+
 /**
  * 지도 위 표시되는 지역 정보
  * @description 폴리곤 클릭 시 외부로 전달되는 데이터. API 호출 파라미터로 활용.
@@ -31,6 +42,8 @@ export interface MapConfig {
 	showLabels?: boolean;
 	/** 라벨 최소 면적 임계값 — 이 값 이하인 폴리곤은 라벨 숨김 */
 	labelAreaThreshold?: number;
+	/** 드릴다운 활성화 여부 (기본값: true) */
+	enableDrillDown?: boolean;
 }
 
 /**
