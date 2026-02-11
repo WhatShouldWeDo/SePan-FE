@@ -9,11 +9,11 @@ import {
 } from "@/components/icons"
 
 const toastVariants = cva(
-	"flex w-full items-center gap-2 rounded-xl px-4 py-3",
+	"flex items-center gap-2 rounded-xl px-4 py-3",
 	{
 		variants: {
 			variant: {
-				info: "bg-background-alt",
+				info: "bg-toast-info-bg",
 				error: "bg-status-negative-bg",
 				success: "bg-status-positive-bg",
 			},
