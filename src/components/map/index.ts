@@ -1,7 +1,7 @@
 // 맵 컴포넌트 export
 
-export { KoreaConstituencyMap } from "./KoreaConstituencyMap";
-export type { KoreaConstituencyMapProps } from "./KoreaConstituencyMap";
+export { KoreaAdminMap } from "./KoreaAdminMap";
+export type { KoreaAdminMapProps } from "./KoreaAdminMap";
 
 export { RegionPolygon } from "./RegionPolygon";
 export { MapTooltip } from "./MapTooltip";
