@@ -65,6 +65,8 @@
 	--color-fill-strong: var(--fill-strong);
 	--color-fill-alt: var(--fill-alt);
 	--color-fill-disabled: var(--fill-disabled);
+	--color-surface-inverse: var(--surface-inverse);
+	--color-surface-secondary: var(--surface-secondary);
 	--color-interaction-inactive: var(--interaction-inactive);
 	--color-interaction-disabled: var(--interaction-disabled);
 	--color-status-negative: var(--status-negative);
@@ -73,6 +75,7 @@
 	--color-status-cautionary-bg: var(--status-cautionary-bg);
 	--color-status-positive: var(--status-positive);
 	--color-status-positive-bg: var(--status-positive-bg);
+	--color-toast-info-bg: var(--toast-info-bg);
 	--color-material-dimmer: var(--material-dimmer);
 	--color-party-dpk: var(--party-dpk);
 	--color-party-ppp: var(--party-ppp);
@@ -207,6 +210,10 @@
 	--fill-alt: rgba(107, 114, 128, 0.05);       /* #6B7280 @ 5% */
 	--fill-disabled: #f7f8fa;                    /* Disabled Background */
 
+	/* Surface */
+	--surface-inverse: #1F222C;                  /* Dark surface (선택 원형 배경) */
+	--surface-secondary: #F1F3F7;                /* Secondary surface (범위 배경) */
+
 	/* Interaction */
 	--interaction-inactive: #9CA3AF;             /* Cool Neutral/50 */
 	--interaction-disabled: #F1F3F7;             /* Cool Neutral/10 */
@@ -218,6 +225,9 @@
 	--status-cautionary-bg: #FFF4E5;
 	--status-positive: #00BF40;
 	--status-positive-bg: #E5F9EC;
+
+	/* Toast */
+	--toast-info-bg: #C2C7D2;                    /* Cool Neutral/40 */
 
 	/* Material */
 	--material-dimmer: rgba(17, 24, 39, 0.5);   /* #111827 @ 50% */
@@ -274,6 +284,20 @@
 	--map-stroke: 0.25 0 0;
 	--map-label: 0.85 0 0;
 	--map-fill-search-highlight: 0.5 0.15 140;
+}
+
+/* Sonner custom toast: 중앙 정렬 + 모바일 대응 */
+[data-sonner-toast][data-x-position="center"] {
+	left: 0;
+	right: 0;
+	display: flex;
+	justify-content: center;
+}
+
+@media (max-width: 600px) {
+	[data-sonner-toaster] {
+		--width: calc(100vw - 32px);
+	}
 }
 
 @layer base {
