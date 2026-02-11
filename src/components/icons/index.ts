@@ -17,3 +17,4 @@
 export { CircleCheckFill } from "./CircleCheckFill"
 export { CircleExclamationFill } from "./CircleExclamationFill"
 export { CircleCloseFill } from "./CircleCloseFill"
+export { TriangleWarningFill } from "./TriangleWarningFill"
