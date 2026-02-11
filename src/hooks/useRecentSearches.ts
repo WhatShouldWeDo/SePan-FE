@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 
-const STORAGE_KEY = "democrasee:recent-region-searches";
+const STORAGE_KEY = "democrasee:recent-region-searches-v3";
 const MAX_ITEMS = 5;
 
 interface RecentSearch {
@@ -8,9 +8,11 @@ interface RecentSearch {
 	displayName: string;
 	/** 시도 약칭 */
 	sido: string;
-	/** 선거구 코드 (시도만이면 null) */
-	constituencyCode: string | null;
-	/** 읍면동 코드 (읍면동까지 선택된 경우) */
+	/** 시군 코드 (4자리=하위구 시, 5자리=독립 시군구) */
+	cityCode: string | null;
+	/** 구 코드 (5자리, 하위구 시의 구만 해당) */
+	guCode: string | null;
+	/** 읍면동 코드 */
 	emdCode?: string | null;
 }
 
@@ -40,7 +42,7 @@ function saveToStorage(items: RecentSearch[]): void {
  * @description
  * - localStorage에 최대 5개 저장
  * - 중복 제거 (같은 지역 다시 검색 시 맨 앞으로)
- * - Phase 3-B
+ * - Phase 5.5: cityCode/guCode 필드로 전환 (v3)
  */
 export function useRecentSearches() {
 	const [recentSearches, setRecentSearches] =
@@ -48,11 +50,12 @@ export function useRecentSearches() {
 
 	const addRecentSearch = useCallback((item: RecentSearch) => {
 		setRecentSearches((prev) => {
-			// 중복 제거 (sido + constituencyCode + emdCode 기준)
+			// 중복 제거 (sido + cityCode + guCode + emdCode 기준)
 			const filtered = prev.filter(
 				(s) =>
 					s.sido !== item.sido ||
-					s.constituencyCode !== item.constituencyCode ||
+					s.cityCode !== item.cityCode ||
+					s.guCode !== item.guCode ||
 					s.emdCode !== item.emdCode,
 			);
 			const updated = [item, ...filtered].slice(0, MAX_ITEMS);

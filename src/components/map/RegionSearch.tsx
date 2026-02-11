@@ -12,69 +12,138 @@ const MAX_RESULTS = 10;
 
 interface SearchableRegion {
 	sido: string;
-	constituencyCode: string | null;
-	constituencyName: string | null;
+	cityCode: string | null;
+	guCode: string | null;
 	emdCode: string | null;
 	displayName: string;
 	searchText: string;
+	/** 검색 결과 태그: "시도" | "시군" | "구" | "읍면동" */
+	tag: string;
 }
 
 interface RegionSearchProps {
 	onSelect: (result: SearchSelectedRegion) => void;
-	/** 선거구 GeoJSON (동적 로딩 데이터) — null이면 시도만 검색 */
-	constituencyFeatures?: GeoJSON.FeatureCollection | null;
-	/** 읍면동 GeoJSON (동적 로딩 데이터) — null이면 읍면동 검색 비활성 */
+	/** 시군 GeoJSON (229개, 하위구 시 합쳐짐) */
+	sigunFeatures?: GeoJSON.FeatureCollection | null;
+	/** 시군구 GeoJSON (255개, 구 레벨) */
+	sigunguFeatures?: GeoJSON.FeatureCollection | null;
+	/** 읍면동 GeoJSON */
 	emdFeatures?: GeoJSON.FeatureCollection | null;
 }
 
-/** 검색 가능한 시도 + 선거구 + 읍면동 목록 빌드 */
+/** 검색 가능한 시도 + 시군 + 구 + 읍면동 목록 빌드 */
 function buildSearchData(
-	constituencyFeatures: GeoJSON.FeatureCollection | null,
+	sigunFeatures: GeoJSON.FeatureCollection | null,
+	sigunguFeatures: GeoJSON.FeatureCollection | null,
 	emdFeatures: GeoJSON.FeatureCollection | null,
 ): SearchableRegion[] {
 	const items: SearchableRegion[] = [];
 
-	// 시도 17개
+	// 1. 시도 17개
 	for (const [short, full] of Object.entries(SIDO_NAME_MAP)) {
 		items.push({
 			sido: short,
-			constituencyCode: null,
-			constituencyName: null,
+			cityCode: null,
+			guCode: null,
 			emdCode: null,
 			displayName: full,
 			searchText: `${short} ${full}`,
+			tag: "시도",
 		});
 	}
 
-	// 선거구 (데이터가 로드된 경우에만)
-	if (constituencyFeatures) {
-		for (const f of constituencyFeatures.features) {
-			const props = f.properties as Record<string, string>;
+	// 2. 시군 (~229개, sigunFeatures에서)
+	if (sigunFeatures) {
+		for (const f of sigunFeatures.features) {
+			const props = f.properties as Record<string, string | boolean>;
+			const fullName = `${getSidoFullName(props.SIDO as string)} ${props.CITY_NM as string}`;
 			items.push({
-				sido: props.SIDO,
-				constituencyCode: props.SGG_Code,
-				constituencyName: props.SGG,
+				sido: props.SIDO as string,
+				cityCode: props.CITY_CD as string,
+				guCode: null,
 				emdCode: null,
-				displayName: props.SIDO_SGG,
-				searchText: `${props.SIDO} ${getSidoFullName(props.SIDO)} ${props.SGG} ${props.SIDO_SGG}`,
+				displayName: fullName,
+				searchText: `${props.SIDO} ${getSidoFullName(props.SIDO as string)} ${props.CITY_NM} ${fullName}`,
+				tag: "시군",
 			});
 		}
 	}
 
-	// 읍면동 (데이터가 로드된 경우에만)
+	// 3. 하위 구 (sigunguFeatures에서, 하위구 시의 구만)
+	// sigunFeatures에서 HAS_GU=true인 CITY_CD prefix를 수집
+	const hasGuPrefixes = new Set<string>();
+	if (sigunFeatures) {
+		for (const f of sigunFeatures.features) {
+			const props = f.properties as Record<string, string | boolean>;
+			if (props.HAS_GU === true) {
+				hasGuPrefixes.add(props.CITY_CD as string);
+			}
+		}
+	}
+
+	// CITY_CD(4자리) → CITY_NM 매핑 (검색 표시용)
+	const cityNameMap = new Map<string, string>();
+	if (sigunFeatures) {
+		for (const f of sigunFeatures.features) {
+			const props = f.properties as Record<string, string | boolean>;
+			if (props.HAS_GU === true) {
+				cityNameMap.set(
+					props.CITY_CD as string,
+					props.CITY_NM as string,
+				);
+			}
+		}
+	}
+
+	if (sigunguFeatures) {
+		for (const f of sigunguFeatures.features) {
+			const props = f.properties as Record<string, string>;
+			const sguCd = props.SGU_CD;
+			// 하위구 시의 구인지 확인 (SGU_CD 앞 4자리가 hasGuPrefixes에 있는지)
+			const prefix4 = sguCd.substring(0, 4);
+			if (!hasGuPrefixes.has(prefix4)) continue;
+
+			const cityName = cityNameMap.get(prefix4) ?? "";
+			const fullName = `${getSidoFullName(props.SIDO)} ${cityName} ${props.SGU_NM}`;
+			items.push({
+				sido: props.SIDO,
+				cityCode: prefix4,
+				guCode: sguCd,
+				emdCode: null,
+				displayName: fullName,
+				searchText: `${props.SIDO} ${getSidoFullName(props.SIDO)} ${cityName} ${props.SGU_NM} ${fullName}`,
+				tag: "구",
+			});
+		}
+	}
+
+	// 4. 읍면동
 	if (emdFeatures) {
 		for (const f of emdFeatures.features) {
 			const props = f.properties as Record<string, string>;
-			// EMD_KOR_NM: "서울특별시 종로구 사직동" → 동 이름 추출
 			const parts = props.EMD_KOR_NM.split(" ");
 			const dongName = parts[parts.length - 1];
+			const sguCode = props.EMD_CD.substring(0, 5);
+
+			// cityCode 결정: 하위구 시이면 4자리, 아니면 5자리
+			const prefix4 = sguCode.substring(0, 4);
+			let cityCode: string;
+			let guCode: string | null = null;
+			if (hasGuPrefixes.has(prefix4)) {
+				cityCode = prefix4;
+				guCode = sguCode;
+			} else {
+				cityCode = sguCode;
+			}
+
 			items.push({
 				sido: props.SIDO,
-				constituencyCode: props.SGG_Code,
-				constituencyName: null,
+				cityCode,
+				guCode,
 				emdCode: props.EMD_CD,
 				displayName: props.EMD_KOR_NM,
 				searchText: `${props.SIDO} ${props.EMD_KOR_NM} ${dongName}`,
+				tag: "읍면동",
 			});
 		}
 	}
@@ -83,20 +152,19 @@ function buildSearchData(
 }
 
 /**
- * 지역구 검색 컴포넌트
+ * 지역 검색 컴포넌트
  *
  * @description
  * - Input + 필터링 드롭다운 (새 패키지 없음)
- * - 시도(17) + 선거구(254) = 271개 항목
+ * - 시도(17) + 시군(229) + 구(하위구 시만) + 읍면동(3558) 항목
  * - includes() + 초성 매칭 (Phase 3-B)
  * - 최근 검색어 표시 (Phase 3-B)
- * - 키보드 네비게이션: ArrowUp/Down, Enter, Escape
- * - ARIA combobox 패턴
- * - h-12 (48px) 인풋, min-h-[44px] 결과 항목 (CLAUDE.md 4-1)
+ * - Phase 5.5: 시군 레벨 검색 항목 추가, cityCode/guCode 필드
  */
 export function RegionSearch({
 	onSelect,
-	constituencyFeatures = null,
+	sigunFeatures = null,
+	sigunguFeatures = null,
 	emdFeatures = null,
 }: RegionSearchProps) {
 	const [query, setQuery] = useState("");
@@ -109,15 +177,14 @@ export function RegionSearch({
 		useRecentSearches();
 
 	const searchData = useMemo(
-		() => buildSearchData(constituencyFeatures, emdFeatures),
-		[constituencyFeatures, emdFeatures],
+		() => buildSearchData(sigunFeatures, sigunguFeatures, emdFeatures),
+		[sigunFeatures, sigunguFeatures, emdFeatures],
 	);
 
 	const results = useMemo(() => {
 		const trimmed = query.trim();
 		if (!trimmed) return [];
 
-		// 초성 쿼리인 경우 초성 매칭, 아닌 경우 includes 매칭
 		const useChosung = isChosungQuery(trimmed);
 
 		return searchData
@@ -129,29 +196,28 @@ export function RegionSearch({
 			.slice(0, MAX_RESULTS);
 	}, [query, searchData]);
 
-	// 검색어가 없을 때 최근 검색어를 보여줄지 여부
 	const showRecent = isOpen && !query.trim() && recentSearches.length > 0;
 	const showResults = isOpen && query.trim().length > 0 && results.length > 0;
 	const showDropdown = showRecent || showResults;
 
-	// 드롭다운에 표시할 항목 수 (키보드 네비게이션용)
 	const dropdownItemCount = showRecent
 		? recentSearches.length
 		: results.length;
 
 	const handleSelect = useCallback(
 		(item: SearchableRegion) => {
-			// 최근 검색어에 추가
 			addRecentSearch({
 				displayName: item.displayName,
 				sido: item.sido,
-				constituencyCode: item.constituencyCode,
+				cityCode: item.cityCode,
+				guCode: item.guCode,
 				emdCode: item.emdCode,
 			});
 
 			onSelect({
 				sido: item.sido,
-				constituencyCode: item.constituencyCode,
+				cityCode: item.cityCode,
+				guCode: item.guCode,
 				emdCode: item.emdCode,
 			});
 			setQuery("");
@@ -166,10 +232,10 @@ export function RegionSearch({
 		(item: RecentSearch) => {
 			onSelect({
 				sido: item.sido,
-				constituencyCode: item.constituencyCode,
+				cityCode: item.cityCode,
+				guCode: item.guCode,
 				emdCode: item.emdCode,
 			});
-			// 선택한 항목을 최근 검색 맨 앞으로
 			addRecentSearch(item);
 			setQuery("");
 			setIsOpen(false);
@@ -253,7 +319,6 @@ export function RegionSearch({
 	}, []);
 
 	const handleBlur = useCallback((e: React.FocusEvent) => {
-		// 드롭다운 내 클릭 시 blur → 선택이 무시되는 것 방지
 		const relatedTarget = e.relatedTarget as HTMLElement | null;
 		if (relatedTarget?.closest("[data-region-search-listbox]")) {
 			return;
@@ -281,9 +346,9 @@ export function RegionSearch({
 							? `${listboxId}-option-${activeIndex}`
 							: undefined
 					}
-					aria-label="지역구 검색"
+					aria-label="지역 검색"
 					aria-autocomplete="list"
-					placeholder="지역구를 검색하세요 (초성 검색 가능)"
+					placeholder="지역을 검색하세요 (초성 검색 가능)"
 					value={query}
 					onChange={handleInputChange}
 					onKeyDown={handleKeyDown}
@@ -338,7 +403,7 @@ export function RegionSearch({
 					{showRecent &&
 						recentSearches.map((item, index) => (
 							<li
-								key={`recent-${item.sido}-${item.constituencyCode ?? "sido"}`}
+								key={`recent-${item.sido}-${item.cityCode ?? "sido"}-${item.guCode ?? ""}`}
 								id={`${listboxId}-option-${index}`}
 								role="option"
 								aria-selected={index === activeIndex}
@@ -369,7 +434,8 @@ export function RegionSearch({
 							<li
 								key={
 									item.emdCode ??
-									item.constituencyCode ??
+									item.guCode ??
+									item.cityCode ??
 									`sido-${item.sido}`
 								}
 								id={`${listboxId}-option-${index}`}
@@ -389,15 +455,9 @@ export function RegionSearch({
 								<span className="font-medium">
 									{item.displayName}
 								</span>
-								{item.emdCode ? (
-									<span className="text-sm text-muted-foreground">
-										읍면동
-									</span>
-								) : item.constituencyCode ? (
-									<span className="text-sm text-muted-foreground">
-										{getSidoFullName(item.sido)}
-									</span>
-								) : null}
+								<span className="text-sm text-muted-foreground">
+									{item.tag}
+								</span>
 							</li>
 						))}
 				</ul>
