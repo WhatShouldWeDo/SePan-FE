@@ -26,3 +26,4 @@ dist-ssr
 /.claude/commands
 /docs/plans
 /docs/memo
+src/app/routes/TestPage.tsx
