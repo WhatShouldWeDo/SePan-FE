@@ -75,6 +75,7 @@
 	--color-status-cautionary-bg: var(--status-cautionary-bg);
 	--color-status-positive: var(--status-positive);
 	--color-status-positive-bg: var(--status-positive-bg);
+	--color-toast-info-bg: var(--toast-info-bg);
 	--color-material-dimmer: var(--material-dimmer);
 	--color-party-dpk: var(--party-dpk);
 	--color-party-ppp: var(--party-ppp);
@@ -225,6 +226,9 @@
 	--status-positive: #00BF40;
 	--status-positive-bg: #E5F9EC;
 
+	/* Toast */
+	--toast-info-bg: #C2C7D2;                    /* Cool Neutral/40 */
+
 	/* Material */
 	--material-dimmer: rgba(17, 24, 39, 0.5);   /* #111827 @ 50% */
 
@@ -280,6 +284,20 @@
 	--map-stroke: 0.25 0 0;
 	--map-label: 0.85 0 0;
 	--map-fill-search-highlight: 0.5 0.15 140;
+}
+
+/* Sonner custom toast: 중앙 정렬 + 모바일 대응 */
+[data-sonner-toast][data-x-position="center"] {
+	left: 0;
+	right: 0;
+	display: flex;
+	justify-content: center;
+}
+
+@media (max-width: 600px) {
+	[data-sonner-toaster] {
+		--width: calc(100vw - 32px);
+	}
 }
 
 @layer base {
