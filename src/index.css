@@ -65,6 +65,8 @@
 	--color-fill-strong: var(--fill-strong);
 	--color-fill-alt: var(--fill-alt);
 	--color-fill-disabled: var(--fill-disabled);
+	--color-surface-inverse: var(--surface-inverse);
+	--color-surface-secondary: var(--surface-secondary);
 	--color-interaction-inactive: var(--interaction-inactive);
 	--color-interaction-disabled: var(--interaction-disabled);
 	--color-status-negative: var(--status-negative);
@@ -206,6 +208,10 @@
 	--fill-strong: rgba(107, 114, 128, 0.16);    /* #6B7280 @ 16% */
 	--fill-alt: rgba(107, 114, 128, 0.05);       /* #6B7280 @ 5% */
 	--fill-disabled: #f7f8fa;                    /* Disabled Background */
+
+	/* Surface */
+	--surface-inverse: #1F222C;                  /* Dark surface (선택 원형 배경) */
+	--surface-secondary: #F1F3F7;                /* Secondary surface (범위 배경) */
 
 	/* Interaction */
 	--interaction-inactive: #9CA3AF;             /* Cool Neutral/50 */
