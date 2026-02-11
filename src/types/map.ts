@@ -1,15 +1,17 @@
 // 지도 공통 타입 정의
 
-/** 지도 드릴다운 레벨 */
-export type MapLevel = "sido" | "constituency" | "eupMyeonDong";
+/** 지도 드릴다운 레벨 (4단계) */
+export type MapLevel = "sido" | "sigun" | "gu" | "eupMyeonDong";
 
 /** 검색으로 선택된 지역 (드릴다운 네비게이션용) */
 export interface SearchSelectedRegion {
 	/** 시도 약칭 (드릴다운 네비게이션용) */
 	sido: string;
-	/** 선거구 코드 (하이라이트용, 시도만 선택 시 null) */
-	constituencyCode: string | null;
-	/** 읍면동 코드 (읍면동 하이라이트용, 선거구까지만 선택 시 null) */
+	/** 시군 코드 (4자리=하위구 시, 5자리=독립 시군구) */
+	cityCode: string | null;
+	/** 구 코드 (5자리, 하위구 시의 구만 해당) */
+	guCode: string | null;
+	/** 읍면동 코드 */
 	emdCode?: string | null;
 }
 
@@ -31,7 +33,7 @@ export interface MapRegion {
 
 /**
  * 지도 설정
- * @description KoreaConstituencyMap 컴포넌트에 전달할 설정 객체
+ * @description KoreaAdminMap 컴포넌트에 전달할 설정 객체
  */
 export interface MapConfig {
 	/** 지도 너비 (px, 기본값: 600) */

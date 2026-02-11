@@ -4,6 +4,8 @@ import { useProjection } from "@/hooks/useProjection";
 import {
 	useMapDrillDown,
 	sidoPropsToMapRegion,
+	sigunPropsToMapRegion,
+	sigunguPropsToMapRegion,
 	emdPropsToMapRegion,
 } from "@/hooks/useMapDrillDown";
 import { useTopoJsonData } from "@/hooks/useTopoJsonData";
@@ -27,12 +29,12 @@ import type {
 	ChoroplethConfig,
 } from "@/types/map";
 
-export interface KoreaConstituencyMapProps {
+export interface KoreaAdminMapProps {
 	/** 지도 설정 */
 	config?: MapConfig;
-	/** 선택된 지역구 코드 */
+	/** 선택된 지역 코드 */
 	selectedCode?: string | null;
-	/** 지역구 클릭 콜백 — API 호출 파라미터로 활용 */
+	/** 지역 클릭 콜백 — API 호출 파라미터로 활용 */
 	onRegionSelect?: (region: MapRegion) => void;
 	/** 검색 결과로 특정 지역으로 네비게이트 */
 	searchNavigation?: SearchSelectedRegion | null;
@@ -46,11 +48,14 @@ export interface KoreaConstituencyMapProps {
 	className?: string;
 }
 
-/** 시도 레벨 라벨 면적 임계값 (시도는 크므로 거의 모두 표시) */
+/** 시도 레벨 라벨 면적 임계값 */
 const SIDO_LABEL_AREA_THRESHOLD = 1e-5;
 
-/** 선거구 레벨 라벨 면적 임계값 */
-const CONSTITUENCY_LABEL_AREA_THRESHOLD = 5e-7;
+/** 시군 레벨 라벨 면적 임계값 */
+const SIGUN_LABEL_AREA_THRESHOLD = 5e-7;
+
+/** 구 레벨 라벨 면적 임계값 */
+const GU_LABEL_AREA_THRESHOLD = 5e-7;
 
 /** 읍면동 레벨 라벨 면적 임계값 */
 const EMD_LABEL_AREA_THRESHOLD = 1e-7;
@@ -59,17 +64,14 @@ const EMD_LABEL_AREA_THRESHOLD = 1e-7;
 const ZOOM_LABEL_THRESHOLD = 2;
 
 /**
- * 22대 국회의원 선거구 폴리곤 지도 (시도 → 선거구 → 읍면동 3단계 드릴다운)
+ * 행정구역 폴리곤 지도 (시도 → 시군 → 구(조건부) → 읍면동 4단계 드릴다운)
  *
  * @description
- * - enableDrillDown=true (기본): 시도 → 선거구 → 읍면동 3단계 드릴다운
- * - enableDrillDown=false: Phase 1.2 호환 단일 뷰
- * - Phase 3-A: TopoJSON 동적 import로 초기 번들 감소
- * - Phase 3-C: Choropleth 색상 매핑 + 범례
- * - Phase 3-D: d3-zoom 기반 줌/팬 (1x~8x)
- * - Phase 4: 읍면동 3단계 드릴다운
+ * - enableDrillDown=true (기본): 4단계 드릴다운
+ * - enableDrillDown=false: 레거시 단일 뷰
+ * - Phase 5.5: 하위 구 보유 시 조건부 4단계 지원
  */
-export function KoreaConstituencyMap({
+export function KoreaAdminMap({
 	config,
 	selectedCode,
 	onRegionSelect,
@@ -78,7 +80,7 @@ export function KoreaConstituencyMap({
 	choroplethConfig = null,
 	isLoading = false,
 	className,
-}: KoreaConstituencyMapProps) {
+}: KoreaAdminMapProps) {
 	const {
 		width = 600,
 		height = 800,
@@ -91,25 +93,35 @@ export function KoreaConstituencyMap({
 	// --- TopoJSON 동적 로딩 ---
 	const {
 		sidoFeatures,
-		constituencyFeatures,
+		sigunFeatures,
+		sigunguFeatures,
 		emdFeatures,
 		isLoading: isDataLoading,
 		error: dataError,
 	} = useTopoJsonData();
 
-	// --- 드릴다운 모드 (3단계) ---
+	// --- 드릴다운 모드 (4단계) ---
 	const {
 		level,
 		selectedSido,
-		selectedConstituency,
-		selectedConstituencyName,
+		selectedCity,
+		selectedCityName,
+		selectedGu,
+		selectedGuName,
 		featureCollection: drillDownFeatureCollection,
 		handleSidoSelect,
-		handleConstituencySelect,
+		handleSigunSelect,
+		handleGuSelect,
 		handleBackToNational,
 		handleBackToSido,
+		handleBackToSigun,
 		navigateToSearchResult,
-	} = useMapDrillDown(sidoFeatures, constituencyFeatures, emdFeatures);
+	} = useMapDrillDown(
+		sidoFeatures,
+		sigunFeatures,
+		sigunguFeatures,
+		emdFeatures,
+	);
 
 	// --- 줌/팬 (Phase 3-D) ---
 	const { svgRef, gRef, zoomLevel, zoomIn, zoomOut, smoothZoomReset } =
@@ -133,6 +145,13 @@ export function KoreaConstituencyMap({
 		});
 	}, [isTransitioning, triggerTransition, gRef, handleBackToSido]);
 
+	const handleAnimatedBackToSigun = useCallback(() => {
+		if (isTransitioning) return;
+		triggerTransition(gRef.current, () => {
+			handleBackToSigun();
+		});
+	}, [isTransitioning, triggerTransition, gRef, handleBackToSigun]);
+
 	// 검색 네비게이션 처리
 	useEffect(() => {
 		if (searchNavigation && enableDrillDown) {
@@ -144,30 +163,32 @@ export function KoreaConstituencyMap({
 	useEffect(() => {
 		smoothZoomReset();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [level, selectedSido, selectedConstituency]);
+	}, [level, selectedSido, selectedCity, selectedGu]);
 
 	// --- 레거시 모드 (enableDrillDown=false) ---
 	const legacyFeatureCollection = useMemo(() => {
-		if (enableDrillDown || !constituencyFeatures) return null;
-		return constituencyFeatures;
-	}, [enableDrillDown, constituencyFeatures]);
+		if (enableDrillDown || !sigunguFeatures) return null;
+		return sigunguFeatures;
+	}, [enableDrillDown, sigunguFeatures]);
 
 	// 현재 표시할 featureCollection
 	const featureCollection = enableDrillDown
 		? drillDownFeatureCollection
 		: (legacyFeatureCollection ?? drillDownFeatureCollection);
 
-	// 현재 레벨 (레거시 모드는 항상 constituency)
-	const currentLevel = enableDrillDown ? level : "constituency";
+	// 현재 레벨 (레거시 모드는 항상 sigun)
+	const currentLevel = enableDrillDown ? level : "sigun";
 
 	// 레벨별 라벨 면적 임계값
 	const effectiveThreshold =
 		labelAreaThreshold ??
 		(currentLevel === "sido"
 			? SIDO_LABEL_AREA_THRESHOLD
-			: currentLevel === "constituency"
-				? CONSTITUENCY_LABEL_AREA_THRESHOLD
-				: EMD_LABEL_AREA_THRESHOLD);
+			: currentLevel === "sigun"
+				? SIGUN_LABEL_AREA_THRESHOLD
+				: currentLevel === "gu"
+					? GU_LABEL_AREA_THRESHOLD
+					: EMD_LABEL_AREA_THRESHOLD);
 
 	// D3 projection + path generator
 	const { pathGenerator } = useProjection(
@@ -177,29 +198,46 @@ export function KoreaConstituencyMap({
 		padding,
 	);
 
+	// sigun 레벨에서 HAS_GU 판별용 맵 (CITY_CD → boolean)
+	const sigunHasGuMap = useMemo(() => {
+		if (!sigunFeatures) return new Map<string, boolean>();
+		const map = new Map<string, boolean>();
+		for (const f of sigunFeatures.features) {
+			const props = f.properties;
+			if (props?.CITY_CD) {
+				map.set(props.CITY_CD as string, props.HAS_GU === true);
+			}
+		}
+		return map;
+	}, [sigunFeatures]);
+
 	// 각 feature의 pathD, centroid, region 미리 계산
 	const regionData = useMemo(
 		() =>
 			featureCollection.features.map((f) => {
 				const props = f.properties as Record<string, string>;
 
-				// 시도 / 선거구 / 읍면동 레벨 분기
 				let region: MapRegion;
 				if (currentLevel === "sido") {
 					region = sidoPropsToMapRegion({ SIDO: props.SIDO });
-				} else if (currentLevel === "eupMyeonDong") {
+				} else if (currentLevel === "sigun") {
+					region = sigunPropsToMapRegion({
+						CITY_CD: props.CITY_CD,
+						CITY_NM: props.CITY_NM,
+						SIDO: props.SIDO,
+					});
+				} else if (currentLevel === "gu") {
+					region = sigunguPropsToMapRegion({
+						SGU_CD: props.SGU_CD,
+						SGU_NM: props.SGU_NM,
+						SIDO: props.SIDO,
+					});
+				} else {
 					region = emdPropsToMapRegion({
 						EMD_CD: props.EMD_CD,
 						EMD_KOR_NM: props.EMD_KOR_NM,
 						SIDO: props.SIDO,
 					});
-				} else {
-					region = {
-						code: props.SGG_Code,
-						sido: props.SIDO,
-						name: props.SGG,
-						fullName: props.SIDO_SGG,
-					};
 				}
 
 				const area = geoArea(f);
@@ -226,7 +264,7 @@ export function KoreaConstituencyMap({
 	const [tooltip, setTooltip] = useState<HoveredRegion | null>(null);
 
 	// 레벨 전환 시 hover 상태 초기화 (렌더 중 상태 조정 패턴)
-	const viewKey = `${currentLevel}-${selectedSido}-${selectedConstituency}`;
+	const viewKey = `${currentLevel}-${selectedSido}-${selectedCity}-${selectedGu}`;
 	const [prevViewKey, setPrevViewKey] = useState(viewKey);
 	if (prevViewKey !== viewKey) {
 		setPrevViewKey(viewKey);
@@ -236,7 +274,6 @@ export function KoreaConstituencyMap({
 
 	const handleHover = useCallback(
 		(region: MapRegion | null, e: React.PointerEvent) => {
-			// 터치에서는 hover 무시 (longpress로 대체, Phase 3-E)
 			if (e.pointerType === "touch") return;
 
 			if (!region) {
@@ -266,7 +303,6 @@ export function KoreaConstituencyMap({
 					region: matched.region,
 					position: { x, y },
 				});
-				// 3초 후 자동 닫기
 				setTimeout(() => setTooltip(null), 3000);
 			}
 		},
@@ -288,9 +324,14 @@ export function KoreaConstituencyMap({
 				triggerTransition(gRef.current, () => {
 					handleSidoSelect(region.sido);
 				});
-			} else if (currentLevel === "constituency") {
+			} else if (currentLevel === "sigun") {
+				const hasGu = sigunHasGuMap.get(region.code) ?? false;
 				triggerTransition(gRef.current, () => {
-					handleConstituencySelect(region.code, region.name);
+					handleSigunSelect(region.code, region.name, hasGu);
+				});
+			} else if (currentLevel === "gu") {
+				triggerTransition(gRef.current, () => {
+					handleGuSelect(region.code, region.name);
 				});
 			} else {
 				// 읍면동 레벨 — 외부 콜백으로 전달
@@ -302,7 +343,9 @@ export function KoreaConstituencyMap({
 			enableDrillDown,
 			currentLevel,
 			handleSidoSelect,
-			handleConstituencySelect,
+			handleSigunSelect,
+			handleGuSelect,
+			sigunHasGuMap,
 			onRegionSelect,
 			triggerTransition,
 			gRef,
@@ -339,11 +382,11 @@ export function KoreaConstituencyMap({
 		) {
 			return searchNavigation.emdCode;
 		}
-		if (
-			currentLevel === "constituency" &&
-			searchNavigation.constituencyCode
-		) {
-			return searchNavigation.constituencyCode;
+		if (currentLevel === "gu" && searchNavigation.guCode) {
+			return searchNavigation.guCode;
+		}
+		if (currentLevel === "sigun" && searchNavigation.cityCode) {
+			return searchNavigation.cityCode;
 		}
 		return null;
 	}, [enableDrillDown, currentLevel, searchNavigation]);
@@ -365,9 +408,11 @@ export function KoreaConstituencyMap({
 	const ariaLabel =
 		currentLevel === "sido"
 			? "시도별 대한민국 지도"
-			: currentLevel === "constituency"
-				? `${selectedSido ?? ""} 선거구 지도`
-				: `${selectedConstituencyName ?? ""} 읍면동 지도`;
+			: currentLevel === "sigun"
+				? `${selectedSido ?? ""} 시군 지도`
+				: currentLevel === "gu"
+					? `${selectedCityName ?? ""} 구 지도`
+					: `${selectedGuName ?? selectedCityName ?? ""} 읍면동 지도`;
 
 	return (
 		<div className={cn("relative", className)}>
@@ -375,9 +420,11 @@ export function KoreaConstituencyMap({
 				<MapBreadcrumb
 					level={level}
 					selectedSido={selectedSido}
-					selectedConstituencyName={selectedConstituencyName}
+					selectedCityName={selectedCityName}
+					selectedGuName={selectedGuName}
 					onBackToNational={handleAnimatedBackToNational}
 					onBackToSido={handleAnimatedBackToSido}
+					onBackToSigun={handleAnimatedBackToSigun}
 				/>
 			)}
 			<svg
@@ -396,8 +443,6 @@ export function KoreaConstituencyMap({
 				<g ref={gRef}>
 					{regionData.map(
 						({ region, pathD, centroid, showLabel, area }) => {
-							// 줌 레벨에 따른 라벨 표시 조정:
-							// - 기본적으로 숨겨진 작은 폴리곤도 줌 2x 이상이면 표시
 							const zoomAdjustedShowLabel =
 								showLabel ||
 								(showLabels &&
