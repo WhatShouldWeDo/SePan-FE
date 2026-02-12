@@ -1,9 +1,34 @@
+import { useState } from "react"
 import { toast } from "@/lib/toast/toast"
 import { Toast } from "@/components/ui/toast"
+import { CategoryNav } from "@/components/ui/category-nav"
+import { CATEGORIES, SUBCATEGORIES } from "@/features/region/data/categories"
 
 const TestPage = () => {
+	const [selectedCategory, setSelectedCategory] = useState<string>()
+	const [selectedSubcategory, setSelectedSubcategory] = useState<string>()
+
 	return (
 		<div className="flex flex-col gap-8 p-8">
+			{/* CategoryNav 테스트 */}
+			<section>
+				<h2 className="text-heading-4 font-bold mb-4">CategoryNav</h2>
+				<CategoryNav
+					categories={CATEGORIES}
+					subcategories={SUBCATEGORIES}
+					selectedCategoryId={selectedCategory}
+					selectedSubcategoryId={selectedSubcategory}
+					onCategorySelect={setSelectedCategory}
+					onSubcategorySelect={(subId, catId) => {
+						setSelectedCategory(catId)
+						setSelectedSubcategory(subId)
+					}}
+				/>
+				<p className="mt-4 text-label-4 text-label-alternative">
+					선택: 카테고리={selectedCategory ?? "없음"} / 서브카테고리={selectedSubcategory ?? "없음"}
+				</p>
+			</section>
+
 			{/* 정적 프레젠테이셔널 Toast 미리보기 */}
 			<section>
 				<h2 className="text-heading-4 font-bold mb-4">Toast Variants (정적)</h2>
