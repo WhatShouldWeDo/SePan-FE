@@ -17,4 +17,6 @@
 export { CircleCheckFill } from "./CircleCheckFill"
 export { CircleExclamationFill } from "./CircleExclamationFill"
 export { CircleCloseFill } from "./CircleCloseFill"
+export { CircleInfoFill } from "./CircleInfoFill"
+export { MegaphoneFill } from "./MegaphoneFill"
 export { TriangleWarningFill } from "./TriangleWarningFill"
