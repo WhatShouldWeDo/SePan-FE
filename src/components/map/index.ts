@@ -5,6 +5,7 @@ export type { KoreaAdminMapProps } from "./KoreaAdminMap";
 
 export { RegionPolygon } from "./RegionPolygon";
 export { MapTooltip } from "./MapTooltip";
+export type { MapTooltipData } from "./MapTooltip";
 export { MapSkeleton } from "./MapSkeleton";
 export { MapBreadcrumb } from "./MapBreadcrumb";
 export { RegionSearch } from "./RegionSearch";
