@@ -68,6 +68,7 @@
 	--color-fill-alt: var(--fill-alt);
 	--color-fill-disabled: var(--fill-disabled);
 	--color-surface-inverse: var(--surface-inverse);
+	--color-surface-primary: var(--surface-primary);
 	--color-surface-secondary: var(--surface-secondary);
 	--color-interaction-inactive: var(--interaction-inactive);
 	--color-interaction-disabled: var(--interaction-disabled);
@@ -219,6 +220,7 @@
 
 	/* Surface */
 	--surface-inverse: #1F222C;                  /* Dark surface (선택 원형 배경) */
+	--surface-primary: #F7F8FA;                  /* Primary surface (Chip solid default 배경) */
 	--surface-secondary: #F1F3F7;                /* Secondary surface (범위 배경) */
 
 	/* Interaction */
