@@ -50,6 +50,8 @@
 	 */
 	--color-primary-strong: var(--primary-strong);
 	--color-primary-heavy: var(--primary-heavy);
+	--color-primary-alpha-5: var(--primary-alpha-5);
+	--color-primary-alpha-50: var(--primary-alpha-50);
 	--color-label-strong: var(--label-strong);
 	--color-label-normal: var(--label-normal);
 	--color-label-neutral: var(--label-neutral);
@@ -189,6 +191,8 @@
 	/* Primary 변형 */
 	--primary-strong: #5736F5;                   /* Violet/600 */
 	--primary-heavy: #4B2AD8;                    /* Violet/700 */
+	--primary-alpha-5: rgba(107, 92, 255, 0.05); /* Primary @ 5% — Chip active outlined bg */
+	--primary-alpha-50: rgba(107, 92, 255, 0.5); /* Primary @ 50% — Chip active outlined border */
 
 	/* Label (텍스트 색상 계층) */
 	--label-strong: #111827;                     /* Cool Neutral/100 */
