@@ -1,6 +1,6 @@
 import React from "react";
 import type { MapRegion } from "@/types/map";
-import { mapColors } from "@/lib/map-theme";
+import { mapColors } from "@/features/region/lib/map-theme";
 
 interface RegionPolygonProps {
 	/** SVG path d 속성 (미리 계산됨) */
