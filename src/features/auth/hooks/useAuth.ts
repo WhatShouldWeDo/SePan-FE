@@ -1,108 +1,77 @@
-import { useState, useCallback, useEffect } from "react"
+import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
+import { useQueryClient } from "@tanstack/react-query"
 import type { User } from "@/types/common"
+import { useApiQuery } from "@/lib/api/hooks"
 import * as authApi from "../api/authApi"
 
-interface AuthState {
-  user: User | null
-  isAuthenticated: boolean
-  isLoading: boolean
-  error: string | null
-}
+/** React Query 캐시 키 — 외부에서 queryClient.setQueryData 시 사용 */
+export const AUTH_QUERY_KEY = ["auth", "me"] as const
 
 interface LoginResult {
   success: boolean
   error?: string
 }
 
+/**
+ * 인증 상태 관리 훅 (React Query 기반)
+ *
+ * - getMe() 쿼리로 인증 상태 자동 관리
+ * - login/logout 시 queryClient.setQueryData로 캐시 직접 갱신
+ * - localStorage에 token 존재할 때만 getMe() 호출 (enabled 조건)
+ */
 export function useAuth() {
   const navigate = useNavigate()
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    isAuthenticated: false,
-    isLoading: true,
-    error: null,
+  const queryClient = useQueryClient()
+
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useApiQuery<User>({
+    queryKey: [...AUTH_QUERY_KEY],
+    queryFn: () => authApi.getMe(),
+    enabled: !!localStorage.getItem("auth_token"),
+    staleTime: Infinity,
+    retry: false,
+    showErrorToast: false,
   })
 
-  // 초기 인증 상태 확인
-  useEffect(() => {
-    const checkAuth = async () => {
-      const token = localStorage.getItem("auth_token")
-      if (!token) {
-        setState({
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error: null,
-        })
-        return
-      }
-
-      const result = await authApi.getMe()
-      if (result.success) {
-        setState({
-          user: result.data,
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-        })
-      } else {
-        localStorage.removeItem("auth_token")
-        setState({
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error: null,
-        })
-      }
-    }
-
-    checkAuth()
-  }, [])
+  const isAuthenticated = !!user
 
   const login = useCallback(
     async (username: string, password: string): Promise<LoginResult> => {
-      setState((prev) => ({ ...prev, error: null }))
-
       const result = await authApi.login({ username, password })
 
       if (result.success) {
         localStorage.setItem("auth_token", result.data.token)
-        setState({
-          user: result.data.user,
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-        })
+        queryClient.setQueryData([...AUTH_QUERY_KEY], result.data.user)
         navigate("/")
         return { success: true }
       }
 
-      const errorMessage = result.error.message
-      setState((prev) => ({ ...prev, error: errorMessage }))
-      return { success: false, error: errorMessage }
+      return { success: false, error: result.error.message }
     },
-    [navigate]
+    [navigate, queryClient],
   )
 
   const logout = useCallback(async () => {
     await authApi.logout()
     localStorage.removeItem("auth_token")
-    setState({
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-      error: null,
-    })
+    queryClient.setQueryData([...AUTH_QUERY_KEY], null)
+    queryClient.removeQueries({ queryKey: [...AUTH_QUERY_KEY] })
     navigate("/login")
-  }, [navigate])
+  }, [navigate, queryClient])
 
   const clearError = useCallback(() => {
-    setState((prev) => ({ ...prev, error: null }))
-  }, [])
+    queryClient.resetQueries({ queryKey: [...AUTH_QUERY_KEY] })
+  }, [queryClient])
 
   return {
-    ...state,
+    user: user ?? null,
+    isAuthenticated,
+    isLoading,
+    error: error?.message ?? null,
     login,
     logout,
     clearError,
