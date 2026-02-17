@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
@@ -16,6 +17,7 @@ const toastVariants = cva(
 				info: "bg-toast-info-bg",
 				error: "bg-status-negative-bg",
 				success: "bg-status-positive-bg",
+				warning: "bg-status-cautionary-bg",
 			},
 		},
 		defaultVariants: {
@@ -28,12 +30,14 @@ const iconMap = {
 	info: CircleExclamationFill,
 	error: TriangleWarningFill,
 	success: CircleCheckFill,
+	warning: TriangleWarningFill,
 } as const
 
 const iconColorMap = {
 	info: "text-label-neutral",
 	error: "text-status-negative",
 	success: "text-status-positive",
+	warning: "text-status-cautionary",
 } as const
 
 function Toast({

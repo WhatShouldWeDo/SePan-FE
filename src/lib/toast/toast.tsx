@@ -18,6 +18,7 @@ export interface ToastOptions {
 const DEFAULT_INFO_DURATION = 3000;
 const DEFAULT_ERROR_DURATION = 4000;
 const DEFAULT_SUCCESS_DURATION = 3000;
+const DEFAULT_WARNING_DURATION = 4000;
 
 export const toast = {
 	success: (message: string, options?: ToastOptions) => {
@@ -39,8 +40,8 @@ export const toast = {
 	},
 
 	warning: (message: string, options?: ToastOptions) => {
-		sonnerToast.custom(() => <Toast variant="info">{message}</Toast>, {
-			duration: options?.duration ?? DEFAULT_INFO_DURATION,
+		sonnerToast.custom(() => <Toast variant="warning">{message}</Toast>, {
+			duration: options?.duration ?? DEFAULT_WARNING_DURATION,
 		});
 	},
 };
