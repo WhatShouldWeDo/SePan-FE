@@ -1,16 +1,16 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { geoArea } from "d3-geo";
-import { useProjection } from "@/hooks/useProjection";
+import { useProjection } from "@/features/region/hooks/useProjection";
 import {
 	useMapDrillDown,
 	sidoPropsToMapRegion,
 	sigunPropsToMapRegion,
 	sigunguPropsToMapRegion,
 	emdPropsToMapRegion,
-} from "@/hooks/useMapDrillDown";
-import { useTopoJsonData } from "@/hooks/useTopoJsonData";
-import { useMapZoom } from "@/hooks/useMapZoom";
-import { useMapTransition } from "@/hooks/useMapTransition";
+} from "@/features/region/hooks/useMapDrillDown";
+import { useTopoJsonData } from "@/features/region/hooks/useTopoJsonData";
+import { useMapZoom } from "@/features/region/hooks/useMapZoom";
+import { useMapTransition } from "@/features/region/hooks/useMapTransition";
 import { useLongPress } from "@/hooks/useLongPress";
 import { RegionPolygon } from "./RegionPolygon";
 import { MapTooltip } from "./MapTooltip";
@@ -18,7 +18,7 @@ import { MapSkeleton } from "./MapSkeleton";
 import { MapBreadcrumb } from "./MapBreadcrumb";
 import { MapZoomControls } from "./MapZoomControls";
 import { cn } from "@/lib/utils";
-import { getChoroplethColor, buildLegendItems } from "@/lib/choropleth-utils";
+import { getChoroplethColor, buildLegendItems } from "@/features/region/lib/choropleth-utils";
 import { MapLegend } from "./MapLegend";
 import type {
 	MapRegion,

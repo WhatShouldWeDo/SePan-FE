@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import type { MapLevel, MapRegion, SearchSelectedRegion } from "@/types/map";
-import { getSidoFullName } from "@/lib/sido-utils";
+import { getSidoFullName } from "@/features/region/lib/sido-utils";
 
 export interface UseMapDrillDownReturn {
 	level: MapLevel;
@@ -352,4 +352,4 @@ export function emdPropsToMapRegion(props: {
 }
 
 // Re-export sigunPropsToMapRegion from sigun-utils for convenience
-export { sigunPropsToMapRegion } from "@/lib/sigun-utils";
+export { sigunPropsToMapRegion } from "@/features/region/lib/sigun-utils";

@@ -6,8 +6,8 @@ import {
 	CardDescription,
 	CardContent,
 } from "@/components/ui/card";
-import { KoreaAdminMap, RegionSearch } from "@/components/map";
-import { useTopoJsonData } from "@/hooks/useTopoJsonData";
+import { KoreaAdminMap, RegionSearch } from "@/features/region/components/map";
+import { useTopoJsonData } from "@/features/region/hooks/useTopoJsonData";
 import type { MapRegion, SearchSelectedRegion } from "@/types/map";
 
 export function RegionPage() {
