@@ -13,7 +13,7 @@ import { SignupStep2 } from "@/features/auth/components/SignupStep2";
 import { SignupStep3 } from "@/features/auth/components/SignupStep3";
 import { SignupStep4 } from "@/features/auth/components/SignupStep4";
 import { SignupComplete } from "@/features/auth/components/SignupComplete";
-import { signup } from "@/features/auth/api/authApi";
+import { signup } from "@/features/auth/api";
 import type {
 	Step1FormData,
 	Step2FormData,
