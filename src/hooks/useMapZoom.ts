@@ -46,6 +46,10 @@ export function useMapZoom(enabled: boolean = true): UseMapZoomReturn {
 	// callback ref: SVG 마운트/언마운트 시 state 갱신 → effect 재실행
 	const [svgNode, setSvgNode] = useState<SVGSVGElement | null>(null);
 	const svgRef = useCallback((node: SVGSVGElement | null) => {
+		if (node) {
+			// 터치 줌/팬을 위해 touch-action 비활성화 (Phase 3-E)
+			node.style.touchAction = "none";
+		}
 		setSvgNode(node);
 	}, []);
 
@@ -78,9 +82,6 @@ export function useMapZoom(enabled: boolean = true): UseMapZoomReturn {
 
 		// 더블클릭 줌 비활성화 (드릴다운과 충돌)
 		svgSelection.on("dblclick.zoom", null);
-
-		// 터치 줌/팬을 위해 touch-action 비활성화 (Phase 3-E)
-		svgNode.style.touchAction = "none";
 
 		zoomBehaviorRef.current = zoomBehavior;
 
