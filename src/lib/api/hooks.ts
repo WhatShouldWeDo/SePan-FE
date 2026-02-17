@@ -170,22 +170,22 @@ export function useApiMutation<TData, TVariables>(
       // 성공 시 data 반환
       return response.data
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data, variables, onMutateResult, context) => {
       // 성공 Toast 표시
       if (showSuccessToast && successMessage) {
         toast.success(successMessage)
       }
       // 사용자 정의 onSuccess 콜백 호출
-      onSuccess?.(data, variables, context)
+      onSuccess?.(data, variables, onMutateResult, context)
     },
-    onError: (error, variables, context) => {
+    onError: (error, variables, onMutateResult, context) => {
       // 에러 Toast는 mutationFn에서 이미 처리되었지만,
       // fetch 에러 등 ApiResponse가 아닌 에러는 여기서 처리
       if (showErrorToast && !(error instanceof Error && error.message)) {
         toastError(error)
       }
       // 사용자 정의 onError 콜백 호출
-      onError?.(error, variables, context)
+      onError?.(error, variables, onMutateResult, context)
     },
   })
 }
