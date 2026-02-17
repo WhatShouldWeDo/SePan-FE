@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { useQueryClient } from "@tanstack/react-query"
 import type { User } from "@/types/common"
 import { useApiQuery } from "@/lib/api/hooks"
-import * as authApi from "../api/authApi"
+import * as authApi from "../api"
 
 /** React Query 캐시 키 — 외부에서 queryClient.setQueryData 시 사용 */
 export const AUTH_QUERY_KEY = ["auth", "me"] as const

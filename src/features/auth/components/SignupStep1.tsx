@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { step1Schema, type Step1FormData } from "../schemas/signupSchema";
-import { checkUsername } from "../api/authApi";
+import { checkUsername } from "../api";
 import { cn } from "@/lib/utils";
 
 interface SignupStep1Props {

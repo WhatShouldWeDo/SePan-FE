@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { step3Schema, type Step3FormData } from "../schemas/signupSchema";
-import { verifyApprovalCode } from "../api/authApi";
+import { verifyApprovalCode } from "../api";
 import { useApiMutation } from "@/lib/api/hooks";
 import { toast } from "@/lib/toast/toast";
 
