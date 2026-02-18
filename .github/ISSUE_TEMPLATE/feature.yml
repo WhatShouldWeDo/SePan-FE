@@ -1,0 +1,61 @@
+name: "기능 구현"
+description: "새로운 기능 구현 요청"
+title: "feat: "
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 기능 구현 요청
+        구현할 기능에 대해 상세히 작성해주세요.
+
+  - type: input
+    id: module
+    attributes:
+      label: "대상 모듈"
+      description: "해당 기능이 속하는 모듈을 선택해주세요."
+      placeholder: "auth / dashboard / region / policy / components"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "기능 설명"
+      description: "구현할 기능을 상세히 설명해주세요."
+      placeholder: "어떤 기능을, 왜, 어떻게 구현해야 하는지 작성해주세요."
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: "사용자 시나리오"
+      description: "PRD/UX 플로우 기반 사용자 시나리오를 작성해주세요."
+      placeholder: |
+        1. 사용자가 ~에 접근한다
+        2. ~를 클릭한다
+        3. ~가 표시된다
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: "완료 조건"
+      description: "이 기능이 완료되었다고 판단할 수 있는 조건을 나열해주세요."
+      placeholder: |
+        - [ ] ~가 정상 동작한다
+        - [ ] 타입 체크 통과 (tsc --noEmit)
+        - [ ] 린트 통과 (pnpm run lint)
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: "참고 자료"
+      description: "관련 문서, Figma 링크, API 스펙 등"
+      placeholder: "PRD 섹션, Figma 링크, ADR 번호 등"
+    validations:
+      required: false
