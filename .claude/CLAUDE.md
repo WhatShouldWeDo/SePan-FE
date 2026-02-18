@@ -38,6 +38,25 @@ npx tsc --noEmit  # 타입 체크
 - PRD/UX 시나리오의 사용자 플로우 최우선. 불확실하면 "가설" 표시 후 질문.
 - 새 화면/퍼널은 **Plan 먼저** → 확인 후 코드. Plan에는 파일 설계, props 설계, 상태 전략, 가설/질문 포함.
 
+### 1-1. GitHub 워크플로우 (필수)
+
+모든 기능/컴포넌트 구현은 아래 흐름을 따른다. **코드 작성 전에 이슈와 브랜치가 먼저 존재해야 한다.**
+
+```
+1. 이슈 생성 (gh issue create --template)
+2. 브랜치 생성 (feature/이슈번호-설명 또는 fix/이슈번호-설명)
+3. 작업 수행
+4. 커밋 & 푸시
+5. PR 생성 (closes #이슈번호 포함)
+6. 리뷰 후 main에 머지
+```
+
+- **이슈 템플릿**: 기능 구현(`feature.yml`), 버그 리포트(`bug.yml`), 컴포넌트 구현(`component.yml`)
+- **브랜치 네이밍**: `feature/{이슈번호}-{간단한-설명}` 또는 `fix/{이슈번호}-{간단한-설명}`
+- **커밋 메시지**: 한국어 Conventional Commits (`feat:`, `fix:`, `refactor:` 등)
+- **PR**: `.github/PULL_REQUEST_TEMPLATE.md` 자동 적용, `closes #이슈번호`로 이슈 연결
+- main 브랜치 직접 커밋 금지 (설정/문서 변경 등 사소한 작업 제외)
+
 ---
 
 ## 2. 컨텍스트 우선순위
@@ -69,6 +88,8 @@ Claude는 아래 순서로 참고:
 
 ### 3-2. 작업 전 (반드시)
 
+- **GitHub 이슈 생성** → 적절한 템플릿 사용, 완료 조건 명시
+- **브랜치 생성** → `feature/{이슈번호}-{설명}` 또는 `fix/{이슈번호}-{설명}`
 - `ARCHITECTURE.md`와 `MODULE_MAP.md`로 현재 구조 파악
 - 대상 모듈의 `architecture/{module}.md` 확인
 - 관련 ADR 확인 → 기존 의사결정 존중
@@ -80,6 +101,7 @@ Claude는 아래 순서로 참고:
 - `ARCHITECTURE.md` — 아키텍처 영향 있으면 반영
 - `architecture/{module}.md` — 최신화 (없으면 생성). **"현재 어떻게"만 작성, "왜"는 ADR로 분리**
 - `plans/active/` 완료 계획 → `plans/archived/`로 이동
+- **PR 생성** → `closes #이슈번호` 포함, 체크리스트 확인 후 머지 요청
 
 ### 3-4. ADR · 트러블슈팅 작성
 
