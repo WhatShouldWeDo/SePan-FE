@@ -1,0 +1,73 @@
+name: "컴포넌트 구현"
+description: "Figma 디자인 기반 UI 컴포넌트 구현"
+title: "feat(ui): "
+labels: ["component"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 컴포넌트 구현
+        Figma 디자인 시스템 기반 컴포넌트 구현 요청입니다.
+
+  - type: input
+    id: component-name
+    attributes:
+      label: "컴포넌트 이름"
+      description: "Figma에서의 컴포넌트 이름"
+      placeholder: "예: Select/Cell/Master, DatePicker"
+    validations:
+      required: true
+
+  - type: input
+    id: target-path
+    attributes:
+      label: "생성 경로"
+      description: "컴포넌트가 생성될 파일 경로"
+      placeholder: "예: src/components/ui/select-cell.tsx"
+    validations:
+      required: true
+
+  - type: textarea
+    id: figma-link
+    attributes:
+      label: "Figma 링크"
+      description: "해당 컴포넌트의 Figma 프레임 링크"
+    validations:
+      required: false
+
+  - type: textarea
+    id: variants
+    attributes:
+      label: "Variants / Props"
+      description: "컴포넌트의 변형(variants)과 주요 props를 나열해주세요."
+      placeholder: |
+        - size: sm / md / lg
+        - variant: default / selected / disabled
+        - label: string
+    validations:
+      required: true
+
+  - type: textarea
+    id: design-tokens
+    attributes:
+      label: "디자인 토큰"
+      description: "사용할 색상, 타이포그래피, 간격 등 디자인 토큰"
+      placeholder: |
+        - 배경: --fill-normal
+        - 텍스트: --label-normal
+        - 폰트: text-body-2 medium
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: "완료 조건"
+      description: "컴포넌트 구현 완료 조건"
+      placeholder: |
+        - [ ] Figma 디자인과 일치
+        - [ ] 모든 variants 구현
+        - [ ] 타입 체크 통과 (tsc --noEmit)
+        - [ ] 접근성 기준 충족 (클릭 타겟 44x44px, WCAG AA)
+    validations:
+      required: true
