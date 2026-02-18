@@ -5,6 +5,7 @@ import { FormControlsSection } from "@/features/test/sections/FormControlsSectio
 import { CategoryNavSection } from "@/features/test/sections/CategoryNavSection"
 import { BannerSection } from "@/features/test/sections/BannerSection"
 import { ToastSection } from "@/features/test/sections/ToastSection"
+import { SelectCellSection } from "@/features/test/sections/SelectCellSection"
 
 const TestPage = () => {
 	return (
@@ -23,10 +24,13 @@ const TestPage = () => {
 			<hr className="border-line-neutral" />
 			<CategoryNavSection />
 
+			<hr className="border-line-neutral" />
+			<SelectCellSection />
+
 			<BannerSection />
 			<ToastSection />
 		</div>
-	)
-}
+	);
+};
 
-export default TestPage
+export default TestPage;
