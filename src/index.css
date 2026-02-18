@@ -149,83 +149,188 @@
 	--color-map-stroke: var(--map-stroke);
 	--color-map-label: var(--map-label);
 	--color-map-fill-search-highlight: var(--map-fill-search-highlight);
+
+	/* ── Primitive Color Palette (Figma Color 페이지 기반) ──
+	 * 사용법: bg-{palette}-{step}, text-{palette}-{step}, border-{palette}-{step}
+	 * 예: <div className="bg-cool-neutral-5 text-blue-50 border-violet-500">
+	 */
+
+	/* Cool Neutral — 0(흰색) → 100(검정) */
+	--color-cool-neutral-0: var(--cool-neutral-0);
+	--color-cool-neutral-5: var(--cool-neutral-5);
+	--color-cool-neutral-10: var(--cool-neutral-10);
+	--color-cool-neutral-20: var(--cool-neutral-20);
+	--color-cool-neutral-30: var(--cool-neutral-30);
+	--color-cool-neutral-40: var(--cool-neutral-40);
+	--color-cool-neutral-50: var(--cool-neutral-50);
+	--color-cool-neutral-60: var(--cool-neutral-60);
+	--color-cool-neutral-70: var(--cool-neutral-70);
+	--color-cool-neutral-80: var(--cool-neutral-80);
+	--color-cool-neutral-90: var(--cool-neutral-90);
+	--color-cool-neutral-100: var(--cool-neutral-100);
+
+	/* Blue — 100(흰색) → 0(검정), Figma 밝기 스케일 */
+	--color-blue-100: var(--blue-100);
+	--color-blue-99: var(--blue-99);
+	--color-blue-95: var(--blue-95);
+	--color-blue-90: var(--blue-90);
+	--color-blue-80: var(--blue-80);
+	--color-blue-70: var(--blue-70);
+	--color-blue-65: var(--blue-65);
+	--color-blue-60: var(--blue-60);
+	--color-blue-55: var(--blue-55);
+	--color-blue-50: var(--blue-50);
+	--color-blue-45: var(--blue-45);
+	--color-blue-40: var(--blue-40);
+	--color-blue-30: var(--blue-30);
+	--color-blue-20: var(--blue-20);
+	--color-blue-10: var(--blue-10);
+	--color-blue-0: var(--blue-0);
+
+	/* Violet — 50(밝음) → 950(어두움), Tailwind 호환 스케일 */
+	--color-violet-50: var(--violet-50);
+	--color-violet-100: var(--violet-100);
+	--color-violet-200: var(--violet-200);
+	--color-violet-300: var(--violet-300);
+	--color-violet-400: var(--violet-400);
+	--color-violet-500: var(--violet-500);
+	--color-violet-600: var(--violet-600);
+	--color-violet-700: var(--violet-700);
+	--color-violet-800: var(--violet-800);
+	--color-violet-900: var(--violet-900);
+	--color-violet-950: var(--violet-950);
+
+	/* Party */
+	--color-dpk-500: var(--dpk-500);
+	--color-ppp-500: var(--ppp-500);
 }
 
 :root {
 	--radius: 0.625rem;
 
+	/* ── Primitive Color Palette (Figma Color 페이지) ── */
+
+	/* Cool Neutral — 0(흰색) → 100(검정) */
+	--cool-neutral-0: #FFFFFF;
+	--cool-neutral-5: #F7F8FA;
+	--cool-neutral-10: #F1F3F7;
+	--cool-neutral-20: #E5E7EB;
+	--cool-neutral-30: #D1D5DB;
+	--cool-neutral-40: #C2C7D2;
+	--cool-neutral-50: #9CA3AF;
+	--cool-neutral-60: #6B7280;
+	--cool-neutral-70: #4B5563;
+	--cool-neutral-80: #374151;
+	--cool-neutral-90: #1F2937;
+	--cool-neutral-100: #111827;
+
+	/* Blue — 100(흰색) → 0(검정), Figma 밝기 스케일 */
+	--blue-100: #FFFFFF;
+	--blue-99: #F7FBFF;
+	--blue-95: #EAF2FE;
+	--blue-90: #C9DEFE;
+	--blue-80: #9EC5FF;
+	--blue-70: #69A5FF;
+	--blue-65: #4F95FF;
+	--blue-60: #3385FF;
+	--blue-55: #1A75FF;
+	--blue-50: #0066FF;
+	--blue-45: #005EEB;
+	--blue-40: #0054D1;
+	--blue-30: #003E9C;
+	--blue-20: #002966;
+	--blue-10: #001536;
+	--blue-0: #111827;
+
+	/* Violet — 50(밝음) → 950(어두움) */
+	--violet-50: #ECEFFF;
+	--violet-100: #DDE1FF;
+	--violet-200: #C2C8FF;
+	--violet-300: #9CA3FF;
+	--violet-400: #7875FF;
+	--violet-500: #6B5CFF;
+	--violet-600: #5736F5;
+	--violet-700: #4B2AD8;
+	--violet-800: #3D25AE;
+	--violet-900: #342689;
+	--violet-950: #211650;
+
+	/* Party */
+	--dpk-500: #0065F4;
+	--ppp-500: #FF2B3A;
+
 	/* ── shadcn 호환 변수 (Figma 값으로 매핑) ── */
-	--background: #FFFFFF;                       /* Background/Normal */
-	--foreground: #111827;                       /* Label/Strong */
-	--card: #FFFFFF;                             /* Background/Normal */
-	--card-foreground: #111827;                  /* Label/Strong */
-	--popover: #FFFFFF;                          /* Background/Normal */
-	--popover-foreground: #111827;               /* Label/Strong */
-	--primary: #6B5CFF;                          /* Primary/Normal (Violet/500) */
-	--primary-foreground: #FFFFFF;               /* Static/White */
-	--secondary: #F1F3F7;                        /* Background/Alternative */
-	--secondary-foreground: #111827;             /* Label/Strong */
-	--muted: #F1F3F7;                            /* Background/Alternative */
-	--muted-foreground: #6B7280;                 /* Label/Neutral */
-	--accent: #F1F3F7;                           /* Background/Alternative */
-	--accent-foreground: #111827;                /* Label/Strong */
-	--destructive: #FF4242;                      /* Status/Negative */
-	--border: rgba(107, 114, 128, 0.22);         /* Line/Normal */
-	--input: rgba(107, 114, 128, 0.16);          /* Line/Neutral */
-	--ring: #6B5CFF;                             /* Primary/Normal */
-	--chart-1: #6B5CFF;                          /* Primary/Normal */
-	--chart-2: #0065F4;                          /* Party/DPK */
-	--chart-3: #FF2B3A;                          /* Party/PPP */
-	--chart-4: #FF9200;                          /* Status/Cautionary */
-	--chart-5: #00BF40;                          /* Status/Positive */
-	--sidebar: #FFFFFF;                          /* Background/Normal */
-	--sidebar-foreground: #111827;               /* Label/Strong */
-	--sidebar-primary: #6B5CFF;                  /* Primary/Normal */
-	--sidebar-primary-foreground: #FFFFFF;       /* Static/White */
-	--sidebar-accent: #F1F3F7;                   /* Background/Alternative */
-	--sidebar-accent-foreground: #111827;        /* Label/Strong */
-	--sidebar-border: rgba(107, 114, 128, 0.16); /* Line/Neutral */
-	--sidebar-ring: #6B5CFF;                     /* Primary/Normal */
+	--background: var(--cool-neutral-0);             /* Background/Normal */
+	--foreground: var(--cool-neutral-100);           /* Label/Strong */
+	--card: var(--cool-neutral-0);                   /* Background/Normal */
+	--card-foreground: var(--cool-neutral-100);      /* Label/Strong */
+	--popover: var(--cool-neutral-0);                /* Background/Normal */
+	--popover-foreground: var(--cool-neutral-100);   /* Label/Strong */
+	--primary: var(--violet-500);                    /* Primary/Normal */
+	--primary-foreground: var(--cool-neutral-0);     /* Static/White */
+	--secondary: var(--cool-neutral-10);             /* Background/Alternative */
+	--secondary-foreground: var(--cool-neutral-100); /* Label/Strong */
+	--muted: var(--cool-neutral-10);                 /* Background/Alternative */
+	--muted-foreground: var(--cool-neutral-60);      /* Label/Neutral */
+	--accent: var(--cool-neutral-10);                /* Background/Alternative */
+	--accent-foreground: var(--cool-neutral-100);    /* Label/Strong */
+	--destructive: #FF4242;                          /* Status/Negative */
+	--border: rgba(107, 114, 128, 0.22);             /* Line/Normal */
+	--input: rgba(107, 114, 128, 0.16);              /* Line/Neutral */
+	--ring: var(--violet-500);                       /* Primary/Normal */
+	--chart-1: var(--violet-500);                    /* Primary/Normal */
+	--chart-2: var(--dpk-500);                       /* Party/DPK */
+	--chart-3: var(--ppp-500);                       /* Party/PPP */
+	--chart-4: #FF9200;                              /* Status/Cautionary */
+	--chart-5: #00BF40;                              /* Status/Positive */
+	--sidebar: var(--cool-neutral-0);                /* Background/Normal */
+	--sidebar-foreground: var(--cool-neutral-100);   /* Label/Strong */
+	--sidebar-primary: var(--violet-500);            /* Primary/Normal */
+	--sidebar-primary-foreground: var(--cool-neutral-0); /* Static/White */
+	--sidebar-accent: var(--cool-neutral-10);        /* Background/Alternative */
+	--sidebar-accent-foreground: var(--cool-neutral-100); /* Label/Strong */
+	--sidebar-border: rgba(107, 114, 128, 0.16);    /* Line/Neutral */
+	--sidebar-ring: var(--violet-500);               /* Primary/Normal */
 
 	/* ── Figma Semantic Tokens ── */
 
 	/* Primary 변형 */
-	--primary-strong: #5736F5;                   /* Violet/600 */
-	--primary-heavy: #4B2AD8;                    /* Violet/700 */
-	--primary-alpha-5: rgba(107, 92, 255, 0.05); /* Primary @ 5% — Chip active outlined bg */
-	--primary-alpha-50: rgba(107, 92, 255, 0.5); /* Primary @ 50% — Chip active outlined border */
+	--primary-strong: var(--violet-600);
+	--primary-heavy: var(--violet-700);
+	--primary-alpha-5: rgba(107, 92, 255, 0.05); /* Violet/500 @ 5% — Chip active outlined bg */
+	--primary-alpha-50: rgba(107, 92, 255, 0.5); /* Violet/500 @ 50% — Chip active outlined border */
 
 	/* Label (텍스트 색상 계층) */
-	--label-strong: #111827;                     /* Cool Neutral/100 */
-	--label-normal: #374151;                     /* Cool Neutral/80 */
-	--label-neutral: #6B7280;                    /* Cool Neutral/60 */
-	--label-alternative: #9CA3AF;                /* Cool Neutral/50 */
-	--label-assistive: #C2C7D2;                  /* Cool Neutral/40 */
-	--label-disabled: #D1D5DB;                   /* Cool Neutral/30 */
-	--label-inverse: #FFFFFF;                    /* Cool Neutral/0 */
+	--label-strong: var(--cool-neutral-100);
+	--label-normal: var(--cool-neutral-80);
+	--label-neutral: var(--cool-neutral-60);
+	--label-alternative: var(--cool-neutral-50);
+	--label-assistive: var(--cool-neutral-40);
+	--label-disabled: var(--cool-neutral-30);
+	--label-inverse: var(--cool-neutral-0);
 
 	/* Background */
-	--background-alt: #F1F3F7;                   /* Cool Neutral/10 */
+	--background-alt: var(--cool-neutral-10);
 
-	/* Line (구분선) */
-	--line-normal: rgba(107, 114, 128, 0.22);    /* #6B7280 @ 22% */
-	--line-neutral: rgba(107, 114, 128, 0.16);   /* #6B7280 @ 16% */
-	--line-alt: rgba(107, 114, 128, 0.08);       /* #6B7280 @ 8% */
+	/* Line (구분선) — Cool Neutral/60 @ opacity */
+	--line-normal: rgba(107, 114, 128, 0.22);
+	--line-neutral: rgba(107, 114, 128, 0.16);
+	--line-alt: rgba(107, 114, 128, 0.08);
 
-	/* Fill (표면 채움) */
-	--fill-normal: rgba(107, 114, 128, 0.08);    /* #6B7280 @ 8% */
-	--fill-strong: rgba(107, 114, 128, 0.16);    /* #6B7280 @ 16% */
-	--fill-alt: rgba(107, 114, 128, 0.05);       /* #6B7280 @ 5% */
-	--fill-disabled: #f7f8fa;                    /* Disabled Background */
+	/* Fill (표면 채움) — Cool Neutral/60 @ opacity */
+	--fill-normal: rgba(107, 114, 128, 0.08);
+	--fill-strong: rgba(107, 114, 128, 0.16);
+	--fill-alt: rgba(107, 114, 128, 0.05);
+	--fill-disabled: var(--cool-neutral-5);
 
 	/* Surface */
 	--surface-inverse: #1F222C;                  /* Dark surface (선택 원형 배경) */
-	--surface-primary: #F7F8FA;                  /* Primary surface (Chip solid default 배경) */
-	--surface-secondary: #F1F3F7;                /* Secondary surface (범위 배경) */
+	--surface-primary: var(--cool-neutral-5);    /* Chip solid default 배경 */
+	--surface-secondary: var(--cool-neutral-10); /* 범위 배경 */
 
 	/* Interaction */
-	--interaction-inactive: #9CA3AF;             /* Cool Neutral/50 */
-	--interaction-disabled: #F1F3F7;             /* Cool Neutral/10 */
+	--interaction-inactive: var(--cool-neutral-50);
+	--interaction-disabled: var(--cool-neutral-10);
 
 	/* Status */
 	--status-negative: #FF4242;
@@ -236,17 +341,17 @@
 	--status-positive-bg: #E5F9EC;
 
 	/* Toast */
-	--toast-info-bg: #C2C7D2;                    /* Cool Neutral/40 */
+	--toast-info-bg: var(--cool-neutral-40);
 
 	/* Shadow */
 	--shadow-overlay-panel: 0 2px 8px rgba(20, 40, 113, 0.06);
 
 	/* Material */
-	--material-dimmer: rgba(17, 24, 39, 0.5);   /* #111827 @ 50% */
+	--material-dimmer: rgba(17, 24, 39, 0.5);   /* Cool Neutral/100 @ 50% */
 
 	/* Party (정당 컬러) */
-	--party-dpk: #0065F4;                        /* DPK/500 — 더불어민주당 */
-	--party-ppp: #FF2B3A;                        /* PPP/500 — 국민의힘 */
+	--party-dpk: var(--dpk-500);                 /* 더불어민주당 */
+	--party-ppp: var(--ppp-500);                 /* 국민의힘 */
 
 	/* Map (지도 전용 — oklch) */
 	--map-fill: 0.92 0.02 250;
