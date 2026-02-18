@@ -1,266 +1,161 @@
-# Democrasee 프로젝트 가이드
+# 프로젝트 가이드
 
-> 이 파일은 Claude Code / Cursor가 자동으로 읽는 프로젝트 컨텍스트입니다.
+> Claude Code / Cursor가 자동으로 읽는 프로젝트 컨텍스트입니다.
 > 다른 프롬프트나 예시 코드가 상충하더라도, 여기 규칙을 우선 적용하세요.
 
 ---
 
 ## 0. 프로젝트 개요
 
-- **프로젝트 타입**: 구독형 웹 서비스 (선거 캠프용 지역분석·정책개발 SaaS, B2B에 가까운 내부 도구)
-- **주 사용자**: 40~60대 장년층 캠프 관계자 (후보자, 선거사무장, 회계책임자, 선거사무원 등)
-- **기능 핵심 축**
-  - 인증: 로그인/회원가입/프로필 관리 (소셜 로그인 없음)
-  - 지역분석: 공공데이터·서버 API 기반 지역 현황 시각화, 인접 지역 비교, AI 인사이트, 리포트
-  - 정책개발: 공약 작성/관리, AI 추천 공약, 역대 공약 분석
-  - 메인 대시보드: 현재 캠프/지역 상태를 한눈에 보여주고 다음 행동으로 자연스럽게 이동시키는 허브
+선거 캠프용 지역분석·정책개발 SaaS (B2B). 주 사용자는 40~60대 장년층 캠프 관계자.
 
-### 기술 스택
+기능 축: 인증(소셜 로그인 없음) · 지역분석(시각화/비교/AI 인사이트) · 정책개발(공약 관리/AI 추천) · 대시보드
 
-| 영역 | 선택 | 비고 |
-|------|------|------|
-| Framework | React + Vite | TypeScript 필수 |
-| 상태관리 (서버) | TanStack React Query | 서버 상태는 반드시 React Query로 |
-| 상태관리 (클라이언트) | 1순위 useState, 2순위 Zustand | Context는 테마/인증 등 제한적 사용만 허용 |
-| 스타일 | Tailwind CSS | 다른 CSS 방식 도입 금지 |
-| API 통신 | REST 기반 | 비즈니스 로직은 프론트에 두지 않기 |
-| 패키지 매니저 | (프로젝트 초기화 시 결정) | — |
-
-### 명령어 (프로젝트 초기화 후 업데이트)
+| 영역            | 선택                 | 비고                               |
+| --------------- | -------------------- | ---------------------------------- |
+| Framework       | React + Vite         | TypeScript 필수                    |
+| 서버 상태       | TanStack React Query | 서버 상태는 반드시 RQ              |
+| 클라이언트 상태 | useState > Zustand   | Context는 테마/인증만              |
+| 스타일          | Tailwind CSS         | 다른 CSS 방식 금지                 |
+| API             | REST                 | 비즈니스 로직은 프론트에 두지 않기 |
 
 ```bash
-# 개발 서버
-# pnpm run dev
-
-# 빌드
-# pnpm run build
-
-# 린트
-# pnpm run lint
-
-# 타입 체크
-# npx tsc --noEmit
+pnpm run dev      # 개발 서버
+pnpm run build    # 빌드
+pnpm run lint     # 린트
+npx tsc --noEmit  # 타입 체크
 ```
 
 ---
 
-## 1. 작업 방식 (바이브 코딩 가드레일)
+## 1. 작업 방식
 
-"생성은 맡기되, 컨텍스트와 결정은 사람이 주도"하는 **예측 가능한 바이브 코딩** 패턴을 따릅니다.
+"생성은 맡기되, 컨텍스트와 결정은 사람이 주도"하는 예측 가능한 바이브 코딩.
 
-### 1-1. 기본 원칙
-
-- 코드를 **직접 읽고 이해 가능한 수준**으로만 생성합니다. 과도한 추상화 금지.
-- 한 번에 한 화면(또는 한 기능)만 집중해서 작업합니다.
-- 새 기술·라이브러리 도입은 항상 먼저 질문 후 제안만. 코드에 바로 반영하지 마세요.
-- PRD/UX 시나리오에 명시된 사용자 플로우를 **최우선**으로 지키고, 불확실하면 "가설" 표시 후 질문하세요.
-
-### 1-2. 요청 단위 전략 (작은 요청 멀티턴)
-
-요청은 최대한 **작은 단위**로 진행합니다.
-
-- 예:
-  - "대시보드 홈에서 사용할 레이아웃 컴포넌트만 만들어줘"
-  - "지역분석 결과 페이지의 인접지역 비교 섹션만 구현해줘. UI 목업 수준이면 됨"
-- Claude는 응답에서:
-  - 구현 범위와 전제 조건을 먼저 요약하고
-  - 파일별 diff를 보여주고
-  - "다음에 이어서 구현할 후보 목록(Todo)"을 간단히 제안해 주세요.
-
-### 1-3. Plan 모드 선호
-
-새로운 화면/퍼널을 만들 때는 먼저 **계획 텍스트**를 보여준 뒤, 확인 후에 코드를 작성하세요.
-
-Plan에 포함할 것:
-- 파일/디렉터리 설계
-- 컴포넌트 단위와 props 설계
-- 상태 관리 전략 (어디에서 어떤 데이터를 가져오고 캐싱할지)
-- 기술적으로 애매한 부분에 대한 가설과 질문 리스트
+- 코드를 직접 읽고 이해 가능한 수준으로만 생성. 과도한 추상화 금지.
+- 한 번에 한 화면(또는 한 기능)만 집중.
+- 새 기술·라이브러리 도입은 항상 질문 먼저. 코드에 바로 반영 금지.
+- PRD/UX 시나리오의 사용자 플로우 최우선. 불확실하면 "가설" 표시 후 질문.
+- 새 화면/퍼널은 **Plan 먼저** → 확인 후 코드. Plan에는 파일 설계, props 설계, 상태 전략, 가설/질문 포함.
 
 ---
 
-## 2. Todo / 체크리스트 운영
+## 2. 컨텍스트 우선순위
 
-프로젝트 루트에 `TODO.md`를 두고, Claude가 스스로 읽고 업데이트할 수 있도록 합니다.
+Claude는 아래 순서로 참고:
 
-- 규칙
-  - 이미 끝난 작업은 `[x]`로 표시
-  - 새로 알아낸 요구사항/결정은 "메모" 섹션에 축적
-  - Claude가 Todo를 수정할 때는 **항상 diff를 보여주고**, 마지막에 "이번 턴에 실제로 완료한 항목"을 리스트로 정리
-
----
-
-## 3. 컨텍스트 계층 구조
-
-Claude는 다음 파일들을 우선순위로 참고하세요:
-
-1. `.claude/CLAUDE.md` (이 파일): 전체 규칙, UX/도메인 컨텍스트
-2. `docs/prd.md` / `docs/ux-flow.md`: 유저 플로우, 퍼널 정의, UX 시나리오
-3. `src/app/router.tsx` (또는 동등 파일): 실제 라우팅 구조
-4. 각 페이지별 `*Page.tsx` / `*View.tsx`: 화면 구조
-5. `TODO.md`: 현재 작업 중인 범위
-
-규칙:
-- 새로운 페이지/기능 설계 시 먼저 **관련 PRD/UX 파일을 찾아서 요약**한 뒤 작업하세요.
-- PRD에 모순·빈칸이 있다면 코드로 추측 구현하지 말고:
-  - "가설" 섹션에 적고
-  - 화면 상에서는 최소한의 안전한 기본값(placeholder, disabled 상태 등)으로만 처리
+1. **이 파일** — 전체 규칙
+2. **`docs/ARCHITECTURE.md`** — 아키텍처 개요 (항상 최신)
+3. **`docs/MODULE_MAP.md`** — 모듈별 파일 위치·역할 (항상 최신)
+4. **`docs/prd.md` / `docs/ux-flow.md`** — 유저 플로우, UX 시나리오
+5. **`docs/architecture/{module}.md`** — 모듈별 상세 구조 (항상 최신)
+6. **`docs/decisions/`** — 의사결정 기록(ADR). append only.
+7. **`docs/troubleshooting/`** — 트러블슈팅 기록. append only.
+8. **`src/app/router.tsx`** — 라우팅 구조
+9. **`TODO.md`** — 현재 작업 범위
 
 ---
 
-## 4. UX / UI 가드레일 (장년층 대상, 시각화 중심)
+## 3. 문서 시스템
 
-### 4-1. 타겟 사용자 UX 원칙
+### 3-1. 문서 성격 구분
 
-- 텍스트는 **충분히 큰 글자**와 높은 대비를 사용 (WCAG AA 이상 지향)
-- 복잡한 데이터 시각화도 "한 문장 요약 + 그래프" 구조로 제시
-- 클릭 타겟(버튼, 탭, 카드)은 최소 44×44px 이상, 모바일/태블릿 고려
-- 컬러 팔레트는 제한된 메인 컬러 중심
+| 디렉토리                                            | 업데이트 방식                   |
+| --------------------------------------------------- | ------------------------------- |
+| `ARCHITECTURE.md`, `MODULE_MAP.md`, `architecture/` | 항상 최신으로 덮어쓰기          |
+| `decisions/`, `troubleshooting/`, `plans/archived/` | **추가만 가능, 기존 수정 금지** |
+| `plans/active/`                                     | 작업 중 업데이트 가능           |
+| `prd.md`, `ux-flow.md`                              | Claude 수정 금지 (사람만 수정)  |
 
-Claude가 새로운 컴포넌트를 만들 때:
-- "텍스트 크기, 색상 대비, 클릭 타겟 크기가 이 원칙을 만족하는지"를 간단히 언급하세요.
-- Tooltip 또는 세부 설명이 필요한 경우, "간단 요약 텍스트 + '자세히 보기' 버튼" 패턴 선호.
+### 3-2. 작업 전 (반드시)
 
-### 4-2. 주요 화면별 UX 포인트
+- `ARCHITECTURE.md`와 `MODULE_MAP.md`로 현재 구조 파악
+- 대상 모듈의 `architecture/{module}.md` 확인
+- 관련 ADR 확인 → 기존 의사결정 존중
+- PRD/UX 모순·빈칸 → 추측 구현 금지, "가설" 표시 + 안전한 기본값
 
-#### 로그인 / 회원가입
+### 3-3. 작업 후 (반드시)
 
-- 소셜 로그인 없음
-- 플로우:
-  - 로그인: 아이디/비밀번호 → 성공 시 대시보드
-  - 회원가입: 기본 정보 → 휴대폰 인증 → 승인코드 입력 → 역할/지역/추가정보 입력 → 완료
-- 각 스텝을 **다단계 폼 컴포넌트**로 분리
-- 유효성 검사는 "한 번에 하나의 오류 메시지"가 보이도록 단순하게
+- `MODULE_MAP.md` — 변경된 파일/모듈 반영
+- `ARCHITECTURE.md` — 아키텍처 영향 있으면 반영
+- `architecture/{module}.md` — 최신화 (없으면 생성). **"현재 어떻게"만 작성, "왜"는 ADR로 분리**
+- `plans/active/` 완료 계획 → `plans/archived/`로 이동
 
-#### 대시보드 홈
+### 3-4. ADR · 트러블슈팅 작성
 
-- 목적: 캠프의 현재 상태를 한눈에 파악 → 다음 행동으로 자연스럽게 이동
-- 최소 구성:
-  - 오늘의 일정 인포배너 (최상단)
-  - 선거일 D-day
-  - 지역분석 요약 카드 (최다 민원 지역, 주요 민원 유형, 증가율)
-  - 정책개발 요약 카드 (최신/진행중/완료된 정책)
-  - 퀵메뉴: "지역분석 바로가기 / 정책개발 바로가기 / 일정 관리"
-- 레이아웃: "일정/CTA 상단 고정 + 요약 카드 + 퀵메뉴" 구조
-- 카드 내용이 없어도 Skeleton/placeholder 표시
-
-#### 지역분석
-
-- 목적: "우리 지역이 인접 지역/전국 대비 어떤 상태인지"를 이해시켜, **문제 인식 → 정책개발으로 연결**
-- 핵심 요소:
-  - 행정동/선거구 단위 시각화 (지도 폴리곤 또는 카드/테이블)
-  - 현황: 현재값, 전년 대비, 전국 평균, 연도별 추이 그래프, 표
-  - 인접 지역 비교: 주요 지표 비교 (리스트 + 바/차트)
-  - AI 분석 인사이트: 핵심 요약 문장 + "자세히 보기" 링크
-  - 상세리포트 CTA
-- 지도/폴리곤은 **추상화된 인터페이스**부터 정의 (`MapView` 컴포넌트, `onRegionSelect`, `regions` props)
-- 인접 지역 비교는 "내 지역 vs 상위 N개 비교 지역" 테이블 + 차트
-
-#### 정책개발
-
-- 목적: 지역분석 데이터 → **공약 생성, 관리, 홍보** 흐름 제공
-- 탭 우선순위: 개요 → 역대공약분석 → 확정공약 → AI 추천
-- "데이터 조회용 탭" vs "작성/관리 탭"을 분리된 컴포넌트로 구조화
-- AI 추천 결과는 항상 "사람이 수정/선택하는 전제", 자동 저장/자동 채택 구현 금지
+- ADR: 기존 패턴과 다른 선택을 했을 때만. 템플릿 → `docs/templates/adr-template.md`
+- 트러블슈팅: 예상치 못한 문제 해결 시. 템플릿 → `docs/templates/troubleshooting-template.md`
+- `MODULE_MAP.md` 형식 → `docs/templates/module-map-guide.md`
+- `ARCHITECTURE.md` 형식 → `docs/templates/architecture-guide.md`
 
 ---
 
-## 5. 코드 스타일 & 아키텍처
+## 4. UX 가드레일
 
-### 5-1. 폴더 구조
+- 텍스트: 충분히 큰 글자, 높은 대비 (WCAG AA 이상)
+- 클릭 타겟: 최소 44×44px
+- 데이터 시각화: "한 문장 요약 + 그래프" 구조
+- 새 컴포넌트 생성 시 위 원칙 준수 여부 간단히 언급
+- **화면별 상세 UX** → `docs/ux-flow.md` 참조. 작업 전 반드시 확인.
+
+---
+
+## 5. 코드 구조
 
 ```
 src/
   app/          # 라우팅, 페이지 스켈레톤
-  features/
-    auth/
-    dashboard/
-    region/
-    policy/
-  components/   # 재사용 UI (공통 컴포넌트)
+  features/     # auth / dashboard / region / policy
+  components/   # 재사용 UI
   hooks/        # 공통 훅
-  lib/          # 유틸리티, API 클라이언트 등
-  types/        # 공통 타입 정의
+  lib/          # 유틸리티, API 클라이언트
+  types/        # 공통 타입
 ```
 
-- 새 기능 추가 시 기존 구조를 재사용하고, 새 아키텍처 패턴을 도입하지 마세요.
-
-### 5-2. 상태 관리 우선순위
-
-1. 로컬 상태 (`useState`)
-2. React Query (서버 상태)
-3. Zustand (꼭 필요한 경량 글로벌 상태만)
-
-### 5-3. 컴포넌트 설계
-
-- 한 컴포넌트는 하나의 역할:
-  - `Page` 컴포넌트: 데이터 패칭 + 레이아웃
-  - `Section` 컴포넌트: 기능 단위 (예: "인접지역 비교 섹션")
-  - `Pure UI` 컴포넌트: 버튼, 카드, 차트 wrapper 등
-- 새 섹션을 만들 때: `Page` → `Section` → `UI` 순으로 레이어 분리
-- 테스트가 필요한 비즈니스 로직은 hooks (`useXxx`)로 분리
+- 상태 관리: useState → React Query → Zustand (이 순서)
+- 컴포넌트 레이어: `Page`(데이터+레이아웃) → `Section`(기능 단위) → `Pure UI`
+- 비즈니스 로직은 hooks(`useXxx`)로 분리
 
 ---
 
-## 6. 금지 목록 (Do NOT)
+## 6. 금지 목록
 
-아래 항목은 어떤 경우에도 Claude가 자의적으로 수행하면 안 됩니다:
-
-- Redux, MobX 등 이 프로젝트에서 사용하지 않는 상태관리 도입
-- Tailwind CSS 외 다른 스타일링 방식 도입
-- 새 라이브러리를 질문 없이 `package.json`에 추가
-- PRD/UX에 없는 기능을 추측으로 구현
-- AI 추천 결과의 자동 저장/자동 채택 로직 구현
-- 소셜 로그인 관련 코드 추가
-- 한 번에 여러 화면/기능을 동시 구현
-- 비즈니스 로직을 프론트엔드에 배치
+- Redux, MobX 등 미사용 상태관리 도입
+- Tailwind 외 스타일링 도입
+- 새 라이브러리 질문 없이 추가
+- PRD/UX에 없는 기능 추측 구현
+- AI 추천 자동 저장/자동 채택
+- 소셜 로그인 코드 추가
+- 한 번에 여러 화면/기능 동시 구현
+- 비즈니스 로직 프론트엔드 배치
+- `decisions/`, `troubleshooting/`, `plans/archived/` 기존 파일 수정
+- `prd.md`, `ux-flow.md` Claude 직접 수정
 
 ---
 
-## 7. Claude에게 특별 요청
+## 7. Claude 작업 규칙
 
-작업 시 항상 다음을 지켜주세요:
-
-1. **변경 요약 먼저** — 어떤 파일을 왜 바꾸는지 3~5줄로 설명
-2. **diff 중심 응답** — 가능한 한 diff 형식으로 제시, 새 파일은 전체 코드
-3. **컨텍스트 다시 확인** — PRD/UX와 상충 가능한 부분 발견 시, 즉시 질문
+1. **변경 요약 먼저** — 어떤 파일을 왜 바꾸는지 3~5줄
+2. **diff 중심 응답** — 새 파일은 전체 코드
+3. **PRD/UX 상충 시** → 즉시 질문
 4. **과도한 파일 생성 금지** — 임시 파일은 작업 끝에 정리
-5. **커밋 단위 추천** — "이 변경은 하나의 커밋으로 묶을 수 있습니다 / 둘로 나누는 게 좋습니다" 정도 추천
-6. **규칙 참조 명시** — 각 턴에서 이 가이드 중 어떤 규칙을 참고했는지 간단히 언급
+5. **커밋 단위 추천**
+6. **규칙 참조 명시** — 이 가이드 중 어떤 규칙 참고했는지 언급
+7. **문서 업데이트 리마인드** — 기능 완료 시 업데이트 필요 문서 목록 제안
 
 ---
 
-## 8. 사용 예시
+## 8. Todo 운영
 
-- "대시보드 홈 레이아웃을 MVP 수준으로 구현하고 싶다"라고 말하면:
-  1. 이 `CLAUDE.md`와 PRD/UX 내용을 요약
-  2. 필요한 파일 목록 & Plan 제시
-  3. 확인 후에만 코드 수정
-  4. 마지막에 Todo 업데이트 제안
-
-- "지역분석 결과 페이지 인접지역 비교만 먼저 목업으로 만들자"라고 말하면:
-  - 실제 API 대신 mock 데이터/타입을 정의하되, 타입/함수 이름을 "실제 API로 교체될 수 있는 형태"로 유지
-  - UI는 표 + 미니 바 차트 정도의 단순하지만 확장 가능한 구조로
+`TODO.md`를 Claude가 읽고 업데이트. 끝난 작업은 `[x]`, 새 요구사항은 "메모" 섹션에 축적. 수정 시 항상 diff + "이번 턴 완료 항목" 정리.
 
 ---
 
 ## 9. Serena Usage (MANDATORY)
-Always use serena MCP tools:
-find_symbol: Locate classes, functions, variables
-get_symbols_overview: Understand file structure
-find_referencing_symbols: Check dependencies before changes
-insert_after_symbol / insert_before_symbol: For code insertion
-replace_symbol: For refactoring
-Never use grep/ripgrep when serena can do semantic search.
-Never read entire files - use serena to get relevant symbols only.￼
 
-_이 `CLAUDE.md`는 MVP 동안 계속 수정될 예정입니다._
+Always use serena MCP tools: `find_symbol`, `get_symbols_overview`, `find_referencing_symbols`, `insert_after_symbol`, `insert_before_symbol`, `replace_symbol`.
+Never use grep/ripgrep when serena can do semantic search. Never read entire files — use serena to get relevant symbols only.
 
-<!-- 참고 자료
-- https://code.claude.com/docs/en/best-practices
-- https://www.velopers.kr/blog/21
-- http://thefarmersfront.github.io/blog/vibe-coding-with-claude-code/
-- https://harper.blog/2025/05/08/basic-claude-code/
-- https://bcho.tistory.com/1492
-- https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices
--->
+---
+
+_이 CLAUDE.md는 MVP 동안 계속 수정될 예정입니다._
