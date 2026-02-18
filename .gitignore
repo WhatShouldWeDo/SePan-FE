@@ -24,7 +24,6 @@ dist-ssr
 *.sw?
 
 /.claude/commands
-/docs/plans
-/docs/memo
+/docs
 src/app/routes/TestPage.tsx
 sigungu.csv

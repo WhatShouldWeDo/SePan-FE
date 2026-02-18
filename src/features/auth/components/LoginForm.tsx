@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/text-field";
 import { Spinner } from "@/components/ui/spinner";
 import { loginSchema, type LoginFormData } from "../schemas/loginSchema";
-import { login } from "../api/authApi";
+import { login } from "../api";
 import { useApiMutation } from "@/lib/api/hooks";
 
 export function LoginForm() {

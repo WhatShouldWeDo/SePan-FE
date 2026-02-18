@@ -1,11 +1,10 @@
-import { CardSectionHeaderSection } from "@/features/test/sections/CardSectionHeaderSection";
-import { ChipSection } from "@/features/test/sections/ChipSection";
-import { ChipTagSection } from "@/features/test/sections/ChipTagSection";
-import { FormControlsSection } from "@/features/test/sections/FormControlsSection";
-import { CategoryNavSection } from "@/features/test/sections/CategoryNavSection";
-import { BannerSection } from "@/features/test/sections/BannerSection";
-import { ToastSection } from "@/features/test/sections/ToastSection";
-import { SelectCellSection } from "@/features/test/sections/SelectCellSection";
+import { CardSectionHeaderSection } from "@/features/test/sections/CardSectionHeaderSection"
+import { ChipSection } from "@/features/test/sections/ChipSection"
+import { ChipTagSection } from "@/features/test/sections/ChipTagSection"
+import { FormControlsSection } from "@/features/test/sections/FormControlsSection"
+import { CategoryNavSection } from "@/features/test/sections/CategoryNavSection"
+import { BannerSection } from "@/features/test/sections/BannerSection"
+import { ToastSection } from "@/features/test/sections/ToastSection"
 
 const TestPage = () => {
 	return (
@@ -23,9 +22,6 @@ const TestPage = () => {
 
 			<hr className="border-line-neutral" />
 			<CategoryNavSection />
-
-			<hr className="border-line-neutral" />
-			<SelectCellSection />
 
 			<BannerSection />
 			<ToastSection />

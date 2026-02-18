@@ -1,6 +1,6 @@
 import { ChevronRight } from "lucide-react";
 import type { MapLevel } from "@/types/map";
-import { getSidoFullName } from "@/lib/sido-utils";
+import { getSidoFullName } from "@/features/region/lib/sido-utils";
 
 interface MapBreadcrumbProps {
 	level: MapLevel;

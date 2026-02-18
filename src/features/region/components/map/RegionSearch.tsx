@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useRef, useId } from "react";
 import { Search, X, Clock } from "lucide-react";
-import { SIDO_NAME_MAP, getSidoFullName } from "@/lib/sido-utils";
+import { SIDO_NAME_MAP, getSidoFullName } from "@/features/region/lib/sido-utils";
 import { isChosungQuery, matchChosung } from "@/lib/hangul-utils";
 import {
 	useRecentSearches,

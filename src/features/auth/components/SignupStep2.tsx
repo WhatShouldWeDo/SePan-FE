@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { step2Schema, type Step2FormData } from "../schemas/signupSchema";
-import { sendVerification, verifyPhone } from "../api/authApi";
+import { sendVerification, verifyPhone } from "../api";
 import { useApiMutation } from "@/lib/api/hooks";
 
 interface SignupStep2Props {
