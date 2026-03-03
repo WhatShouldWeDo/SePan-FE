@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
 	BarChart3,
 	Users,
@@ -29,9 +30,17 @@ import {
 } from "@/features/dashboard/components";
 
 export function DashboardPage() {
+	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(true);
 	const [currentDate] = useState(() => new Date());
 	const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
+	const [weekOffset, setWeekOffset] = useState(0);
+
+	const displayedDate = useMemo(() => {
+		const d = new Date(currentDate);
+		d.setDate(d.getDate() + weekOffset * 7);
+		return d;
+	}, [currentDate, weekOffset]);
 
 	useEffect(() => {
 		const timer = setTimeout(() => setIsLoading(false), 1500);
@@ -104,7 +113,7 @@ export function DashboardPage() {
 							title="지역분석 인사이트"
 							description="AI가 분석한 우리 지역의 핵심 데이터"
 							trailingContent={
-								<Button variant="outline" size="sm">
+								<Button variant="outline" size="sm" onClick={() => navigate("/region")}>
 									바로가기
 								</Button>
 							}
@@ -180,7 +189,7 @@ export function DashboardPage() {
 							title="정책개발 현황"
 							description="공약 관리 및 AI 추천 현황"
 							trailingContent={
-								<Button variant="outline" size="sm">
+								<Button variant="outline" size="sm" onClick={() => navigate("/policy")}>
 									바로가기
 								</Button>
 							}
@@ -237,6 +246,7 @@ export function DashboardPage() {
 										variant="ghost"
 										size="icon-xs"
 										aria-label="이전 주"
+										onClick={() => setWeekOffset((prev) => prev - 1)}
 									>
 										<ChevronLeft className="size-4" />
 									</Button>
@@ -244,6 +254,7 @@ export function DashboardPage() {
 										variant="ghost"
 										size="icon-xs"
 										aria-label="다음 주"
+										onClick={() => setWeekOffset((prev) => prev + 1)}
 									>
 										<ChevronRight className="size-4" />
 									</Button>
@@ -251,7 +262,7 @@ export function DashboardPage() {
 							}
 						/>
 						<WeekStrip
-							currentDate={currentDate}
+							currentDate={displayedDate}
 							selectedDate={selectedDate}
 							onDateSelect={setSelectedDate}
 						/>
