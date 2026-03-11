@@ -98,6 +98,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           aria-label="사용자 메뉴"
           aria-expanded={isDropdownOpen}
           aria-haspopup="menu"
+          aria-controls="user-menu-dropdown"
           className="size-11 flex items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
           <span className="size-8 rounded-full bg-fill-normal border border-line-neutral flex items-center justify-center text-sm font-bold text-label-alternative hover:bg-fill-strong transition-colors">
