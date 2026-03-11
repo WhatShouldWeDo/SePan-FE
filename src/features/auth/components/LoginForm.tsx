@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Eye, EyeOff } from "lucide-react";
 import { TextField } from "@/components/ui/text-field";
 import { Spinner } from "@/components/ui/spinner";
 import { loginSchema, type LoginFormData } from "../schemas/loginSchema";
@@ -10,6 +11,7 @@ import { useApiMutation } from "@/lib/api/hooks";
 
 export function LoginForm() {
 	const navigate = useNavigate();
+	const [showPassword, setShowPassword] = useState(false);
 
 	const {
 		register,
@@ -23,9 +25,7 @@ export function LoginForm() {
 	const { mutate: loginMutation, isPending } = useApiMutation({
 		mutationFn: (data: LoginFormData) => login(data),
 		onSuccess: (data) => {
-			// 토큰 저장
 			localStorage.setItem("auth_token", data.token);
-			// 대시보드로 이동
 			navigate("/");
 		},
 	});
@@ -35,11 +35,13 @@ export function LoginForm() {
 	};
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+		<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+			{/* 아이디 필드 */}
 			<TextField
 				label="아이디"
-				placeholder="아이디를 입력하세요"
+				placeholder="텍스트를 입력해주세요."
 				autoComplete="username"
+				required
 				disabled={isPending}
 				status={errors.username ? "error" : "default"}
 				helperText={errors.username?.message}
@@ -47,22 +49,53 @@ export function LoginForm() {
 				{...register("username")}
 			/>
 
-			<TextField
-				label="비밀번호"
-				type="password"
-				placeholder="비밀번호를 입력하세요"
-				autoComplete="current-password"
-				disabled={isPending}
-				status={errors.password ? "error" : "default"}
-				helperText={errors.password?.message}
-				clearable={false}
-			  {...register("password")}
-			/>
+			{/* 비밀번호 필드 */}
+			<div className="flex flex-col gap-2">
+				<div className="relative">
+					<TextField
+						label="비밀번호"
+						type={showPassword ? "text" : "password"}
+						placeholder="텍스트를 입력해주세요."
+						autoComplete="current-password"
+						required
+						disabled={isPending}
+						status={errors.password ? "error" : "default"}
+						helperText={errors.password?.message}
+						clearable={false}
+						{...register("password")}
+					/>
+					{/* Eye toggle - 입력 필드 우측에 절대 위치 */}
+					<button
+						type="button"
+						className="absolute right-4 top-[42px] text-label-alternative hover:text-label-neutral"
+						onClick={() => setShowPassword((prev) => !prev)}
+						tabIndex={-1}
+						aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+					>
+						{showPassword ? (
+							<EyeOff className="size-5" />
+						) : (
+							<Eye className="size-5" />
+						)}
+					</button>
+				</div>
 
-			<Button
+				{/* 비밀번호를 잊으셨나요? */}
+				<div className="flex justify-end">
+					<button
+						type="button"
+						className="py-1 text-[18px] font-semibold leading-[1.3] text-label-alternative hover:text-label-neutral"
+					>
+						비밀번호를 잊으셨나요?
+					</button>
+				</div>
+			</div>
+
+			{/* 로그인 버튼 */}
+			<button
 				type="submit"
-				className="h-12 w-full text-base"
 				disabled={isPending}
+				className="flex w-full items-center justify-center rounded-xl bg-primary px-7 py-[15px] text-[18px] font-semibold leading-[1.3] text-white transition-colors hover:bg-primary-strong disabled:pointer-events-none disabled:opacity-50"
 			>
 				{isPending ? (
 					<>
@@ -72,7 +105,7 @@ export function LoginForm() {
 				) : (
 					"로그인"
 				)}
-			</Button>
+			</button>
 		</form>
 	);
 }

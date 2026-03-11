@@ -13,13 +13,12 @@ import { NotFoundPage } from "@/app/routes/NotFoundPage";
 import TestPage from "./routes/TestPage";
 
 export const router = createBrowserRouter([
-	// 인증 불필요 라우트
+	// 로그인 (자체 레이아웃)
+	{ path: "/login", element: <LoginPage /> },
+	// 회원가입 (AuthLayout)
 	{
 		element: <AuthLayout />,
-		children: [
-			{ path: "/login", element: <LoginPage /> },
-			{ path: "/signup", element: <SignupPage /> },
-		],
+		children: [{ path: "/signup", element: <SignupPage /> }],
 	},
 	// 인증 필요 라우트
 	{

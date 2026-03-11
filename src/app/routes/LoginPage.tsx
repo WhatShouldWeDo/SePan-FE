@@ -1,25 +1,54 @@
-import { Link } from "react-router-dom"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { LoginForm } from "@/features/auth/components/LoginForm"
+import { Link } from "react-router-dom";
+import { Zap } from "lucide-react";
+import { LoginForm } from "@/features/auth/components/LoginForm";
 
 export function LoginPage() {
-  return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl">로그인</CardTitle>
-        <CardDescription>
-          계정에 로그인하여 서비스를 이용하세요
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <LoginForm />
-        <div className="mt-4 text-center text-sm">
-          계정이 없으신가요?{" "}
-          <Link to="/signup" className="text-primary hover:underline">
-            회원가입
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
-  )
+	return (
+		<div className="flex min-h-screen">
+			{/* 좌측 Primary 배경 영역 */}
+			<div className="hidden bg-primary lg:block lg:w-[62.5%]" />
+
+			{/* 우측 폼 영역 */}
+			<div className="flex w-full items-top justify-center p-6 sm:p-10 lg:w-[37.5%] lg:px-[80px] lg:py-[120px]">
+				<div className="flex w-full max-w-[480px] flex-col gap-[50px]">
+					{/* Header Section */}
+					<div className="flex flex-col gap-8">
+						<div className="flex flex-col gap-7">
+							{/* Logo */}
+							<div className="flex items-center gap-2">
+								<span className="text-[15px] font-bold tracking-tight text-primary">
+									DEMOCRA:SEE
+								</span>
+								<Zap className="size-6 fill-primary text-primary" />
+							</div>
+
+							{/* Title */}
+							<h1 className="text-[34px] font-bold leading-[1.3] text-black">
+								로그인
+							</h1>
+						</div>
+
+						{/* Login Form */}
+						<LoginForm />
+					</div>
+
+					{/* Bottom Section */}
+					<div className="flex flex-col gap-6">
+						{/* 회원가입 링크 */}
+						<div className="flex items-center justify-center gap-3">
+							<span className="text-[18px] font-medium leading-[1.3] text-label-alternative">
+								계정이 없으신가요?
+							</span>
+							<Link
+								to="/signup"
+								className="text-[18px] font-semibold leading-[1.3] text-primary-strong hover:underline"
+							>
+								회원가입
+							</Link>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }
