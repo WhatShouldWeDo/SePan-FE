@@ -24,7 +24,7 @@ export function RootLayout() {
           />
           <div className="flex flex-1 flex-col min-w-0">
             {/* sticky 컨테이너: GNB + 패널을 하나의 sticky 단위로 묶음 */}
-            <div className="sticky top-0 z-30">
+            <div className="sticky top-0 z-30 relative">
               <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
               <GnbPanel />
             </div>
