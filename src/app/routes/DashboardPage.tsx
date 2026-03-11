@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useBreadcrumb } from "@/contexts/useNavigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
 	WantedFillMessage,
@@ -26,6 +27,7 @@ import {
 } from "@/features/dashboard/components";
 
 export function DashboardPage() {
+	useBreadcrumb([{ label: "대시보드" }]);
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(true);
 	const [currentDate] = useState(() => new Date());

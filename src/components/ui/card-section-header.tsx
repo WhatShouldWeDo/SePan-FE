@@ -73,9 +73,7 @@ function CardSectionHeader({
 
 				{/* Trailing Content */}
 				{trailingContent && (
-					<div className="flex shrink-0 items-end">
-						{trailingContent}
-					</div>
+					<div className="flex shrink-0 items-end">{trailingContent}</div>
 				)}
 			</div>
 		</div>
