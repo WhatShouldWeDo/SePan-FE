@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useBreadcrumb } from "@/contexts/NavigationContext";
+import { useBreadcrumb } from "@/contexts/useNavigation";
 import {
 	Card,
 	CardHeader,
