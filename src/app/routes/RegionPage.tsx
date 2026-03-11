@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useBreadcrumb } from "@/contexts/NavigationContext";
 import {
 	Card,
 	CardHeader,
@@ -11,6 +12,7 @@ import { useTopoJsonData } from "@/features/region/hooks/useTopoJsonData";
 import type { MapRegion, SearchSelectedRegion } from "@/types/map";
 
 export function RegionPage() {
+	useBreadcrumb([{ label: "지역분석" }]);
 	const [selected, setSelected] = useState<MapRegion | null>(null);
 	const [searchNavigation, setSearchNavigation] =
 		useState<SearchSelectedRegion | null>(null);
