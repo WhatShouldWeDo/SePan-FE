@@ -10,7 +10,7 @@ import { KoreaAdminMap } from "@/features/region/components/map";
 import { MetricListRow } from "@/features/region/components/MetricListRow";
 import { AiAnalysisBox } from "@/features/region/components/AiAnalysisBox";
 import { CATEGORIES, SUBCATEGORIES } from "@/features/region/data/categories";
-import { useBreadcrumb } from "@/contexts/NavigationContext";
+import { useBreadcrumb } from "@/contexts/useNavigation";
 import type { DeltaInfo } from "@/features/region/components/MetricListRow";
 import type { ChartData, ChartConfig } from "@/types/chart";
 

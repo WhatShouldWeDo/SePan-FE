@@ -1,7 +1,7 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PolicyStatusBadge } from "@/components/PolicyStatusBadge";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { useBreadcrumb } from "@/contexts/NavigationContext";
+import { useBreadcrumb } from "@/contexts/useNavigation";
 
 export function PolicyPage() {
 	useBreadcrumb([{ label: "정책개발" }]);

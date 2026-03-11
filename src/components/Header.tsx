@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react"
 import { Menu } from "lucide-react"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 import { Button } from "@/components/ui/button"
-import { useNavigation } from "@/contexts/NavigationContext"
+import { useNavigation } from "@/contexts/useNavigation"
 
 interface HeaderProps {
   onMenuClick: () => void

@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom"
-import { useBreadcrumb } from "@/contexts/NavigationContext"
+import { useBreadcrumb } from "@/contexts/useNavigation"
 
 export function PolicyFormPage() {
   const { id } = useParams()
