@@ -19,34 +19,38 @@ export function InsightListItem({
 	trailing,
 }: InsightListItemProps) {
 	return (
-		<div className="flex items-center gap-4 rounded-2xl bg-fill-alt p-6">
-			{/* 아이콘 */}
-			<div
-				className={cn(
-					"flex size-12 shrink-0 items-center justify-center rounded-xl",
-					iconBg,
-				)}
-			>
-				{icon}
-			</div>
-
-			{/* 라벨 + 값 */}
-			<div className="flex flex-1 flex-col gap-0.5">
-				<p className="text-caption-1 font-medium leading-[1.3] text-label-alternative">
-					{label}
-				</p>
-				<p
+		<div className="@container rounded-2xl bg-fill-alt p-6">
+			<div className="flex items-center gap-4">
+				{/* 아이콘 */}
+				<div
 					className={cn(
-						"text-title-2 font-bold leading-[1.4]",
-						valueColor ?? "text-label-normal",
+						"flex size-12 shrink-0 items-center justify-center rounded-xl",
+						iconBg,
 					)}
 				>
-					{value}
-				</p>
+					{icon}
+				</div>
+				{/* 라벨 + 값 */}
+				<div className="flex min-w-0 flex-1 flex-col gap-0.5">
+					<p className="text-caption-1 font-medium leading-[1.3] text-label-alternative">
+						{label}
+					</p>
+					<p
+						className={cn(
+							"truncate text-title-2 font-bold leading-[1.4]",
+							valueColor ?? "text-label-normal",
+						)}
+					>
+						{value}
+					</p>
+				</div>
+				{/* 트레일링 — 넓을 때 인라인 */}
+				<div className="hidden shrink-0 @[16rem]:block">
+					{trailing}
+				</div>
 			</div>
-
-			{/* 트레일링 */}
-			<div className="shrink-0">{trailing}</div>
+			{/* 트레일링 — 좁을 때 label/value 아래 */}
+			<div className="mt-2 pl-16 @[16rem]:hidden">{trailing}</div>
 		</div>
 	);
 }
