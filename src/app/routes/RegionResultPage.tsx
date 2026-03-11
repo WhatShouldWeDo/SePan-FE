@@ -150,7 +150,8 @@ export function RegionResultPage() {
 	void regionId;
 
 	const selectedCategoryLabel =
-		CATEGORIES.find((c) => c.id === selectedCategoryId)?.label ?? selectedCategoryId;
+		CATEGORIES.find((c) => c.id === selectedCategoryId)?.label ??
+		selectedCategoryId;
 
 	useBreadcrumb([
 		{ label: "지역분석" },
@@ -172,6 +173,7 @@ export function RegionResultPage() {
 						selectedSubcategoryId={selectedSubcategoryId ?? undefined}
 						onCategorySelect={handleCategorySelect}
 						onSubcategorySelect={handleSubcategorySelect}
+						className="px-[80px] py-4"
 					/>,
 					panelEl,
 				)}
