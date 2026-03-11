@@ -1,15 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
-	BarChart3,
-	Users,
-	TrendingUp,
-	FileText,
-	Lightbulb,
-	Target,
-	ChevronLeft,
-	ChevronRight,
-} from "lucide-react";
+	WantedFillMessage,
+	WantedFillTriangleExclamation,
+	WantedFillMegaphone,
+} from "@/components/icons";
 
 import { Banner } from "@/components/ui/banner";
 import { Badge } from "@/components/ui/badge";
@@ -124,60 +120,63 @@ export function DashboardPage() {
 						<div className="grid grid-cols-2 gap-4">
 							<InsightListItem
 								icon={
-									<Users className="size-6 text-primary" />
+									<WantedFillMessage className="size-8 text-white" />
 								}
-								iconBg="bg-primary/10"
-								label="총 유권자 수"
-								value="245,832명"
-								trailing={
-									<InsightDelta
-										label="전년대비 +2.3%"
-										isPositive
-									/>
-								}
-							/>
-							<InsightListItem
-								icon={
-									<BarChart3 className="size-6 text-[#5C9AFF]" />
-								}
-								iconBg="bg-[#5C9AFF]/10"
-								label="투표율 (지난 선거)"
-								value="58.4%"
-								trailing={
-									<InsightDelta
-										label="전국 평균 대비 +8.4%"
-										isPositive
-									/>
-								}
-							/>
-							<InsightListItem
-								icon={
-									<TrendingUp className="size-6 text-status-positive" />
-								}
-								iconBg="bg-status-positive/10"
-								label="주요 민원"
-								value="교통 35%"
+								iconBg="bg-party-dpk"
+								label="최다 민원 지역"
+								value="삼성동"
 								trailing={
 									<Badge
 										size="sm"
-										className="border-0 bg-status-cautionary/10 text-status-cautionary"
+										className="border-0 bg-party-dpk/8 text-party-dpk"
 									>
-										급상승
+										신규
 									</Badge>
 								}
 							/>
 							<InsightListItem
 								icon={
-									<Target className="size-6 text-status-cautionary" />
+									<WantedFillTriangleExclamation className="size-8 text-white" />
 								}
-								iconBg="bg-status-cautionary/10"
-								label="예산 집행률"
-								value="82%"
+								iconBg="bg-status-cautionary"
+								label="주요 민원 유형"
+								value="교통혼잡"
 								trailing={
 									<InsightDelta
-										label="전년대비 -3.1%"
-										isPositive={false}
+										label="전년대비 +8.4%"
+										isPositive
 									/>
+								}
+							/>
+							<InsightListItem
+								icon={
+									<WantedFillTriangleExclamation className="size-8 text-white" />
+								}
+								iconBg="bg-status-cautionary"
+								label="주요 민원 유형"
+								value="교통혼잡"
+								trailing={
+									<InsightDelta
+										label="전년대비 +8.4%"
+										isPositive
+									/>
+								}
+							/>
+							<InsightListItem
+								icon={
+									<WantedFillMegaphone className="size-8 text-white" />
+								}
+								iconBg="bg-party-ppp"
+								label="민원 증가율"
+								value="+14.5%"
+								valueColor="text-status-negative"
+								trailing={
+									<Badge
+										size="sm"
+										className="border-0 bg-party-ppp/8 text-party-ppp"
+									>
+										상승
+									</Badge>
 								}
 							/>
 						</div>
@@ -200,34 +199,28 @@ export function DashboardPage() {
 						<div className="grid grid-cols-2 gap-4">
 							<InsightListItem
 								icon={
-									<FileText className="size-6 text-primary" />
+									<WantedFillMessage className="size-8 text-white" />
 								}
-								iconBg="bg-primary/10"
-								label="확정 공약"
-								value="12개"
+								iconBg="bg-party-dpk"
+								label="완료된 정책"
+								value="버스정류장 신설 외 14건"
 								trailing={
-									<Badge
-										size="sm"
-										className="border-0 bg-status-positive/10 text-status-positive"
-									>
-										작성중 5개
-									</Badge>
+									<span className="text-title-2 font-bold text-party-dpk">
+										15건
+									</span>
 								}
 							/>
 							<InsightListItem
 								icon={
-									<Lightbulb className="size-6 text-status-cautionary" />
+									<WantedFillTriangleExclamation className="size-8 text-white" />
 								}
-								iconBg="bg-status-cautionary/10"
-								label="AI 추천 정책"
-								value="3건"
+								iconBg="bg-status-cautionary"
+								label="진행중 정책"
+								value="도서관 짓기 외 5건"
 								trailing={
-									<Badge
-										size="sm"
-										className="border-0 bg-primary/10 text-primary"
-									>
-										신규
-									</Badge>
+									<Button size="sm">
+										이어서 작성
+									</Button>
 								}
 							/>
 						</div>

@@ -1,6 +1,5 @@
-import { ChevronUp } from "lucide-react";
-
 import { cn } from "@/lib/utils";
+import { WantedCaretUp } from "@/components/icons";
 
 interface InsightListItemProps {
 	icon: React.ReactNode;
@@ -67,8 +66,8 @@ export function InsightDelta({ label, isPositive = true }: InsightDeltaProps) {
 				isPositive ? "text-status-positive" : "text-status-negative",
 			)}
 		>
-			<ChevronUp
-				className={cn("size-4", !isPositive && "rotate-180")}
+			<WantedCaretUp
+				className={cn("size-5", !isPositive && "rotate-180")}
 				aria-hidden="true"
 			/>
 			{label}
