@@ -1,9 +1,10 @@
 // src/components/Header.tsx
-import { useState, useRef, useEffect } from "react"
-import { Menu } from "lucide-react"
+import { useState, useRef, useEffect, useContext } from "react"
+import { Menu, ChevronDown } from "lucide-react"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { useNavigation } from "@/contexts/useNavigation"
+import { GnbPanelContext } from "@/contexts/GnbPanelContext"
 
 interface HeaderProps {
   onMenuClick: () => void
@@ -12,6 +13,10 @@ interface HeaderProps {
 export function Header({ onMenuClick }: HeaderProps) {
   const { user, logout } = useAuth()
   const { breadcrumbs } = useNavigation()
+  const panelCtx = useContext(GnbPanelContext)
+  const hasPanel = panelCtx?.hasPanel ?? false
+  const isPanelOpen = panelCtx?.isPanelOpen ?? false
+  const setIsPanelOpen = panelCtx?.setIsPanelOpen
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -82,6 +87,23 @@ export function Header({ onMenuClick }: HeaderProps) {
                   >
                     {item.label}
                   </span>
+                  {/* Chevron: 마지막 항목이고 패널이 등록된 경우에만 표시 */}
+                  {isLast && hasPanel && (
+                    <button
+                      type="button"
+                      aria-label={isPanelOpen ? "카테고리 패널 닫기" : "카테고리 패널 열기"}
+                      aria-expanded={isPanelOpen}
+                      onClick={() => setIsPanelOpen?.(!isPanelOpen)}
+                      className="flex items-center justify-center size-[44px] -my-2 -mr-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    >
+                      <ChevronDown
+                        className={[
+                          "size-4 text-label-strong transition-transform duration-200",
+                          isPanelOpen ? "rotate-180" : "rotate-0",
+                        ].join(" ")}
+                      />
+                    </button>
+                  )}
                 </span>
               )
             })}
