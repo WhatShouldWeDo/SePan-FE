@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { DuoWallet } from "@/components/icons";
 import type {
@@ -119,7 +119,7 @@ function SubcategoryPanel({
 
 	return (
 		<div
-			className="absolute left-0 right-0 top-full z-50 rounded-[24px] border border-line-neutral bg-background px-8 py-4"
+			className="absolute left-0 right-0 top-full z-20 rounded-[24px] border border-line-neutral bg-background px-8 py-4"
 			style={{ boxShadow: "0px 2px 8px 0px rgba(20, 40, 113, 0.06)" }}
 		>
 			<div className="flex flex-wrap gap-5">
@@ -173,6 +173,15 @@ function CategoryNav({
 	const [hoveredCategoryId, setHoveredCategoryId] = useState<string | null>(
 		null,
 	);
+
+	// 스크롤 시 서브카테고리 패널 닫기 (GNB 패널 슬라이드와 동기화)
+	useEffect(() => {
+		function handleScroll() {
+			setHoveredCategoryId(null);
+		}
+		window.addEventListener("scroll", handleScroll, { passive: true });
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
 
 	const handlePointerLeave = useCallback(() => {
 		setHoveredCategoryId(null);
