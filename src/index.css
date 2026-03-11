@@ -59,6 +59,7 @@
 	--color-label-assistive: var(--label-assistive);
 	--color-label-disabled: var(--label-disabled);
 	--color-label-inverse: var(--label-inverse);
+	--color-label-inverse-48: var(--label-inverse-48);
 	--color-background-alt: var(--background-alt);
 	--color-line-normal: var(--line-normal);
 	--color-line-neutral: var(--line-neutral);
@@ -308,6 +309,7 @@
 	--label-assistive: var(--cool-neutral-40);
 	--label-disabled: var(--cool-neutral-30);
 	--label-inverse: var(--cool-neutral-0);
+	--label-inverse-48: rgba(255, 255, 255, 0.48);
 
 	/* Background */
 	--background-alt: var(--cool-neutral-10);
