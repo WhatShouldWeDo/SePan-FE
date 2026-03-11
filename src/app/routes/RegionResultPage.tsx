@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useParams } from "react-router-dom";
 
 import { CategoryNav } from "@/components/ui/category-nav";
@@ -10,7 +11,7 @@ import { KoreaAdminMap } from "@/features/region/components/map";
 import { MetricListRow } from "@/features/region/components/MetricListRow";
 import { AiAnalysisBox } from "@/features/region/components/AiAnalysisBox";
 import { CATEGORIES, SUBCATEGORIES } from "@/features/region/data/categories";
-import { useBreadcrumb } from "@/contexts/useNavigation";
+import { useBreadcrumb, useGnbPanel } from "@/contexts/useNavigation";
 import type { DeltaInfo } from "@/features/region/components/MetricListRow";
 import type { ChartData, ChartConfig } from "@/types/chart";
 
@@ -130,6 +131,8 @@ export function RegionResultPage() {
 		(subcategoryId: string, categoryId: string) => {
 			setSelectedCategoryId(categoryId);
 			setSelectedSubcategoryId(subcategoryId);
+			// 서브카테고리 선택 시 화면 최상단으로 부드럽게 이동
+			window.scrollTo({ top: 0, behavior: "smooth" });
 		},
 		[],
 	);
@@ -147,7 +150,8 @@ export function RegionResultPage() {
 	void regionId;
 
 	const selectedCategoryLabel =
-		CATEGORIES.find((c) => c.id === selectedCategoryId)?.label ?? selectedCategoryId;
+		CATEGORIES.find((c) => c.id === selectedCategoryId)?.label ??
+		selectedCategoryId;
 
 	useBreadcrumb([
 		{ label: "지역분석" },
@@ -155,107 +159,125 @@ export function RegionResultPage() {
 		{ label: selectedCategoryLabel },
 	]);
 
+	const { panelEl } = useGnbPanel();
+
 	return (
-		<div className="flex flex-col gap-6 px-[56px] py-4">
-			{/* ── CategoryNav ── */}
-			<CategoryNav
-				categories={CATEGORIES}
-				subcategories={SUBCATEGORIES}
-				selectedCategoryId={selectedCategoryId}
-				selectedSubcategoryId={selectedSubcategoryId ?? undefined}
-				onCategorySelect={handleCategorySelect}
-				onSubcategorySelect={handleSubcategorySelect}
-			/>
+		<>
+			{/* CategoryNav를 GnbPanel portal 타겟에 렌더링 */}
+			{panelEl &&
+				createPortal(
+					<CategoryNav
+						categories={CATEGORIES}
+						subcategories={SUBCATEGORIES}
+						selectedCategoryId={selectedCategoryId}
+						selectedSubcategoryId={selectedSubcategoryId ?? undefined}
+						onCategorySelect={handleCategorySelect}
+						onSubcategorySelect={handleSubcategorySelect}
+						className="px-[80px] py-4"
+					/>,
+					panelEl,
+				)}
 
-			{/* ── Heading ── */}
-			<div className="flex flex-col gap-1">
-				<div className="flex items-center gap-2">
-					<h1 className="text-heading-2 font-bold leading-[1.3] text-label-normal">
-						{subcategoryLabel}
-					</h1>
-					<Badge
-						variant="ghost"
-						size="md"
-						className="bg-primary-alpha-5 text-primary"
-					>
-						{regionDisplayName}
-					</Badge>
-				</div>
-				<p className="text-body-2 font-medium leading-[1.5] text-label-alternative">
-					지역 분석 데이터와 역대 공약을 기반으로 최적의 정책을 추천합니다.
-				</p>
-			</div>
-
-			{/* ── AI 분석 결과 ── */}
-			<AiAnalysisBox text={MOCK_AI_ANALYSIS} />
-
-			{/* ── 2열 카드 섹션: 지도 + 지표 ── */}
-			<div className="grid grid-cols-2 gap-4 2xl:gap-6">
-				{/* 좌측: 폴리곤 지도 */}
-				<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
-					<CardSectionHeader
-						title={MOCK_DISTRICT_NAME}
-						description="선거구 단위"
-					/>
-					<div className="flex items-center justify-center">
-						<KoreaAdminMap className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full" />
+			<div className="flex flex-col gap-6 px-[56px] py-4">
+				{/* ── CategoryNav (페이지 상단 고정) ── */}
+				<CategoryNav
+					categories={CATEGORIES}
+					subcategories={SUBCATEGORIES}
+					selectedCategoryId={selectedCategoryId}
+					selectedSubcategoryId={selectedSubcategoryId ?? undefined}
+					onCategorySelect={handleCategorySelect}
+					onSubcategorySelect={handleSubcategorySelect}
+				/>
+				{/* ── Heading ── */}
+				<div className="flex flex-col gap-1">
+					<div className="flex items-center gap-2">
+						<h1 className="text-heading-2 font-bold leading-[1.3] text-label-normal">
+							{subcategoryLabel}
+						</h1>
+						<Badge
+							variant="ghost"
+							size="md"
+							className="bg-primary-alpha-5 text-primary"
+						>
+							{regionDisplayName}
+						</Badge>
 					</div>
-				</section>
+					<p className="text-body-2 font-medium leading-[1.5] text-label-alternative">
+						지역 분석 데이터와 역대 공약을 기반으로 최적의 정책을 추천합니다.
+					</p>
+				</div>
 
-				{/* 우측: 지표 메트릭 리스트 */}
+				{/* ── AI 분석 결과 ── */}
+				<AiAnalysisBox text={MOCK_AI_ANALYSIS} />
+
+				{/* ── 2열 카드 섹션: 지도 + 지표 ── */}
+				<div className="grid grid-cols-2 gap-4 2xl:gap-6">
+					{/* 좌측: 폴리곤 지도 */}
+					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
+						<CardSectionHeader
+							title={MOCK_DISTRICT_NAME}
+							description="선거구 단위"
+						/>
+						<div className="flex items-center justify-center">
+							<KoreaAdminMap className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full" />
+						</div>
+					</section>
+
+					{/* 우측: 지표 메트릭 리스트 */}
+					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
+						<CardSectionHeader
+							title={MOCK_REGION_NAME}
+							description="행정안전부 2026년 1월"
+							trailingContent={
+								<Badge
+									variant="ghost"
+									size="md"
+									className="bg-primary-alpha-5 text-primary"
+								>
+									내 선거구
+								</Badge>
+							}
+						/>
+						<div className="flex flex-col gap-1">
+							{MOCK_METRICS.map((metric) => (
+								<MetricListRow
+									key={metric.label}
+									label={metric.label}
+									value={metric.value}
+									unit={metric.unit}
+									subValueBadge={metric.subValueBadge}
+									deltas={metric.deltas}
+								/>
+							))}
+						</div>
+					</section>
+				</div>
+
+				{/* ── 하단: 추이 차트 ── */}
 				<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
 					<CardSectionHeader
-						title={MOCK_REGION_NAME}
-						description="행정안전부 2026년 1월"
-						trailingContent={
-							<Badge
-								variant="ghost"
-								size="md"
-								className="bg-primary-alpha-5 text-primary"
-							>
-								내 선거구
-							</Badge>
-						}
+						title="인구수 추이"
+						description="월별 인구수 변화 추이"
 					/>
-					<div className="flex flex-col gap-1">
-						{MOCK_METRICS.map((metric) => (
-							<MetricListRow
-								key={metric.label}
-								label={metric.label}
-								value={metric.value}
-								unit={metric.unit}
-								subValueBadge={metric.subValueBadge}
-								deltas={metric.deltas}
+
+					{/* Chip 필터 */}
+					<div className="flex gap-2">
+						{CHIP_FILTERS.map((chip) => (
+							<Chip
+								key={chip.id}
+								label={chip.label}
+								size="medium"
+								state={activeChip === chip.id ? "active" : "default"}
+								variant="outlined"
+								onClick={() => setActiveChip(chip.id)}
 							/>
 						))}
 					</div>
+
+					{/* BarChart */}
+					<BarChart data={MOCK_MONTHLY_DATA} config={CHART_CONFIG} />
 				</section>
 			</div>
-
-			{/* ── 하단: 추이 차트 ── */}
-			<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
-				<CardSectionHeader
-					title="인구수 추이"
-					description="월별 인구수 변화 추이"
-				/>
-
-				{/* Chip 필터 */}
-				<div className="flex gap-2">
-					{CHIP_FILTERS.map((chip) => (
-						<Chip
-							key={chip.id}
-							label={chip.label}
-							size="medium"
-							state={activeChip === chip.id ? "active" : "default"}
-							variant="outlined"
-							onClick={() => setActiveChip(chip.id)}
-						/>
-					))}
-				</div>
-
-				{/* BarChart */}
-				<BarChart data={MOCK_MONTHLY_DATA} config={CHART_CONFIG} />
-			</section>
-		</div>
+		</>
 	);
 }
