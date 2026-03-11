@@ -117,68 +117,70 @@ export function DashboardPage() {
 						<Banner variant="notice">
 							강남구 인구 유입이 전월 대비 12% 증가했습니다. 청년층 정책 수요가 높아지고 있어요.
 						</Banner>
-						<div className="grid grid-cols-2 gap-4">
-							<InsightListItem
-								icon={
-									<WantedFillMessage className="size-8 text-white" />
-								}
-								iconBg="bg-party-dpk"
-								label="최다 민원 지역"
-								value="삼성동"
-								trailing={
-									<Badge
-										size="sm"
-										className="border-0 bg-party-dpk/8 text-party-dpk"
-									>
-										신규
-									</Badge>
-								}
-							/>
-							<InsightListItem
-								icon={
-									<WantedFillTriangleExclamation className="size-8 text-white" />
-								}
-								iconBg="bg-status-cautionary"
-								label="주요 민원 유형"
-								value="교통혼잡"
-								trailing={
-									<InsightDelta
-										label="전년대비 +8.4%"
-										isPositive
-									/>
-								}
-							/>
-							<InsightListItem
-								icon={
-									<WantedFillTriangleExclamation className="size-8 text-white" />
-								}
-								iconBg="bg-status-cautionary"
-								label="주요 민원 유형"
-								value="교통혼잡"
-								trailing={
-									<InsightDelta
-										label="전년대비 +8.4%"
-										isPositive
-									/>
-								}
-							/>
-							<InsightListItem
-								icon={
-									<WantedFillMegaphone className="size-8 text-white" />
-								}
-								iconBg="bg-party-ppp"
-								label="민원 증가율"
-								value="+14.5%"
-								valueColor="text-status-negative"
-								trailing={
-									<Badge
-										size="sm"
-										className="border-0 bg-party-ppp/8 text-party-ppp"
-									>
-										상승
-									</Badge>
-								}
-							/>
+						<div className="@container">
+							<div className="grid grid-cols-1 gap-4 @lg:grid-cols-2">
+								<InsightListItem
+									icon={
+										<WantedFillMessage className="size-8 text-white" />
+									}
+									iconBg="bg-party-dpk"
+									label="최다 민원 지역"
+									value="삼성동"
+									trailing={
+										<Badge
+											size="sm"
+											className="border-0 bg-party-dpk/8 text-party-dpk"
+										>
+											신규
+										</Badge>
+									}
+								/>
+								<InsightListItem
+									icon={
+										<WantedFillTriangleExclamation className="size-8 text-white" />
+									}
+									iconBg="bg-status-cautionary"
+									label="주요 민원 유형"
+									value="교통혼잡"
+									trailing={
+										<InsightDelta
+											label="전년대비 +8.4%"
+											isPositive
+										/>
+									}
+								/>
+								<InsightListItem
+									icon={
+										<WantedFillTriangleExclamation className="size-8 text-white" />
+									}
+									iconBg="bg-status-cautionary"
+									label="주요 민원 유형"
+									value="교통혼잡"
+									trailing={
+										<InsightDelta
+											label="전년대비 +8.4%"
+											isPositive
+										/>
+									}
+								/>
+								<InsightListItem
+									icon={
+										<WantedFillMegaphone className="size-8 text-white" />
+									}
+									iconBg="bg-party-ppp"
+									label="민원 증가율"
+									value="+14.5%"
+									valueColor="text-status-negative"
+									trailing={
+										<Badge
+											size="sm"
+											className="border-0 bg-party-ppp/8 text-party-ppp"
+										>
+											상승
+										</Badge>
+									}
+								/>
+							</div>
 						</div>
 					</CardSection>
 
@@ -196,33 +198,35 @@ export function DashboardPage() {
 						<Banner variant="notice">
 							교통 분야 공약 3건이 검토 대기 중입니다. AI가 새로운 정책을 추천했어요.
 						</Banner>
-						<div className="grid grid-cols-2 gap-4">
-							<InsightListItem
-								icon={
-									<WantedFillMessage className="size-8 text-white" />
-								}
-								iconBg="bg-party-dpk"
-								label="완료된 정책"
-								value="버스정류장 신설 외 14건"
-								trailing={
-									<span className="text-title-2 font-bold text-party-dpk">
-										15건
-									</span>
-								}
-							/>
-							<InsightListItem
-								icon={
-									<WantedFillTriangleExclamation className="size-8 text-white" />
-								}
-								iconBg="bg-status-cautionary"
-								label="진행중 정책"
-								value="도서관 짓기 외 5건"
-								trailing={
-									<Button size="sm">
-										이어서 작성
-									</Button>
-								}
-							/>
+						<div className="@container">
+							<div className="grid grid-cols-1 gap-4 @lg:grid-cols-2">
+								<InsightListItem
+									icon={
+										<WantedFillMessage className="size-8 text-white" />
+									}
+									iconBg="bg-party-dpk"
+									label="완료된 정책"
+									value="버스정류장 신설 외 14건"
+									trailing={
+										<span className="text-title-2 font-bold text-party-dpk">
+											15건
+										</span>
+									}
+								/>
+								<InsightListItem
+									icon={
+										<WantedFillTriangleExclamation className="size-8 text-white" />
+									}
+									iconBg="bg-status-cautionary"
+									label="진행중 정책"
+									value="도서관 짓기 외 5건"
+									trailing={
+										<Button size="sm">
+											이어서 작성
+										</Button>
+									}
+								/>
+							</div>
 						</div>
 					</CardSection>
 				</div>
