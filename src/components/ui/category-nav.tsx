@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { DuoWallet } from "@/components/icons";
 import type {
 	CategoryItem,
 	SubcategoryItem,
@@ -61,18 +62,38 @@ function CategoryNavItem({
 				)}
 			/>
 
-			{/* Icon — 컬러 원형 + 이니셜 (에셋 확보 전 폴백) */}
-			<div
-				className="flex size-[72px] shrink-0 items-center justify-center rounded-[18px]"
-				style={{ backgroundColor: `${category.iconColor}20` }}
-			>
-				<div
-					className="flex size-[48px] items-center justify-center rounded-full text-[20px] font-bold text-white"
-					style={{ backgroundColor: category.iconColor }}
-				>
-					{category.label.charAt(0)}
+			{/* Icon — CSS mask-luminance로 Figma 에셋 표현, 에셋 없으면 이니셜 폴백 */}
+			{category.iconAsset ? (
+				<div className="relative size-[50px] shrink-0 overflow-clip rounded-[14px]">
+					<div
+						className="absolute inset-0"
+						style={{
+							backgroundColor: category.iconColor,
+							maskImage: `url('${category.iconAsset}')`,
+							maskMode: "luminance",
+							maskSize: "39px 39px",
+							maskPosition: "5.5px 5.5px",
+							maskRepeat: "no-repeat",
+							WebkitMaskImage: `url('${category.iconAsset}')`,
+							WebkitMaskSize: "39px 39px",
+							WebkitMaskPosition: "5.5px 5.5px",
+							WebkitMaskRepeat: "no-repeat",
+						}}
+					/>
 				</div>
-			</div>
+			) : (
+				<div
+					className="flex size-[50px] shrink-0 items-center justify-center rounded-[14px]"
+					style={{ backgroundColor: `${category.iconColor}20` }}
+				>
+					<div
+						className="flex size-[34px] items-center justify-center rounded-full text-[14px] font-bold text-white"
+						style={{ backgroundColor: category.iconColor }}
+					>
+						{category.label.charAt(0)}
+					</div>
+				</div>
+			)}
 
 			{/* Label */}
 			<span
@@ -98,8 +119,8 @@ function SubcategoryPanel({
 
 	return (
 		<div
-			className="mt-3 rounded-[24px] border border-line-neutral bg-background px-8 py-4"
-			style={{ boxShadow: "var(--shadow-overlay-panel)" }}
+			className="absolute left-0 right-0 top-full z-50 mt-2 rounded-[24px] border border-line-neutral bg-background px-8 py-4"
+			style={{ boxShadow: "0px 2px 8px 0px rgba(20, 40, 113, 0.06)" }}
 		>
 			<div className="flex flex-wrap gap-5">
 				{items.map((item) => (
@@ -112,7 +133,7 @@ function SubcategoryPanel({
 						)}
 						onClick={() => onSelect(item)}
 					>
-						{/* Interaction overlay — selected와 hover 동일 크기(inset-x -8px) */}
+						{/* Interaction overlay */}
 						<div
 							className={cn(
 								"pointer-events-none absolute inset-x-[-8px] inset-y-0 rounded-[12px] transition-opacity",
@@ -122,25 +143,9 @@ function SubcategoryPanel({
 							)}
 						/>
 
-						{/* Subcategory icon */}
-						<div className="relative z-10 flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-surface-secondary">
-							<svg
-								className="size-5 opacity-[0.74]"
-								viewBox="0 0 20 20"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<rect
-									x="3"
-									y="3"
-									width="14"
-									height="14"
-									rx="3"
-									stroke="currentColor"
-									strokeWidth="1.5"
-									className="text-label-alternative"
-								/>
-							</svg>
+						{/* DuoWallet 아이콘 */}
+						<div className="relative z-10 flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-surface-secondary">
+							<DuoWallet className="size-5 text-primary opacity-[0.74]" />
 						</div>
 
 						{/* Label */}
