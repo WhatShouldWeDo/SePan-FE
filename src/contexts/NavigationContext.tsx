@@ -1,5 +1,5 @@
 // src/contexts/NavigationContext.tsx
-import { createContext, useContext, useEffect, useRef, useState } from "react"
+import { createContext, useContext, useEffect, useMemo, useState } from "react"
 
 export interface BreadcrumbItem {
   label: string
@@ -14,8 +14,12 @@ const NavigationContext = createContext<NavigationContextValue | null>(null)
 
 export function NavigationProvider({ children }: { children: React.ReactNode }) {
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([])
+  const value = useMemo(
+    () => ({ breadcrumbs, setBreadcrumbs }),
+    [breadcrumbs]
+  )
   return (
-    <NavigationContext.Provider value={{ breadcrumbs, setBreadcrumbs }}>
+    <NavigationContext.Provider value={value}>
       {children}
     </NavigationContext.Provider>
   )
@@ -27,11 +31,8 @@ export function useBreadcrumb(items: BreadcrumbItem[]) {
 
   // items 배열을 안정적으로 비교하기 위해 JSON 직렬화 사용
   const serialized = JSON.stringify(items)
-  const prevRef = useRef<string>("")
 
   useEffect(() => {
-    if (prevRef.current === serialized) return
-    prevRef.current = serialized
     ctx.setBreadcrumbs(items)
     return () => {
       // 페이지 언마운트 시 초기화
