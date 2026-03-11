@@ -9,6 +9,8 @@ export interface CategoryItem {
 	id: string;
 	label: string;
 	iconColor: string;
+	/** CSS mask-image용 아이콘 에셋 경로 (PNG) */
+	iconAsset?: string;
 }
 
 export interface SubcategoryItem {
@@ -17,16 +19,26 @@ export interface SubcategoryItem {
 	categoryId: string;
 }
 
+import voterIcon from "@/assets/category-icons/voter.png";
+import economyIcon from "@/assets/category-icons/economy.png";
+import housingIcon from "@/assets/category-icons/housing.png";
+import safetyIcon from "@/assets/category-icons/safety.png";
+import welfareIcon from "@/assets/category-icons/welfare.png";
+import transportIcon from "@/assets/category-icons/transport.png";
+import cultureIcon from "@/assets/category-icons/culture.png";
+import agingIcon from "@/assets/category-icons/aging.png";
+import educationIcon from "@/assets/category-icons/education.png";
+
 export const CATEGORIES: CategoryItem[] = [
-	{ id: "voter", label: "유권자 분석", iconColor: "#009cfd" },
-	{ id: "economy", label: "경제", iconColor: "#fd8b00" },
-	{ id: "housing", label: "주거·부동산", iconColor: "#0cc6a1" },
-	{ id: "safety", label: "사회안전", iconColor: "#1d36b5" },
-	{ id: "welfare", label: "복지·분배", iconColor: "#fd00b1" },
-	{ id: "transport", label: "교통", iconColor: "#389d40" },
-	{ id: "culture", label: "문화여가", iconColor: "#731db5" },
-	{ id: "aging", label: "저출산·고령화", iconColor: "#b51d52" },
-	{ id: "education", label: "교육", iconColor: "#fa7d01" },
+	{ id: "voter", label: "유권자 분석", iconColor: "#009cfd", iconAsset: voterIcon },
+	{ id: "economy", label: "경제", iconColor: "#fd8b00", iconAsset: economyIcon },
+	{ id: "housing", label: "주거·부동산", iconColor: "#0cc6a1", iconAsset: housingIcon },
+	{ id: "safety", label: "사회안전", iconColor: "#1d36b5", iconAsset: safetyIcon },
+	{ id: "welfare", label: "복지·분배", iconColor: "#fd00b1", iconAsset: welfareIcon },
+	{ id: "transport", label: "교통", iconColor: "#389d40", iconAsset: transportIcon },
+	{ id: "culture", label: "문화여가", iconColor: "#731db5", iconAsset: cultureIcon },
+	{ id: "aging", label: "저출산·고령화", iconColor: "#b51d52", iconAsset: agingIcon },
+	{ id: "education", label: "교육", iconColor: "#fa7d01", iconAsset: educationIcon },
 ];
 
 export const SUBCATEGORIES: Record<string, SubcategoryItem[]> = {
