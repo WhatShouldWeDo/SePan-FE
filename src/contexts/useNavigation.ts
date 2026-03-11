@@ -1,6 +1,7 @@
 // src/contexts/useNavigation.ts
 import { useContext, useEffect } from "react"
 import { NavigationContext } from "./NavigationContext"
+import { GnbPanelContext } from "./GnbPanelContext"
 import type { BreadcrumbItem } from "./NavigationContext"
 
 export function useBreadcrumb(items: BreadcrumbItem[]) {
@@ -24,4 +25,25 @@ export function useNavigation() {
   const ctx = useContext(NavigationContext)
   if (!ctx) throw new Error("useNavigation must be used within NavigationProvider")
   return ctx
+}
+
+export function useGnbPanel() {
+  const ctx = useContext(GnbPanelContext)
+  if (!ctx) throw new Error("useGnbPanel must be used within GnbPanelProvider")
+
+  // 마운트 시 "이 페이지는 패널을 가진다"고 등록
+  useEffect(() => {
+    ctx.setHasPanel(true)
+    return () => {
+      ctx.setHasPanel(false)
+      ctx.setIsPanelOpen(false)
+    }
+  // ctx.setHasPanel / ctx.setIsPanelOpen은 안정적인 setState ref이므로 의존성 생략 안전
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return {
+    panelEl: ctx.panelEl,
+    isPanelOpen: ctx.isPanelOpen,
+  }
 }
