@@ -9,10 +9,7 @@ import { BarChart } from "@/components/charts";
 import { KoreaAdminMap } from "@/features/region/components/map";
 import { MetricListRow } from "@/features/region/components/MetricListRow";
 import { AiAnalysisBox } from "@/features/region/components/AiAnalysisBox";
-import {
-	CATEGORIES,
-	SUBCATEGORIES,
-} from "@/features/region/data/categories";
+import { CATEGORIES, SUBCATEGORIES } from "@/features/region/data/categories";
 import type { DeltaInfo } from "@/features/region/components/MetricListRow";
 import type { ChartData, ChartConfig } from "@/types/chart";
 
@@ -129,7 +126,8 @@ export function RegionResultPage() {
 	}, []);
 
 	const handleSubcategorySelect = useCallback(
-		(subcategoryId: string, _categoryId: string) => {
+		(subcategoryId: string, categoryId: string) => {
+			setSelectedCategoryId(categoryId);
 			setSelectedSubcategoryId(subcategoryId);
 		},
 		[],
@@ -190,9 +188,7 @@ export function RegionResultPage() {
 						description="선거구 단위"
 					/>
 					<div className="flex items-center justify-center">
-						<KoreaAdminMap
-							className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full"
-						/>
+						<KoreaAdminMap className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full" />
 					</div>
 				</section>
 
