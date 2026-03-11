@@ -1,8 +1,10 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PolicyStatusBadge } from "@/components/PolicyStatusBadge";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { useBreadcrumb } from "@/contexts/NavigationContext";
 
 export function PolicyPage() {
+	useBreadcrumb([{ label: "정책개발" }]);
 	return (
 		<div className="container py-6">
 			<div className="mb-6">
