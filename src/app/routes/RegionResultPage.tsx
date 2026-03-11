@@ -177,6 +177,15 @@ export function RegionResultPage() {
 				)}
 
 			<div className="flex flex-col gap-6 px-[56px] py-4">
+				{/* ── CategoryNav (페이지 상단 고정) ── */}
+				<CategoryNav
+					categories={CATEGORIES}
+					subcategories={SUBCATEGORIES}
+					selectedCategoryId={selectedCategoryId}
+					selectedSubcategoryId={selectedSubcategoryId ?? undefined}
+					onCategorySelect={handleCategorySelect}
+					onSubcategorySelect={handleSubcategorySelect}
+				/>
 				{/* ── Heading ── */}
 				<div className="flex flex-col gap-1">
 					<div className="flex items-center gap-2">
