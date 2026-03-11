@@ -10,6 +10,7 @@ import { KoreaAdminMap } from "@/features/region/components/map";
 import { MetricListRow } from "@/features/region/components/MetricListRow";
 import { AiAnalysisBox } from "@/features/region/components/AiAnalysisBox";
 import { CATEGORIES, SUBCATEGORIES } from "@/features/region/data/categories";
+import { useBreadcrumb } from "@/contexts/NavigationContext";
 import type { DeltaInfo } from "@/features/region/components/MetricListRow";
 import type { ChartData, ChartConfig } from "@/types/chart";
 
@@ -144,6 +145,15 @@ export function RegionResultPage() {
 	// TODO: regionId로 API 조회 후 실제 지역명 표시
 	const regionDisplayName = MOCK_REGION_NAME;
 	void regionId;
+
+	const selectedCategoryLabel =
+		CATEGORIES.find((c) => c.id === selectedCategoryId)?.label ?? selectedCategoryId;
+
+	useBreadcrumb([
+		{ label: "지역분석" },
+		{ label: regionDisplayName },
+		{ label: selectedCategoryLabel },
+	]);
 
 	return (
 		<div className="flex flex-col gap-6 px-[56px] py-4">
