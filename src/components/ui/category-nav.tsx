@@ -119,7 +119,7 @@ function SubcategoryPanel({
 
 	return (
 		<div
-			className="absolute left-0 right-0 top-full z-50 mt-2 rounded-[24px] border border-line-neutral bg-background px-8 py-4"
+			className="absolute left-0 right-0 top-full z-50 rounded-[24px] border border-line-neutral bg-background px-8 py-4"
 			style={{ boxShadow: "0px 2px 8px 0px rgba(20, 40, 113, 0.06)" }}
 		>
 			<div className="flex flex-wrap gap-5">
@@ -178,14 +178,14 @@ function CategoryNav({
 		setHoveredCategoryId(null);
 	}, []);
 
-	// hover 우선, 없으면 selected 패널, 둘 다 없으면 숨김
-	const activePanelCategoryId = hoveredCategoryId ?? selectedCategoryId ?? null;
+	// mouseleave 시 무조건 숨김 — hover 중일 때만 패널 표시
+	const activePanelCategoryId = hoveredCategoryId;
 	const activePanelItems = activePanelCategoryId
 		? subcategories[activePanelCategoryId]
 		: undefined;
 
 	return (
-		<div className={cn("relative", className)} onPointerLeave={handlePointerLeave}>
+		<div className={cn("relative pb-2", className)} onPointerLeave={handlePointerLeave}>
 			{/* 카테고리 아이콘 행 */}
 			<div className="flex items-center gap-3">
 				{categories.map((cat) => (
