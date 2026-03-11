@@ -11,7 +11,7 @@ export function GnbPanel() {
     if (!ctx) return
     ctx.setPanelEl(contentRef.current)
     return () => ctx.setPanelEl(null)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // 패널 열려있을 때 스크롤 감지 → 닫기
@@ -22,7 +22,7 @@ export function GnbPanel() {
     }
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ctx?.isPanelOpen])
 
   if (!ctx) return null
@@ -30,20 +30,21 @@ export function GnbPanel() {
   const isOpen = ctx.isPanelOpen
 
   return (
-    // overflow-hidden이 슬라이드 업 시 패널을 GNB 뒤로 클리핑
-    <div className="overflow-hidden" aria-hidden={!isOpen}>
+    <div
+      // 닫힘: overflow-hidden으로 높이 0 클리핑
+      // 열림: overflow-visible로 SubcategoryPanel(absolute) 노출 허용
+      className={[
+        "transition-[max-height] duration-200 ease-out",
+        isOpen ? "overflow-visible" : "overflow-hidden",
+      ].join(" ")}
+      style={{ maxHeight: isOpen ? "500px" : "0px" }}
+      aria-hidden={!isOpen}
+    >
+      {/* CategoryNav가 createPortal로 여기에 렌더됨 */}
       <div
-        className={[
-          "transition-transform duration-200 ease-out",
-          isOpen ? "translate-y-0" : "-translate-y-full",
-        ].join(" ")}
-      >
-        {/* CategoryNav가 createPortal로 여기에 렌더됨 */}
-        <div
-          ref={contentRef}
-          className="bg-background border-b border-line-neutral/50 shadow-sm"
-        />
-      </div>
+        ref={contentRef}
+        className="bg-background border-b border-line-neutral/50 shadow-sm"
+      />
     </div>
   )
 }
