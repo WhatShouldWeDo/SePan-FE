@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useParams } from "react-router-dom";
 
 import { CategoryNav } from "@/components/ui/category-nav";
@@ -10,7 +11,7 @@ import { KoreaAdminMap } from "@/features/region/components/map";
 import { MetricListRow } from "@/features/region/components/MetricListRow";
 import { AiAnalysisBox } from "@/features/region/components/AiAnalysisBox";
 import { CATEGORIES, SUBCATEGORIES } from "@/features/region/data/categories";
-import { useBreadcrumb } from "@/contexts/useNavigation";
+import { useBreadcrumb, useGnbPanel } from "@/contexts/useNavigation";
 import type { DeltaInfo } from "@/features/region/components/MetricListRow";
 import type { ChartData, ChartConfig } from "@/types/chart";
 
@@ -130,6 +131,8 @@ export function RegionResultPage() {
 		(subcategoryId: string, categoryId: string) => {
 			setSelectedCategoryId(categoryId);
 			setSelectedSubcategoryId(subcategoryId);
+			// 서브카테고리 선택 시 화면 최상단으로 부드럽게 이동
+			window.scrollTo({ top: 0, behavior: "smooth" });
 		},
 		[],
 	);
@@ -155,18 +158,25 @@ export function RegionResultPage() {
 		{ label: selectedCategoryLabel },
 	]);
 
-	return (
-		<div className="flex flex-col gap-6 px-[56px] py-4">
-			{/* ── CategoryNav ── */}
-			<CategoryNav
-				categories={CATEGORIES}
-				subcategories={SUBCATEGORIES}
-				selectedCategoryId={selectedCategoryId}
-				selectedSubcategoryId={selectedSubcategoryId ?? undefined}
-				onCategorySelect={handleCategorySelect}
-				onSubcategorySelect={handleSubcategorySelect}
-			/>
+	const { panelEl } = useGnbPanel();
 
+	return (
+		<>
+			{/* CategoryNav를 GnbPanel portal 타겟에 렌더링 */}
+			{panelEl &&
+				createPortal(
+					<CategoryNav
+						categories={CATEGORIES}
+						subcategories={SUBCATEGORIES}
+						selectedCategoryId={selectedCategoryId}
+						selectedSubcategoryId={selectedSubcategoryId ?? undefined}
+						onCategorySelect={handleCategorySelect}
+						onSubcategorySelect={handleSubcategorySelect}
+					/>,
+					panelEl,
+				)}
+
+			<div className="flex flex-col gap-6 px-[56px] py-4">
 			{/* ── Heading ── */}
 			<div className="flex flex-col gap-1">
 				<div className="flex items-center gap-2">
@@ -257,5 +267,6 @@ export function RegionResultPage() {
 				<BarChart data={MOCK_MONTHLY_DATA} config={CHART_CONFIG} />
 			</section>
 		</div>
+		</>
 	);
 }
