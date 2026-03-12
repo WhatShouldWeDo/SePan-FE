@@ -217,7 +217,7 @@ export function RegionResultPage() {
 					{/* 좌측: 폴리곤 지도 */}
 					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
 						<CardSectionHeader
-							title={MY_REGION.districtName}
+							title={viewMode === "default" ? MY_REGION.districtName : (selectedRegion?.name ?? MY_REGION.districtName)}
 							description="선거구 단위"
 						/>
 						<div className="flex items-center justify-center">
