@@ -148,6 +148,16 @@ export function RegionResultPage() {
 			? `인구수 추이 — ${MY_REGION.name} vs ${selectedRegion?.fullName ?? ""}`
 			: "인구수 추이";
 
+	const compareChartConfig: ChartConfig = {
+		xKey: "month",
+		series: [
+			{ key: "myPopulation", label: MY_REGION.name, color: "#6B5CFF" },
+			{ key: "selectedPopulation", label: selectedRegion?.fullName ?? "", color: "#FF6B6B" },
+		],
+		height: 400,
+		showLegend: true,
+	};
+
 	// TODO: regionId로 API 조회 후 실제 지역명 표시
 	void regionId;
 
@@ -222,9 +232,9 @@ export function RegionResultPage() {
 						/>
 						<div className="flex items-center justify-center">
 							<KoreaAdminMap
-							onRegionSelect={handleRegionSelect}
-							className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full"
-						/>
+								onRegionSelect={handleRegionSelect}
+								className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full"
+							/>
 						</div>
 					</section>
 
@@ -338,15 +348,7 @@ export function RegionResultPage() {
 						) : (
 							<BarChart
 								data={mergeMonthlyData(MY_REGION_MONTHLY, SELECTED_REGION_MONTHLY)}
-								config={{
-									xKey: "month",
-									series: [
-										{ key: "myPopulation", label: MY_REGION.name, color: "#6B5CFF" },
-										{ key: "selectedPopulation", label: selectedRegion.fullName, color: "#FF6B6B" },
-									],
-									height: 400,
-									showLegend: true,
-								}}
+								config={compareChartConfig}
 							/>
 						)}
 					</section>
