@@ -10,6 +10,8 @@ import { BarChart } from "@/components/charts";
 import { KoreaAdminMap } from "@/features/region/components/map";
 import { MetricListRow } from "@/features/region/components/MetricListRow";
 import { AiAnalysisBox } from "@/features/region/components/AiAnalysisBox";
+import { MetricActionButtons } from "@/features/region/components/MetricActionButtons";
+import { MetricComparisonCard } from "@/features/region/components/MetricComparisonCard";
 import { CATEGORIES, SUBCATEGORIES } from "@/features/region/data/categories";
 import { useBreadcrumb, useGnbPanel } from "@/contexts/useNavigation";
 import {
@@ -157,16 +159,6 @@ export function RegionResultPage() {
 
 	const { panelEl } = useGnbPanel();
 
-	// Suppress unused variable warnings for handlers used in future tasks
-	void handleAnalysis;
-	void handleCompare;
-	void handleReset;
-	void compareChartSplit;
-	void mergeMonthlyData;
-	void MOCK_COMPARISON_SUMMARY;
-	void currentChartData;
-	void chartTitle;
-
 	return (
 		<>
 			{/* CategoryNav를 GnbPanel portal 타겟에 렌더링 */}
@@ -232,34 +224,55 @@ export function RegionResultPage() {
 						</div>
 					</section>
 
-					{/* 우측: 지표 메트릭 리스트 */}
-					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
-						<CardSectionHeader
-							title={regionDisplayName}
-							description="행정안전부 2026년 1월"
-							trailingContent={
-								<Badge
-									variant="ghost"
-									size="md"
-									className="bg-primary-alpha-5 text-primary"
-								>
-									내 선거구
-								</Badge>
-							}
+					{/* 우측: 지표 메트릭 리스트 (모드별 분기) */}
+					{viewMode === "compare" && selectedRegion ? (
+						<MetricComparisonCard
+							myRegionName={MY_REGION.name}
+							selectedRegionName={selectedRegion.fullName}
+							myMetrics={MY_REGION_METRICS}
+							selectedMetrics={SELECTED_REGION_METRICS}
+							summaryText={MOCK_COMPARISON_SUMMARY}
+							onReset={handleReset}
 						/>
-						<div className="flex flex-col gap-1">
-							{currentMetrics.map((metric) => (
-								<MetricListRow
-									key={metric.label}
-									label={metric.label}
-									value={metric.value}
-									unit={metric.unit}
-									subValueBadge={metric.subValueBadge}
-									deltas={metric.deltas}
+					) : (
+						<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
+							<CardSectionHeader
+								title={viewMode === "default" ? MY_REGION.name : (selectedRegion?.fullName ?? MY_REGION.name)}
+								description="행정안전부 2026년 1월"
+								trailingContent={
+									viewMode === "default" ? (
+										<Badge
+											variant="ghost"
+											size="md"
+											className="bg-primary-alpha-5 text-primary"
+										>
+											내 선거구
+										</Badge>
+									) : undefined
+								}
+							/>
+							<div className="flex flex-col gap-1">
+								{currentMetrics.map((metric) => (
+									<MetricListRow
+										key={metric.label}
+										label={metric.label}
+										value={metric.value}
+										unit={metric.unit}
+										subValueBadge={metric.subValueBadge}
+										deltas={metric.deltas}
+									/>
+								))}
+							</div>
+							{/* 액션 버튼 (preview, analysis 모드) */}
+							{viewMode !== "default" && (
+								<MetricActionButtons
+									showAnalysis={viewMode === "preview"}
+									onAnalysisClick={handleAnalysis}
+									onCompareClick={handleCompare}
 								/>
-							))}
-						</div>
-					</section>
+							)}
+						</section>
+					)}
 				</div>
 
 				{/* ── 하단: 추이 차트 ── */}
