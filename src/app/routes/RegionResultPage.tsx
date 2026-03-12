@@ -6,6 +6,7 @@ import { CategoryNav } from "@/components/ui/category-nav";
 import { CardSectionHeader } from "@/components/ui/card-section-header";
 import { Chip } from "@/components/ui/chip";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { BarChart } from "@/components/charts";
 import { KoreaAdminMap } from "@/features/region/components/map";
 import { MetricListRow } from "@/features/region/components/MetricListRow";
@@ -29,16 +30,19 @@ import type { ChartConfig } from "@/types/chart";
 import type { MapRegion } from "@/types/map";
 
 /* ═══════════════════════════════════════════════════════════
-   Constants
+   Chart Configs
    ═══════════════════════════════════════════════════════════ */
 
-const CHART_CONFIG: ChartConfig = {
+const SINGLE_CHART_CONFIG: ChartConfig = {
 	xKey: "month",
-	// #6B5CFF = --violet-500 = --primary (Recharts는 hex만 허용)
 	series: [{ key: "population", label: "인구수", color: "#6B5CFF" }],
 	height: 400,
 	showLegend: false,
 };
+
+/* ═══════════════════════════════════════════════════════════
+   Constants
+   ═══════════════════════════════════════════════════════════ */
 
 type ChipFilter = "yearly" | "quarterly" | "monthly";
 
@@ -276,29 +280,97 @@ export function RegionResultPage() {
 				</div>
 
 				{/* ── 하단: 추이 차트 ── */}
-				<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
-					<CardSectionHeader
-						title="인구수 추이"
-						description="월별 인구수 변화 추이"
-					/>
+				{viewMode === "compare" && selectedRegion ? (
+					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
+						<CardSectionHeader
+							title={chartTitle}
+							description="월별 인구수 변화 추이"
+							trailingContent={
+								<div className="flex items-center gap-2">
+									<span className="text-label-4 text-label-alternative">
+										분리 보기
+									</span>
+									<Switch
+										size="sm"
+										checked={compareChartSplit}
+										onCheckedChange={setCompareChartSplit}
+									/>
+								</div>
+							}
+						/>
 
-					{/* Chip 필터 */}
-					<div className="flex gap-2">
-						{CHIP_FILTERS.map((chip) => (
-							<Chip
-								key={chip.id}
-								label={chip.label}
-								size="medium"
-								state={activeChip === chip.id ? "active" : "default"}
-								variant="outlined"
-								onClick={() => setActiveChip(chip.id)}
+						{/* Chip 필터 */}
+						<div className="flex gap-2">
+							{CHIP_FILTERS.map((chip) => (
+								<Chip
+									key={chip.id}
+									label={chip.label}
+									size="medium"
+									state={activeChip === chip.id ? "active" : "default"}
+									variant="outlined"
+									onClick={() => setActiveChip(chip.id)}
+								/>
+							))}
+						</div>
+
+						{/* 차트: Grouped Bar or 좌우 분리 */}
+						{compareChartSplit ? (
+							<div className="grid grid-cols-2 gap-6">
+								<div>
+									<p className="text-label-3 font-semibold text-primary mb-4">
+										{MY_REGION.name}
+									</p>
+									<BarChart data={MY_REGION_MONTHLY} config={SINGLE_CHART_CONFIG} />
+								</div>
+								<div>
+									<p className="text-label-3 font-semibold text-status-negative mb-4">
+										{selectedRegion.fullName}
+									</p>
+									<BarChart
+										data={SELECTED_REGION_MONTHLY}
+										config={{
+											...SINGLE_CHART_CONFIG,
+											series: [{ key: "population", label: "인구수", color: "#FF6B6B" }],
+										}}
+									/>
+								</div>
+							</div>
+						) : (
+							<BarChart
+								data={mergeMonthlyData(MY_REGION_MONTHLY, SELECTED_REGION_MONTHLY)}
+								config={{
+									xKey: "month",
+									series: [
+										{ key: "myPopulation", label: MY_REGION.name, color: "#6B5CFF" },
+										{ key: "selectedPopulation", label: selectedRegion.fullName, color: "#FF6B6B" },
+									],
+									height: 400,
+									showLegend: true,
+								}}
 							/>
-						))}
-					</div>
-
-					{/* BarChart */}
-					<BarChart data={MY_REGION_MONTHLY} config={CHART_CONFIG} />
-				</section>
+						)}
+					</section>
+				) : (
+					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
+						<CardSectionHeader
+							title={chartTitle}
+							description="월별 인구수 변화 추이"
+						/>
+						<div className="flex gap-2">
+							{CHIP_FILTERS.map((chip) => (
+								<Chip
+									key={chip.id}
+									label={chip.label}
+									size="medium"
+									state={activeChip === chip.id ? "active" : "default"}
+									variant="outlined"
+									onClick={() => setActiveChip(chip.id)}
+								/>
+							))}
+						</div>
+						<BarChart data={currentChartData} config={SINGLE_CHART_CONFIG} />
+					</section>
+				)}
 			</div>
 		</>
 	);
