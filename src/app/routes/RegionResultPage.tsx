@@ -12,86 +12,23 @@ import { MetricListRow } from "@/features/region/components/MetricListRow";
 import { AiAnalysisBox } from "@/features/region/components/AiAnalysisBox";
 import { CATEGORIES, SUBCATEGORIES } from "@/features/region/data/categories";
 import { useBreadcrumb, useGnbPanel } from "@/contexts/useNavigation";
-import type { DeltaInfo } from "@/features/region/components/MetricListRow";
-import type { ChartData, ChartConfig } from "@/types/chart";
+import {
+	MY_REGION,
+	MY_REGION_METRICS,
+	MY_REGION_MONTHLY,
+	SELECTED_REGION_METRICS,
+	SELECTED_REGION_MONTHLY,
+	MOCK_AI_ANALYSIS,
+	mergeMonthlyData,
+	MOCK_COMPARISON_SUMMARY,
+} from "@/features/region/data/mock-comparison";
+import type { MetricRowData } from "@/features/region/data/mock-comparison";
+import type { ChartConfig } from "@/types/chart";
+import type { MapRegion } from "@/types/map";
 
 /* ═══════════════════════════════════════════════════════════
-   Mock Data — API 연동 전 하드코딩
+   Constants
    ═══════════════════════════════════════════════════════════ */
-
-interface MetricRowData {
-	label: string;
-	value: string;
-	unit?: string;
-	subValueBadge?: string;
-	deltas?: DeltaInfo[];
-}
-
-const MOCK_REGION_NAME = "강남구 갑";
-const MOCK_DISTRICT_NAME = "강남구";
-
-const MOCK_AI_ANALYSIS =
-	"고학력·고소득 신도시형 선거구로 진보-보수 경합지역. IT 산업 집중으로 청년층 비중 높음.";
-
-const MOCK_METRICS: MetricRowData[] = [
-	{
-		label: "인구수",
-		value: "207,018",
-		unit: "명",
-		deltas: [
-			{ label: "전년대비", value: "4.5%", direction: "up", color: "blue" },
-		],
-	},
-	{
-		label: "중위연령",
-		value: "51.3",
-		unit: "세",
-		deltas: [
-			{ label: "전년대비", value: "6.1세", direction: "up", color: "red" },
-			{
-				label: "전국평균 대비",
-				value: "8.4%",
-				direction: "up",
-				color: "red",
-			},
-		],
-	},
-	{
-		label: "남녀비율",
-		value: "103.00",
-		deltas: [
-			{ label: "남성이 많음", value: "4.5%", direction: "up", color: "blue" },
-		],
-	},
-	{
-		label: "남성인구",
-		value: "104,949",
-		unit: "명",
-		subValueBadge: "50.7%",
-	},
-	{
-		label: "여성인구",
-		value: "102,069",
-		unit: "명",
-		subValueBadge: "49.3%",
-	},
-];
-
-/** 월별 인구수 추이 (BarChart 데이터) */
-const MOCK_MONTHLY_DATA: ChartData = [
-	{ month: "Jan", population: 195000 },
-	{ month: "Feb", population: 188000 },
-	{ month: "Mar", population: 190000 },
-	{ month: "Apr", population: 185000 },
-	{ month: "May", population: 192000 },
-	{ month: "Jun", population: 187000 },
-	{ month: "Jul", population: 198000 },
-	{ month: "Aug", population: 191000 },
-	{ month: "Sep", population: 193000 },
-	{ month: "Oct", population: 189000 },
-	{ month: "Nov", population: 192000 },
-	{ month: "Dec", population: 197000 },
-];
 
 const CHART_CONFIG: ChartConfig = {
 	xKey: "month",
@@ -113,6 +50,8 @@ const CHIP_FILTERS: { id: ChipFilter; label: string }[] = [
    Page Component
    ═══════════════════════════════════════════════════════════ */
 
+type ViewMode = "default" | "preview" | "analysis" | "compare";
+
 export function RegionResultPage() {
 	const { regionId } = useParams();
 
@@ -121,6 +60,45 @@ export function RegionResultPage() {
 		string | null
 	>("population");
 	const [activeChip, setActiveChip] = useState<ChipFilter>("monthly");
+
+	const [viewMode, setViewMode] = useState<ViewMode>("default");
+	const [selectedRegion, setSelectedRegion] = useState<{
+		code: string;
+		name: string;
+		fullName: string;
+	} | null>(null);
+	const [compareChartSplit, setCompareChartSplit] = useState(false);
+
+	const handleRegionSelect = useCallback(
+		(region: MapRegion) => {
+			if (region.fullName === MY_REGION.fullName) {
+				setViewMode("default");
+				setSelectedRegion(null);
+			} else {
+				setViewMode("preview");
+				setSelectedRegion({
+					code: region.code,
+					name: region.name,
+					fullName: region.fullName,
+				});
+			}
+			setCompareChartSplit(false);
+		},
+		[],
+	);
+
+	const handleAnalysis = useCallback(() => {
+		setViewMode("analysis");
+	}, []);
+
+	const handleCompare = useCallback(() => {
+		setViewMode("compare");
+	}, []);
+
+	const handleReset = useCallback(() => {
+		setViewMode("preview");
+		setCompareChartSplit(false);
+	}, []);
 
 	const handleCategorySelect = useCallback((categoryId: string) => {
 		setSelectedCategoryId(categoryId);
@@ -145,8 +123,26 @@ export function RegionResultPage() {
 		: null;
 	const subcategoryLabel = selectedSubcategory?.label ?? "인구현황";
 
+	// 파생 값
+	const regionDisplayName =
+		viewMode === "default" || !selectedRegion
+			? MY_REGION.name
+			: selectedRegion.fullName;
+
+	const currentMetrics: MetricRowData[] =
+		viewMode === "default" ? MY_REGION_METRICS : SELECTED_REGION_METRICS;
+
+	const currentChartData =
+		viewMode === "default" || viewMode === "preview"
+			? MY_REGION_MONTHLY
+			: SELECTED_REGION_MONTHLY;
+
+	const chartTitle =
+		viewMode === "compare"
+			? `인구수 추이 — ${MY_REGION.name} vs ${selectedRegion?.fullName ?? ""}`
+			: "인구수 추이";
+
 	// TODO: regionId로 API 조회 후 실제 지역명 표시
-	const regionDisplayName = MOCK_REGION_NAME;
 	void regionId;
 
 	const selectedCategoryLabel =
@@ -160,6 +156,16 @@ export function RegionResultPage() {
 	]);
 
 	const { panelEl } = useGnbPanel();
+
+	// Suppress unused variable warnings for handlers used in future tasks
+	void handleAnalysis;
+	void handleCompare;
+	void handleReset;
+	void compareChartSplit;
+	void mergeMonthlyData;
+	void MOCK_COMPARISON_SUMMARY;
+	void currentChartData;
+	void chartTitle;
 
 	return (
 		<>
@@ -178,7 +184,7 @@ export function RegionResultPage() {
 					panelEl,
 				)}
 
-			<div className="flex flex-col gap-6 px-[56px] py-4">
+			<div className="flex flex-col gap-6 px-[56px]">
 				{/* ── CategoryNav (페이지 상단 고정) ── */}
 				<CategoryNav
 					categories={CATEGORIES}
@@ -215,18 +221,21 @@ export function RegionResultPage() {
 					{/* 좌측: 폴리곤 지도 */}
 					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
 						<CardSectionHeader
-							title={MOCK_DISTRICT_NAME}
+							title={MY_REGION.districtName}
 							description="선거구 단위"
 						/>
 						<div className="flex items-center justify-center">
-							<KoreaAdminMap className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full" />
+							<KoreaAdminMap
+							onRegionSelect={handleRegionSelect}
+							className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full"
+						/>
 						</div>
 					</section>
 
 					{/* 우측: 지표 메트릭 리스트 */}
 					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
 						<CardSectionHeader
-							title={MOCK_REGION_NAME}
+							title={regionDisplayName}
 							description="행정안전부 2026년 1월"
 							trailingContent={
 								<Badge
@@ -239,7 +248,7 @@ export function RegionResultPage() {
 							}
 						/>
 						<div className="flex flex-col gap-1">
-							{MOCK_METRICS.map((metric) => (
+							{currentMetrics.map((metric) => (
 								<MetricListRow
 									key={metric.label}
 									label={metric.label}
@@ -275,7 +284,7 @@ export function RegionResultPage() {
 					</div>
 
 					{/* BarChart */}
-					<BarChart data={MOCK_MONTHLY_DATA} config={CHART_CONFIG} />
+					<BarChart data={MY_REGION_MONTHLY} config={CHART_CONFIG} />
 				</section>
 			</div>
 		</>
