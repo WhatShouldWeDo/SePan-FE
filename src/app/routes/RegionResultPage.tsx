@@ -141,10 +141,15 @@ export function RegionResultPage() {
 			? MY_REGION_MONTHLY
 			: SELECTED_REGION_MONTHLY;
 
+	const chartRegionLabel =
+		viewMode === "default" || viewMode === "preview"
+			? MY_REGION.name
+			: (selectedRegion?.fullName ?? MY_REGION.name);
+
 	const chartTitle =
 		viewMode === "compare"
-			? `인구수 추이 — ${MY_REGION.name} vs ${selectedRegion?.fullName ?? ""}`
-			: "인구수 추이";
+			? `${MY_REGION.name} vs ${selectedRegion?.fullName ?? ""}`
+			: chartRegionLabel;
 
 	const compareChartConfig: ChartConfig = {
 		xKey: "month",
@@ -222,7 +227,7 @@ export function RegionResultPage() {
 					{/* 좌측: 폴리곤 지도 */}
 					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
 						<CardSectionHeader
-							title={viewMode === "default" ? MY_REGION.districtName : (selectedRegion?.name ?? MY_REGION.districtName)}
+							title={MY_REGION.districtName}
 							description="선거구 단위"
 						/>
 						<div className="flex items-center justify-center">
