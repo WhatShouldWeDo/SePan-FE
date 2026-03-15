@@ -360,6 +360,7 @@
 	--map-fill-hover: 0.75 0.1 250;
 	--map-fill-selected: 0.65 0.15 250;
 	--map-stroke: 0.98 0 0;
+	--map-stroke-hover: 0.45 0.2 250;
 	--map-label: 0.3 0 0;
 	--map-fill-search-highlight: 0.8 0.15 140;
 }
@@ -401,6 +402,7 @@
 	--map-fill-hover: 0.55 0.12 250;
 	--map-fill-selected: 0.65 0.15 250;
 	--map-stroke: 0.25 0 0;
+	--map-stroke-hover: 0.7 0.2 250;
 	--map-label: 0.85 0 0;
 	--map-fill-search-highlight: 0.5 0.15 140;
 }
