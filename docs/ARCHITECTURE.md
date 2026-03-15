@@ -61,7 +61,7 @@ src/
 │   ├── Sidebar.tsx              # Figma 기반 (접힘 80px / 펼침 280px, Duo 아이콘)
 │   └── ...                     # ConfirmDialog, DdayBadge 등
 │
-├── hooks/                      # 공유 훅 (useLongPress, useRecentSearches)
+├── hooks/                      # 공유 훅 (useContainerSize, useLongPress, useRecentSearches)
 │
 ├── lib/                        # 유틸리티 & 인프라
 │   ├── api/                    # REST 클라이언트 + React Query 훅
@@ -122,7 +122,9 @@ Context는 테마/인증 등 제한적 사용만 허용. Redux, MobX 등 금지.
 ### 지도/시각화
 
 - TopoJSON → GeoJSON 변환 (`topojson-client`)
-- D3 projection + `fitExtent()` 자동 스케일링
+- D3 projection + `fitExtent()` 전체 영역 자동 스케일링 (컨테이너 크기 동적 감지)
+- `useContainerSize` 훅으로 ResizeObserver 기반 컨테이너 width/height 실시간 추적
+- 레벨 변경 시 `fitExtent`가 최적 확대 비율·중앙 좌표를 자동 계산, d3-zoom identity(1x) 리셋
 - 동적 import로 TopoJSON 지연 로딩 (`useTopoJsonData`)
 - `React.memo` + 커스텀 `arePropsEqual`로 폴리곤 렌더링 최적화
 

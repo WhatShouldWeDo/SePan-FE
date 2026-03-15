@@ -1,6 +1,6 @@
 # Module Map
 
-> 최종 업데이트: 2026-03-15 (비교 추이 차트 Figma 디자인 반영, 지도 hover stroke, 초기 줌 150%)
+> 최종 업데이트: 2026-03-15 (지도 auto-fit zoom — 동적 컨테이너 크기 감지, fitExtent 전체 영역 적용)
 
 ---
 
@@ -44,8 +44,8 @@
   - `components/map/index.ts` — 컴포넌트 re-export
   - `hooks/useMapDrillDown.ts` — 4단계 드릴다운 상태 관리 + 지역 변환 함수
   - `hooks/useTopoJsonData.ts` — TopoJSON 동적 import + GeoJSON 변환
-  - `hooks/useProjection.ts` — D3 geoMercator 프로젝션 (fitExtent 자동 스케일링)
-  - `hooks/useMapZoom.ts` — D3 줌 동작 관리
+  - `hooks/useProjection.ts` — D3 geoMercator 프로젝션 (fitExtent 전체 영역 자동 스케일링)
+  - `hooks/useMapZoom.ts` — D3 줌 동작 관리 (identity 리셋, 1x~8x)
   - `hooks/useMapTransition.ts` — D3 전환 애니메이션
   - `lib/choropleth-utils.ts` — oklch 색상 보간, choropleth 색상 매핑, 범례 생성
   - `lib/map-theme.ts` — 지도 CSS 변수 (fill, hover, selected, stroke, strokeHover 등)
@@ -64,7 +64,7 @@
 - **외부 의존성**: d3-geo, d3-zoom, d3-transition, d3-selection, topojson-client
 - **관련 ADR**: [ADR-003](decisions/003-map-rendering-stack.md), [ADR-004](decisions/004-pointer-events-migration.md), [ADR-005](decisions/005-topojson-dynamic-import.md), [ADR-006](decisions/006-hangul-chosung-search.md), [ADR-007](decisions/007-oklch-choropleth.md), [ADR-008](decisions/008-d3-transition-reversal.md), [ADR-011](decisions/011-constituency-to-admin-code.md), [ADR-012](decisions/012-conditional-4level-drilldown.md)
 - **상세 문서**: [`docs/architecture/region.md`](architecture/region.md)
-- **상태**: RegionResultPage Figma R.2.0 퍼블리싱 완료 + 비교 추이 차트 Figma 반영 완료, 데이터는 하드코딩 (API 연동 전)
+- **상태**: RegionResultPage Figma R.2.0 퍼블리싱 완료 + 비교 추이 차트 Figma 반영 완료 + 지도 auto-fit zoom 적용, 데이터는 하드코딩 (API 연동 전)
 
 ### Dashboard
 
@@ -226,6 +226,7 @@
 
 | 파일 | 역할 | 의존 |
 |------|------|------|
+| `useContainerSize.ts` | ResizeObserver 기반 컨테이너 크기 동적 감지 (width/height) | — |
 | `useLongPress.ts` | 롱프레스 제스처 감지 | — |
 | `useRecentSearches.ts` | localStorage 기반 최근 검색 이력 (최대 5개, 중복 제거) | — |
 
