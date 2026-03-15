@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import { useBreadcrumb } from "@/contexts/useNavigation"
-import electionIcon from "@/assets/pledges/election-icon.svg"
+import agingIcon from "@/assets/category-icons/aging.png"
 import locationFillIcon from "@/assets/pledges/location-fill.svg"
 
 /* ─── Types ─── */
@@ -73,11 +73,23 @@ function ElectionTypeCard({ to, title, description }: ElectionTypeItem) {
 		>
 			{/* 상단 아이콘 영역 */}
 			<div className="flex items-center justify-center bg-[rgba(181,29,82,0.08)] px-6 py-8">
-				<img
-					src={electionIcon}
-					alt=""
-					className="size-12 rounded-[18px]"
-				/>
+				<div className="relative size-16 shrink-0 overflow-clip rounded-[18px]">
+					<div
+						className="absolute inset-0"
+						style={{
+							backgroundColor: "#b51d52",
+							maskImage: `url('${agingIcon}')`,
+							maskMode: "luminance",
+							maskSize: "50px 50px",
+							maskPosition: "center",
+							maskRepeat: "no-repeat",
+							WebkitMaskImage: `url('${agingIcon}')`,
+							WebkitMaskSize: "50px 50px",
+							WebkitMaskPosition: "center",
+							WebkitMaskRepeat: "no-repeat",
+						}}
+					/>
+				</div>
 			</div>
 			{/* 하단 텍스트 영역 */}
 			<div className="flex flex-col items-center gap-1 px-6 py-5">
@@ -105,11 +117,21 @@ function QuickStartCard({
 	return (
 		<div className="flex flex-1 items-center gap-4 rounded-3xl bg-white p-6 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.06)]">
 			{/* 좌측 아이콘 */}
-			<div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[rgba(181,29,82,0.08)]">
-				<img
-					src={electionIcon}
-					alt=""
-					className="size-12 rounded-[18px]"
+			<div className="relative size-16 shrink-0 overflow-clip rounded-xl bg-[rgba(181,29,82,0.08)]">
+				<div
+					className="absolute inset-0"
+					style={{
+						backgroundColor: "#b51d52",
+						maskImage: `url('${agingIcon}')`,
+						maskMode: "luminance",
+						maskSize: "50px 50px",
+						maskPosition: "center",
+						maskRepeat: "no-repeat",
+						WebkitMaskImage: `url('${agingIcon}')`,
+						WebkitMaskSize: "50px 50px",
+						WebkitMaskPosition: "center",
+						WebkitMaskRepeat: "no-repeat",
+					}}
 				/>
 			</div>
 			{/* 우측 정보 */}
