@@ -12,12 +12,14 @@ import { useTopoJsonData } from "@/features/region/hooks/useTopoJsonData";
 import { useMapZoom } from "@/features/region/hooks/useMapZoom";
 import { useMapTransition } from "@/features/region/hooks/useMapTransition";
 import { useLongPress } from "@/hooks/useLongPress";
+import { useContainerSize } from "@/hooks/useContainerSize";
 import { RegionPolygon } from "./RegionPolygon";
 import { MapTooltip } from "./MapTooltip";
 import { MapSkeleton } from "./MapSkeleton";
 import { MapBreadcrumb } from "./MapBreadcrumb";
 import { MapZoomControls } from "./MapZoomControls";
 import { cn } from "@/lib/utils";
+import { mapColors } from "@/features/region/lib/map-theme";
 import { getChoroplethColor, buildLegendItems } from "@/features/region/lib/choropleth-utils";
 import { MapLegend } from "./MapLegend";
 import type {
@@ -82,13 +84,16 @@ export function KoreaAdminMap({
 	className,
 }: KoreaAdminMapProps) {
 	const {
-		width = 600,
-		height = 800,
 		padding = 20,
 		showLabels = true,
 		labelAreaThreshold,
 		enableDrillDown = true,
 	} = config ?? {};
+
+	const { containerRef, width: measuredWidth, height: measuredHeight } =
+		useContainerSize();
+	const width = measuredWidth || (config?.width ?? 600);
+	const height = measuredHeight || (config?.height ?? 800);
 
 	// --- TopoJSON 동적 로딩 ---
 	const {
@@ -415,7 +420,7 @@ export function KoreaAdminMap({
 					: `${selectedGuName ?? selectedCityName ?? ""} 읍면동 지도`;
 
 	return (
-		<div className={cn("relative", className)}>
+		<div ref={containerRef} className={cn("relative overflow-hidden", className)}>
 			{enableDrillDown && (
 				<MapBreadcrumb
 					level={level}
@@ -432,6 +437,7 @@ export function KoreaAdminMap({
 				width={width}
 				height={height}
 				viewBox={`0 0 ${width} ${height}`}
+				overflow="hidden"
 				role="img"
 				aria-label={ariaLabel}
 				style={{ cursor: zoomLevel > 1 ? "grab" : undefined }}
@@ -441,9 +447,37 @@ export function KoreaAdminMap({
 				onPointerCancel={longPress.onPointerUp}
 			>
 				<g ref={gRef}>
-					{/* 기본 폴리곤 (hover/selected 제외) */}
+					{/* Layer 1: 비활성 폴리곤 path만 — label을 분리하여 인접 폴리곤에 가리지 않도록 함 */}
 					{regionData.map(
-						({ region, pathD, centroid, showLabel, area }) => {
+						({ region, pathD, centroid }) => {
+							const isActive =
+								hoveredCode === region.code ||
+								selectedCode === region.code ||
+								searchHighlightCode === region.code;
+							if (isActive) return null;
+
+							return (
+								<RegionPolygon
+									key={region.code}
+									pathD={pathD}
+									centroid={centroid}
+									region={region}
+									isHovered={false}
+									isSelected={false}
+									showLabel={false}
+									fillOverride={
+										choroplethColorMap?.[region.code] ??
+										null
+									}
+									onHover={handleHover}
+									onClick={handleClick}
+								/>
+							);
+						},
+					)}
+					{/* Layer 2: 비활성 폴리곤 label — 모든 path 위에 렌더링 */}
+					{regionData.map(
+						({ region, centroid, showLabel, area }) => {
 							const isActive =
 								hoveredCode === region.code ||
 								selectedCode === region.code ||
@@ -458,26 +492,25 @@ export function KoreaAdminMap({
 										effectiveThreshold /
 											(zoomLevel * zoomLevel));
 
+							if (!zoomAdjustedShowLabel) return null;
+
 							return (
-								<RegionPolygon
+								<text
 									key={region.code}
-									pathD={pathD}
-									centroid={centroid}
-									region={region}
-									isHovered={false}
-									isSelected={false}
-									showLabel={zoomAdjustedShowLabel}
-									fillOverride={
-										choroplethColorMap?.[region.code] ??
-										null
-									}
-									onHover={handleHover}
-									onClick={handleClick}
-								/>
+									x={centroid[0]}
+									y={centroid[1]}
+									textAnchor="middle"
+									dominantBaseline="central"
+									fill={mapColors.label}
+									fontSize={10}
+									pointerEvents="none"
+								>
+									{region.name}
+								</text>
 							);
 						},
 					)}
-					{/* hover/selected 폴리곤을 마지막에 렌더링 → stroke가 위에 표시 */}
+					{/* Layer 3: hover/selected 폴리곤 — path + label 최상위 렌더링 */}
 					{regionData.map(
 						({ region, pathD, centroid, showLabel, area }) => {
 							const isHovered = hoveredCode === region.code;
