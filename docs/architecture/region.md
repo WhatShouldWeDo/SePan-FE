@@ -1,6 +1,6 @@
 # Region 모듈 상세 구조
 
-> 최종 업데이트: 2026-03-12 (지역 비교분석 기능: 4 ViewMode + 비교 카드 + 차트 Switch)
+> 최종 업데이트: 2026-03-15 (지도 초기 드릴다운 + 차트 제목 로직 + MetricListRow 반응형)
 
 ---
 
@@ -80,6 +80,7 @@ interface MetricListRowProps {
 - 델타 화살표: `WantedCaretUp` 아이콘 + `direction=down`일 때 `rotate-180`
 - 컬러: `text-party-dpk` (blue) / `text-party-ppp` (red) CSS 변수 사용
 - SubValue 뱃지: `bg-status-positive` + `opacity-[0.08]` 오버레이 기법
+- 반응형: Body 영역 `flex-wrap` + `gap-y-1` — 너비 부족 시 subValueBadge와 deltas가 줄바꿈 (비교 모드 좌우 분할 시 필요)
 
 ### AiAnalysisBox
 
@@ -212,6 +213,16 @@ default ──(지도 타 지역 클릭)──→ preview
 - `handleRegionSelect`는 내 선거구 클릭 시 `default`, 타 지역 클릭 시 `preview`로 전환.
 - 파생 값: `regionDisplayName`, `currentMetrics`, `currentChartData`, `chartTitle`, `compareChartConfig`
 
+### 지도 초기 드릴다운
+
+`KoreaAdminMap`에 `searchNavigation={MY_REGION_NAV}`를 전달하여 페이지 로딩 시 전국 지도 대신 기본 선거구(강남구) 읍면동 레벨로 자동 드릴다운. 지도 CardSectionHeader title은 항상 `MY_REGION.districtName` ("강남구") — 지도가 표시하는 전체 지역명.
+
+### 차트 제목 로직
+
+- default/preview: 내 선거구명 (예: "강남구 갑")
+- analysis: 선택 지역명 (예: "서울 종로")
+- compare: "{내 선거구} vs {선택 지역}" (예: "강남구 갑 vs 서울 종로")
+
 ### 비교 모드 컴포넌트
 
 - **MetricActionButtons** — `showAnalysis` prop으로 "분석 결과 보기" 버튼 조건부 표시. Button `default` + `outline` variant 사용.
@@ -230,6 +241,7 @@ default ──(지도 타 지역 클릭)──→ preview
 - `MY_REGION` — 내 선거구 정보 (name, fullName, districtName)
 - `MY_REGION_METRICS` / `SELECTED_REGION_METRICS` — 각 지역 메트릭
 - `MY_REGION_MONTHLY` / `SELECTED_REGION_MONTHLY` — 월별 추이 데이터
+- `MY_REGION_NAV` — 내 선거구 지도 초기 네비게이션 (`SearchSelectedRegion` 타입, 강남구 `cityCode: "11680"`)
 - `mergeMonthlyData()` — 두 데이터셋을 월 기준으로 인덱스 매칭 (API 연동 시 키 기반 조인으로 변경 필요)
 
 ### 카드 스타일
