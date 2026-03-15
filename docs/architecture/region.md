@@ -1,6 +1,6 @@
 # Region 모듈 상세 구조
 
-> 최종 업데이트: 2026-03-15 (비교 추이 차트 Figma 반영, 지도 hover stroke 3px, 초기 줌 150%)
+> 최종 업데이트: 2026-03-15 (지도 auto-fit zoom, label 3-layer 렌더링)
 
 ---
 
@@ -33,8 +33,8 @@ features/region/
 ├── hooks/
 │   ├── useMapDrillDown.ts        # 4단계 드릴다운 상태 관리
 │   ├── useTopoJsonData.ts        # TopoJSON 동적 import + GeoJSON 변환
-│   ├── useProjection.ts          # D3 geoMercator (fitExtent)
-│   ├── useMapZoom.ts             # D3 줌 동작 (초기 150%, 리셋 150%)
+│   ├── useProjection.ts          # D3 geoMercator (fitExtent 전체 영역)
+│   ├── useMapZoom.ts             # D3 줌 동작 (identity 리셋, 1x~8x)
 │   └── useMapTransition.ts       # D3 전환 애니메이션
 ├── lib/
 │   ├── choropleth-utils.ts       # oklch 색상 보간, 범례 생성
@@ -100,22 +100,29 @@ AI 분석 결과 표시. `WantedMagicWand` 아이콘 + primary 배경.
 - CSS 변수: `--map-stroke-hover` (Light: `oklch(0.45 0.2 250)`, Dark: `oklch(0.7 0.2 250)`)
 - 전환 애니메이션: `transition: fill 150ms, stroke 150ms, stroke-width 150ms`
 
-### SVG 렌더링 순서 (z-index 대체)
+### SVG 3-layer 렌더링 (z-index 대체)
 
-SVG는 CSS z-index가 아닌 DOM 순서로 렌더링 우선순위가 결정됨. `KoreaAdminMap`에서 `regionData.map()`을 두 번 순회:
+SVG는 CSS z-index가 아닌 DOM 순서로 렌더링 우선순위가 결정됨. `KoreaAdminMap`에서 `regionData.map()`을 세 번 순회:
 
-1. **1차 패스**: hover/selected가 아닌 폴리곤 렌더링 (일반 레이어)
-2. **2차 패스**: hover/selected 폴리곤만 렌더링 (최상위 레이어)
+1. **Layer 1**: 비활성 폴리곤 `<path>`만 렌더링 (`showLabel={false}`)
+2. **Layer 2**: 비활성 폴리곤 `<text>` label만 렌더링 — 모든 path 위에 그려져 인접 폴리곤에 가리지 않음
+3. **Layer 3**: hover/selected 폴리곤 `<path>` + `<text>` 함께 렌더링 (최상위)
 
-이를 통해 hover된 폴리곤의 3px stroke가 인접 폴리곤 위에 항상 표시됨.
+Layer 2의 `<text>`는 `mapColors.label` 색상, `fontSize={10}`, `pointerEvents="none"` — `RegionPolygon` 내부 label과 동일 스타일.
 
-### 초기 줌 레벨
+이를 통해:
+- 모든 label이 인접 폴리곤 fill 위에 표시됨
+- hover된 폴리곤의 3px stroke가 다른 폴리곤 위에 항상 표시됨
 
-`useMapZoom.ts`의 `INITIAL_ZOOM = 1.5` — 모든 드릴다운 레벨에서 150% 기본 확대.
+### Auto-fit Zoom (동적 컨테이너 크기 감지)
 
-- 초기화 시 SVG 중심 기준 `zoomIdentity.translate(cx, cy).scale(1.5).translate(-cx, -cy)` 적용
-- `zoomReset` / `smoothZoomReset`도 동일한 150% transform으로 리셋 (1x가 아닌 1.5x)
+`KoreaAdminMap`은 `useContainerSize` 훅(`src/hooks/useContainerSize.ts`)으로 컨테이너의 실제 width/height를 ResizeObserver로 감지한다.
+
+- `useProjection`이 `fitExtent()`로 전체 컨테이너 영역(`[padding, width-padding] × [padding, height-padding]`)에 피처를 최적 맞춤
+- `useMapZoom`의 초기/리셋 transform = `zoomIdentity` (1x, translate 없음)
+- 레벨 변경 시 `smoothZoomReset()`으로 identity 리셋 → projection 재계산과 함께 새 피처가 뷰포트를 최대한 채움
 - 줌 범위: 1x ~ 8x (MIN_ZOOM ~ MAX_ZOOM)
+- 컨테이너 측정 전 fallback: `config.width ?? 600`, `config.height ?? 800`
 
 ---
 
@@ -285,7 +292,7 @@ RegionResultPage
 ├── Badge (components/ui)
 ├── Switch (components/ui) — 통합 보기 토글
 ├── BarChart (components/charts) — darkTooltip, barSize/barGap/barRadius
-├── KoreaAdminMap (region/components/map) — hover stroke 3px, 초기 줌 150%
+├── KoreaAdminMap (region/components/map) — hover stroke 3px, auto-fit zoom
 ├── MetricListRow (region/components)
 ├── AiAnalysisBox (region/components) — 비교 카드 내부에서 border 추가
 ├── MetricActionButtons (region/components)
