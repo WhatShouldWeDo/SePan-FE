@@ -257,8 +257,7 @@
 | `/login` | LoginPage | 불필요 |
 | `/signup` | SignupPage | 불필요 |
 | `/` | DashboardPage | 필요 |
-| `/region` | RegionPage | 필요 |
-| `/region/:regionId` | RegionResultPage | 필요 |
+| `/region` | RegionResultPage | 필요 |
 | `/policy` | PolicyPage | 필요 |
 | `/policy/new` | PolicyFormPage | 필요 |
 | `/policy/:id/edit` | PolicyFormPage | 필요 |
@@ -279,8 +278,7 @@
 | `DashboardPage.tsx` | 대시보드 홈 (Figma H.1.0.Main), 바로가기 네비게이션(`/region`, `/policy`), 주간 일정 탐색. InsightListItem 그리드 2곳에 Container Query(`@container` + `@lg:grid-cols-2`) 적용 — 컨테이너 512px 미만 시 1열 전환 | `features/dashboard/components`, `components/ui`, `DashboardCardSkeleton`, `components/icons` (WantedFill*), `react-router-dom` |
 | `LoginPage.tsx` | 로그인 (자체 전체화면 레이아웃: 좌 62.5% Primary 배경 / 우 37.5% 폼 영역, AuthLayout 미사용) | `auth/components/LoginForm`, `lucide-react` |
 | `SignupPage.tsx` | 회원가입 | `auth/components/Signup*` |
-| `RegionPage.tsx` | 지역분석 (지도+검색) | `region/components/map`, `region/hooks` |
-| `RegionResultPage.tsx` | 지역분석 결과 (Figma R.2.0): 4가지 ViewMode(default/preview/analysis/compare) + CategoryNav×2 + AI분석 + 폴리곤지도/MetricList 2열 + 비교모드(좌우카드+Grouped/분리차트) | `region/components/*`, `region/data/*`, `components/ui`, `components/charts`, `contexts/useNavigation` |
+| `RegionResultPage.tsx` | 지역분석 (`/region`): 4가지 ViewMode(default/preview/analysis/compare) + CategoryNav×2 + AI분석 + 폴리곤지도/MetricList 2열 + 비교모드(좌우카드+Grouped/분리차트) | `region/components/*`, `region/data/*`, `components/ui`, `components/charts`, `contexts/useNavigation` |
 | `PolicyPage.tsx` | 정책 관리 (탭 기반, MVP 목업) | `components/ui/tabs`, `PolicyStatusBadge` |
 | `PolicyFormPage.tsx` | 정책 작성/수정 폼 | `components/ui` |
 | `TestPage.tsx` | 컴포넌트 쇼케이스 | `test/sections/*` |
