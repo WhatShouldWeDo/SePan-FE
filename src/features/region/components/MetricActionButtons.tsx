@@ -16,17 +16,17 @@ export function MetricActionButtons({
 	return (
 		<div className="flex gap-3">
 			{showAnalysis && (
-				<Button variant="default" size="lg" className="flex-1" onClick={onAnalysisClick}>
-					분석 결과 보기
+				<Button variant="default" size="lg" className="min-w-0 flex-1" onClick={onAnalysisClick}>
+					<span className="truncate">분석 결과 보기</span>
 				</Button>
 			)}
 			<Button
 				variant="outline"
 				size="lg"
-				className={showAnalysis ? "flex-1" : "w-full"}
+				className={showAnalysis ? "min-w-0 flex-1" : "w-full"}
 				onClick={onCompareClick}
 			>
-				내 선거구와 비교분석 하기
+				<span className="truncate">내 선거구와 비교분석 하기</span>
 			</Button>
 		</div>
 	);
