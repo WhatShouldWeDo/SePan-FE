@@ -86,9 +86,9 @@ function MetricListRow({
 				</span>
 
 				{/* Body */}
-				<div className="flex items-center justify-between">
+				<div className="flex flex-wrap items-center justify-between gap-y-1">
 					{/* Leading: value + unit + subValue badge */}
-					<div className="flex items-center gap-2">
+					<div className="flex flex-wrap items-center gap-2">
 						<span className="text-title-3 font-bold leading-[1.4] text-label-normal">
 							{value}
 							{unit && (
@@ -108,7 +108,7 @@ function MetricListRow({
 
 					{/* Trailing: deltas */}
 					{deltas && deltas.length > 0 && (
-						<div className="flex items-center gap-4">
+						<div className="flex flex-wrap items-center gap-4">
 							{deltas.map((delta) => (
 								<DeltaDisplay key={delta.label} {...delta} />
 							))}
