@@ -23,6 +23,8 @@ export interface BarChartProps {
   isLoading?: boolean
   /** 값 포맷 함수 (툴팁, 축 레이블) */
   valueFormatter?: ChartFormatter
+  /** 다크 스타일 툴팁 */
+  darkTooltip?: boolean
   /** 커스텀 className */
   className?: string
 }
@@ -65,6 +67,7 @@ export function BarChart({
   horizontal = false,
   isLoading = false,
   valueFormatter,
+  darkTooltip = false,
   className,
 }: BarChartProps) {
   // 로딩 상태
@@ -90,11 +93,14 @@ export function BarChart({
     showTooltip = true,
     showLegend = true,
     showGrid = true,
+    barSize,
+    barGap,
+    barRadius = 4,
   } = config
 
   return (
     <ResponsiveContainer width="100%" height={height} className={className}>
-      <RechartsBarChart data={data} layout={horizontal ? 'vertical' : 'horizontal'}>
+      <RechartsBarChart data={data} layout={horizontal ? 'vertical' : 'horizontal'} barGap={barGap} barSize={barSize}>
         {/* 그리드 */}
         {showGrid && <CartesianGrid strokeDasharray="3 3" opacity={0.3} />}
 
@@ -134,12 +140,25 @@ export function BarChart({
         {/* 툴팁 */}
         {showTooltip && (
           <Tooltip
-            contentStyle={{
-              backgroundColor: 'white',
-              border: '1px solid #e5e7eb',
-              borderRadius: '8px',
-              fontSize: '14px',
-            }}
+            contentStyle={
+              darkTooltip
+                ? {
+                    backgroundColor: '#374151',
+                    border: 'none',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    color: '#fff',
+                    boxShadow: '0px 1px 4px rgba(25, 33, 61, 0.08)',
+                  }
+                : {
+                    backgroundColor: 'white',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                  }
+            }
+            itemStyle={darkTooltip ? { color: '#fff' } : undefined}
+            labelStyle={darkTooltip ? { color: '#fff' } : undefined}
             formatter={valueFormatter}
           />
         )}
@@ -154,7 +173,7 @@ export function BarChart({
             dataKey={s.key}
             name={s.label}
             fill={s.color || getChartColor(idx)}
-            radius={[4, 4, 0, 0]} // 상단 모서리 둥글게
+            radius={[barRadius, barRadius, 0, 0]}
           />
         ))}
       </RechartsBarChart>

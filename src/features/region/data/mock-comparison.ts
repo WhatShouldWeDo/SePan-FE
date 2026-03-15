@@ -150,3 +150,70 @@ export const MOCK_COMPARISON_SUMMARY =
 /** Mock AI 분석 텍스트 */
 export const MOCK_AI_ANALYSIS =
 	"고학력·고소득 신도시형 선거구로 진보-보수 경합지역. IT 산업 집중으로 청년층 비중 높음.";
+
+/* ═══════════════════════════════════════════════════════════
+   Compare 그래프 보기 — 추가 Mock 데이터
+   ═══════════════════════════════════════════════════════════ */
+
+export interface CompareMetricSummary {
+	label: string;
+	value: string;
+	badge?: { text: string; color: "blue" | "red" };
+	delta?: { value: string; direction: "up" | "down" };
+}
+
+/** 비교 차트 상단 메트릭 요약 (좌: 내 선거구, 우: 비교 선거구) */
+export const COMPARE_METRIC_SUMMARIES: [CompareMetricSummary, CompareMetricSummary] = [
+	{
+		label: "중위연령",
+		value: "42.3세",
+		badge: { text: "연령대 낮음", color: "blue" },
+		delta: { value: "14.6%", direction: "up" },
+	},
+	{
+		label: "중위연령",
+		value: "51.3세",
+		badge: { text: "연령대 높음", color: "red" },
+		delta: { value: "24.9%", direction: "up" },
+	},
+];
+
+export interface InsightCardData {
+	label: string;
+	value: string;
+	trailing: string;
+}
+
+/** 내 선거구 인사이트 카드 */
+export const MY_REGION_INSIGHTS: InsightCardData[] = [
+	{ label: "라벨 내용이 들어갑니다", value: "인사이트 값 내용이 들어갑니다", trailing: "29%" },
+	{ label: "라벨 내용이 들어갑니다", value: "인사이트 값 내용이 들어갑니다", trailing: "29%" },
+	{ label: "라벨 내용이 들어갑니다", value: "인사이트 값 내용이 들어갑니다", trailing: "29%" },
+];
+
+/** 비교 선거구 인사이트 카드 */
+export const SELECTED_REGION_INSIGHTS: InsightCardData[] = [
+	{ label: "라벨 내용이 들어갑니다", value: "인사이트 값 내용이 들어갑니다", trailing: "29%" },
+	{ label: "라벨 내용이 들어갑니다", value: "인사이트 값 내용이 들어갑니다", trailing: "29%" },
+	{ label: "라벨 내용이 들어갑니다", value: "인사이트 값 내용이 들어갑니다", trailing: "29%" },
+];
+
+export interface BottomMetricData {
+	label: string;
+	value: string;
+	trailing:
+		| { type: "badge"; text: string; color: "blue" | "red" }
+		| { type: "delta"; label: string; value: string; direction: "up" | "down"; color: "blue" | "red" };
+}
+
+/** 하단 메트릭 요약 행 */
+export const COMPARE_BOTTOM_METRICS: [BottomMetricData, BottomMetricData][] = [
+	[
+		{ label: "라벨 내용입니다", value: "735", trailing: { type: "badge", text: "+10.1%", color: "blue" } },
+		{ label: "라벨 내용입니다", value: "21.5%", trailing: { type: "delta", label: "전년대비", value: "8.4%", direction: "up", color: "red" } },
+	],
+	[
+		{ label: "라벨 내용입니다", value: "735", trailing: { type: "badge", text: "+10.1%", color: "blue" } },
+		{ label: "라벨 내용입니다", value: "21.5%", trailing: { type: "delta", label: "전년대비", value: "8.4%", direction: "up", color: "red" } },
+	],
+];
