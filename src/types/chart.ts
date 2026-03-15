@@ -54,6 +54,12 @@ export interface ChartConfig {
   showGrid?: boolean
   /** 반응형 여부 (기본값: true) */
   responsive?: boolean
+  /** 바 너비 고정 (픽셀) */
+  barSize?: number
+  /** 같은 카테고리 내 바 간격 (픽셀) */
+  barGap?: number
+  /** 바 상단 모서리 둥글기 (픽셀, 기본값: 4) */
+  barRadius?: number
 }
 
 /**
