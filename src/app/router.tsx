@@ -6,8 +6,8 @@ import { LoginPage } from "@/app/routes/LoginPage";
 import { SignupPage } from "@/app/routes/SignupPage";
 import { DashboardPage } from "@/app/routes/DashboardPage";
 import { RegionResultPage } from "@/app/routes/RegionResultPage";
-import { PolicyPage } from "@/app/routes/PolicyPage";
-import { PolicyFormPage } from "@/app/routes/PolicyFormPage";
+import { PledgesOverviewPage } from "@/app/routes/PledgesOverviewPage";
+import { PledgesPlaceholderPage } from "@/app/routes/PledgesPlaceholderPage";
 import { NotFoundPage } from "@/app/routes/NotFoundPage";
 import TestPage from "./routes/TestPage";
 
@@ -28,9 +28,8 @@ export const router = createBrowserRouter([
 				children: [
 					{ path: "/", element: <DashboardPage /> },
 					{ path: "/region", element: <RegionResultPage /> },
-					{ path: "/policy", element: <PolicyPage /> },
-					{ path: "/policy/new", element: <PolicyFormPage /> },
-					{ path: "/policy/:id/edit", element: <PolicyFormPage /> },
+					{ path: "/pledges", element: <PledgesOverviewPage /> },
+					{ path: "/pledges/:type", element: <PledgesPlaceholderPage /> },
 					{ path: "/test", element: <TestPage /> },
 				],
 			},
