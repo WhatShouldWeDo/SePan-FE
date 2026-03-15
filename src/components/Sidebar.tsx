@@ -32,7 +32,7 @@ interface SidebarProps {
 const mainNavItems: NavItem[] = [
   { href: "/", label: "대시보드", icon: DuoHome },
   { href: "/region", label: "지역분석", icon: DuoChartPie },
-  { href: "/policy", label: "정책개발", icon: DuoBookOpen },
+  { href: "/pledges", label: "역대공약분석", icon: DuoBookOpen },
   { href: null, label: "선거감시", icon: DuoBinocular },
   { href: null, label: "주소록", icon: DuoAddressBook },
 ]
