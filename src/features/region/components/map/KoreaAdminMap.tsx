@@ -441,8 +441,15 @@ export function KoreaAdminMap({
 				onPointerCancel={longPress.onPointerUp}
 			>
 				<g ref={gRef}>
+					{/* 기본 폴리곤 (hover/selected 제외) */}
 					{regionData.map(
 						({ region, pathD, centroid, showLabel, area }) => {
+							const isActive =
+								hoveredCode === region.code ||
+								selectedCode === region.code ||
+								searchHighlightCode === region.code;
+							if (isActive) return null;
+
 							const zoomAdjustedShowLabel =
 								showLabel ||
 								(showLabels &&
@@ -457,11 +464,44 @@ export function KoreaAdminMap({
 									pathD={pathD}
 									centroid={centroid}
 									region={region}
-									isHovered={hoveredCode === region.code}
-									isSelected={
-										selectedCode === region.code ||
-										searchHighlightCode === region.code
+									isHovered={false}
+									isSelected={false}
+									showLabel={zoomAdjustedShowLabel}
+									fillOverride={
+										choroplethColorMap?.[region.code] ??
+										null
 									}
+									onHover={handleHover}
+									onClick={handleClick}
+								/>
+							);
+						},
+					)}
+					{/* hover/selected 폴리곤을 마지막에 렌더링 → stroke가 위에 표시 */}
+					{regionData.map(
+						({ region, pathD, centroid, showLabel, area }) => {
+							const isHovered = hoveredCode === region.code;
+							const isSelected =
+								selectedCode === region.code ||
+								searchHighlightCode === region.code;
+							if (!isHovered && !isSelected) return null;
+
+							const zoomAdjustedShowLabel =
+								showLabel ||
+								(showLabels &&
+									zoomLevel >= ZOOM_LABEL_THRESHOLD &&
+									area >
+										effectiveThreshold /
+											(zoomLevel * zoomLevel));
+
+							return (
+								<RegionPolygon
+									key={region.code}
+									pathD={pathD}
+									centroid={centroid}
+									region={region}
+									isHovered={isHovered}
+									isSelected={isSelected}
 									showLabel={zoomAdjustedShowLabel}
 									fillOverride={
 										choroplethColorMap?.[region.code] ??
