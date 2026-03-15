@@ -1,105 +1,47 @@
 import { useState, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { useParams } from "react-router-dom";
 
 import { CategoryNav } from "@/components/ui/category-nav";
 import { CardSectionHeader } from "@/components/ui/card-section-header";
 import { Chip } from "@/components/ui/chip";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { BarChart } from "@/components/charts";
 import { KoreaAdminMap } from "@/features/region/components/map";
 import { MetricListRow } from "@/features/region/components/MetricListRow";
 import { AiAnalysisBox } from "@/features/region/components/AiAnalysisBox";
+import { MetricActionButtons } from "@/features/region/components/MetricActionButtons";
+import { MetricComparisonCard } from "@/features/region/components/MetricComparisonCard";
 import { CATEGORIES, SUBCATEGORIES } from "@/features/region/data/categories";
 import { useBreadcrumb, useGnbPanel } from "@/contexts/useNavigation";
-import type { DeltaInfo } from "@/features/region/components/MetricListRow";
-import type { ChartData, ChartConfig } from "@/types/chart";
+import {
+	MY_REGION,
+	MY_REGION_METRICS,
+	MY_REGION_MONTHLY,
+	SELECTED_REGION_METRICS,
+	SELECTED_REGION_MONTHLY,
+	MOCK_AI_ANALYSIS,
+	mergeMonthlyData,
+	MOCK_COMPARISON_SUMMARY,
+} from "@/features/region/data/mock-comparison";
+import type { MetricRowData } from "@/features/region/data/mock-comparison";
+import type { ChartConfig } from "@/types/chart";
+import type { MapRegion } from "@/types/map";
 
 /* ═══════════════════════════════════════════════════════════
-   Mock Data — API 연동 전 하드코딩
+   Chart Configs
    ═══════════════════════════════════════════════════════════ */
 
-interface MetricRowData {
-	label: string;
-	value: string;
-	unit?: string;
-	subValueBadge?: string;
-	deltas?: DeltaInfo[];
-}
-
-const MOCK_REGION_NAME = "강남구 갑";
-const MOCK_DISTRICT_NAME = "강남구";
-
-const MOCK_AI_ANALYSIS =
-	"고학력·고소득 신도시형 선거구로 진보-보수 경합지역. IT 산업 집중으로 청년층 비중 높음.";
-
-const MOCK_METRICS: MetricRowData[] = [
-	{
-		label: "인구수",
-		value: "207,018",
-		unit: "명",
-		deltas: [
-			{ label: "전년대비", value: "4.5%", direction: "up", color: "blue" },
-		],
-	},
-	{
-		label: "중위연령",
-		value: "51.3",
-		unit: "세",
-		deltas: [
-			{ label: "전년대비", value: "6.1세", direction: "up", color: "red" },
-			{
-				label: "전국평균 대비",
-				value: "8.4%",
-				direction: "up",
-				color: "red",
-			},
-		],
-	},
-	{
-		label: "남녀비율",
-		value: "103.00",
-		deltas: [
-			{ label: "남성이 많음", value: "4.5%", direction: "up", color: "blue" },
-		],
-	},
-	{
-		label: "남성인구",
-		value: "104,949",
-		unit: "명",
-		subValueBadge: "50.7%",
-	},
-	{
-		label: "여성인구",
-		value: "102,069",
-		unit: "명",
-		subValueBadge: "49.3%",
-	},
-];
-
-/** 월별 인구수 추이 (BarChart 데이터) */
-const MOCK_MONTHLY_DATA: ChartData = [
-	{ month: "Jan", population: 195000 },
-	{ month: "Feb", population: 188000 },
-	{ month: "Mar", population: 190000 },
-	{ month: "Apr", population: 185000 },
-	{ month: "May", population: 192000 },
-	{ month: "Jun", population: 187000 },
-	{ month: "Jul", population: 198000 },
-	{ month: "Aug", population: 191000 },
-	{ month: "Sep", population: 193000 },
-	{ month: "Oct", population: 189000 },
-	{ month: "Nov", population: 192000 },
-	{ month: "Dec", population: 197000 },
-];
-
-const CHART_CONFIG: ChartConfig = {
+const SINGLE_CHART_CONFIG: ChartConfig = {
 	xKey: "month",
-	// #6B5CFF = --violet-500 = --primary (Recharts는 hex만 허용)
 	series: [{ key: "population", label: "인구수", color: "#6B5CFF" }],
 	height: 400,
 	showLegend: false,
 };
+
+/* ═══════════════════════════════════════════════════════════
+   Constants
+   ═══════════════════════════════════════════════════════════ */
 
 type ChipFilter = "yearly" | "quarterly" | "monthly";
 
@@ -113,14 +55,53 @@ const CHIP_FILTERS: { id: ChipFilter; label: string }[] = [
    Page Component
    ═══════════════════════════════════════════════════════════ */
 
-export function RegionResultPage() {
-	const { regionId } = useParams();
+type ViewMode = "default" | "preview" | "analysis" | "compare";
 
+export function RegionResultPage() {
 	const [selectedCategoryId, setSelectedCategoryId] = useState("voter");
 	const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<
 		string | null
 	>("population");
 	const [activeChip, setActiveChip] = useState<ChipFilter>("monthly");
+
+	const [viewMode, setViewMode] = useState<ViewMode>("default");
+	const [selectedRegion, setSelectedRegion] = useState<{
+		code: string;
+		name: string;
+		fullName: string;
+	} | null>(null);
+	const [compareChartSplit, setCompareChartSplit] = useState(false);
+
+	const handleRegionSelect = useCallback(
+		(region: MapRegion) => {
+			if (region.fullName === MY_REGION.fullName) {
+				setViewMode("default");
+				setSelectedRegion(null);
+			} else {
+				setViewMode("preview");
+				setSelectedRegion({
+					code: region.code,
+					name: region.name,
+					fullName: region.fullName,
+				});
+			}
+			setCompareChartSplit(false);
+		},
+		[],
+	);
+
+	const handleAnalysis = useCallback(() => {
+		setViewMode("analysis");
+	}, []);
+
+	const handleCompare = useCallback(() => {
+		setViewMode("compare");
+	}, []);
+
+	const handleReset = useCallback(() => {
+		setViewMode("preview");
+		setCompareChartSplit(false);
+	}, []);
 
 	const handleCategorySelect = useCallback((categoryId: string) => {
 		setSelectedCategoryId(categoryId);
@@ -145,9 +126,34 @@ export function RegionResultPage() {
 		: null;
 	const subcategoryLabel = selectedSubcategory?.label ?? "인구현황";
 
-	// TODO: regionId로 API 조회 후 실제 지역명 표시
-	const regionDisplayName = MOCK_REGION_NAME;
-	void regionId;
+	// 파생 값
+	const regionDisplayName =
+		viewMode === "default" || !selectedRegion
+			? MY_REGION.name
+			: selectedRegion.fullName;
+
+	const currentMetrics: MetricRowData[] =
+		viewMode === "default" ? MY_REGION_METRICS : SELECTED_REGION_METRICS;
+
+	const currentChartData =
+		viewMode === "default" || viewMode === "preview"
+			? MY_REGION_MONTHLY
+			: SELECTED_REGION_MONTHLY;
+
+	const chartTitle =
+		viewMode === "compare"
+			? `인구수 추이 — ${MY_REGION.name} vs ${selectedRegion?.fullName ?? ""}`
+			: "인구수 추이";
+
+	const compareChartConfig: ChartConfig = {
+		xKey: "month",
+		series: [
+			{ key: "myPopulation", label: MY_REGION.name, color: "#6B5CFF" },
+			{ key: "selectedPopulation", label: selectedRegion?.fullName ?? "", color: "#FF6B6B" },
+		],
+		height: 400,
+		showLegend: true,
+	};
 
 	const selectedCategoryLabel =
 		CATEGORIES.find((c) => c.id === selectedCategoryId)?.label ??
@@ -178,7 +184,7 @@ export function RegionResultPage() {
 					panelEl,
 				)}
 
-			<div className="flex flex-col gap-6 px-[56px] py-4">
+			<div className="flex flex-col gap-6 px-[56px]">
 				{/* ── CategoryNav (페이지 상단 고정) ── */}
 				<CategoryNav
 					categories={CATEGORIES}
@@ -215,68 +221,152 @@ export function RegionResultPage() {
 					{/* 좌측: 폴리곤 지도 */}
 					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
 						<CardSectionHeader
-							title={MOCK_DISTRICT_NAME}
+							title={viewMode === "default" ? MY_REGION.districtName : (selectedRegion?.name ?? MY_REGION.districtName)}
 							description="선거구 단위"
 						/>
 						<div className="flex items-center justify-center">
-							<KoreaAdminMap className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full" />
+							<KoreaAdminMap
+								onRegionSelect={handleRegionSelect}
+								className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full"
+							/>
 						</div>
 					</section>
 
-					{/* 우측: 지표 메트릭 리스트 */}
-					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
-						<CardSectionHeader
-							title={MOCK_REGION_NAME}
-							description="행정안전부 2026년 1월"
-							trailingContent={
-								<Badge
-									variant="ghost"
-									size="md"
-									className="bg-primary-alpha-5 text-primary"
-								>
-									내 선거구
-								</Badge>
-							}
+					{/* 우측: 지표 메트릭 리스트 (모드별 분기) */}
+					{viewMode === "compare" && selectedRegion ? (
+						<MetricComparisonCard
+							myRegionName={MY_REGION.name}
+							selectedRegionName={selectedRegion.fullName}
+							myMetrics={MY_REGION_METRICS}
+							selectedMetrics={SELECTED_REGION_METRICS}
+							summaryText={MOCK_COMPARISON_SUMMARY}
+							onReset={handleReset}
 						/>
-						<div className="flex flex-col gap-1">
-							{MOCK_METRICS.map((metric) => (
-								<MetricListRow
-									key={metric.label}
-									label={metric.label}
-									value={metric.value}
-									unit={metric.unit}
-									subValueBadge={metric.subValueBadge}
-									deltas={metric.deltas}
+					) : (
+						<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
+							<CardSectionHeader
+								title={viewMode === "default" ? MY_REGION.name : (selectedRegion?.fullName ?? MY_REGION.name)}
+								description="행정안전부 2026년 1월"
+								trailingContent={
+									viewMode === "default" ? (
+										<Badge
+											variant="ghost"
+											size="md"
+											className="bg-primary-alpha-5 text-primary"
+										>
+											내 선거구
+										</Badge>
+									) : undefined
+								}
+							/>
+							<div className="flex flex-col gap-1">
+								{currentMetrics.map((metric) => (
+									<MetricListRow
+										key={metric.label}
+										label={metric.label}
+										value={metric.value}
+										unit={metric.unit}
+										subValueBadge={metric.subValueBadge}
+										deltas={metric.deltas}
+									/>
+								))}
+							</div>
+							{/* 액션 버튼 (preview, analysis 모드) */}
+							{viewMode !== "default" && (
+								<MetricActionButtons
+									showAnalysis={viewMode === "preview"}
+									onAnalysisClick={handleAnalysis}
+									onCompareClick={handleCompare}
 								/>
-							))}
-						</div>
-					</section>
+							)}
+						</section>
+					)}
 				</div>
 
 				{/* ── 하단: 추이 차트 ── */}
-				<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
-					<CardSectionHeader
-						title="인구수 추이"
-						description="월별 인구수 변화 추이"
-					/>
+				{viewMode === "compare" && selectedRegion ? (
+					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
+						<CardSectionHeader
+							title={chartTitle}
+							description="월별 인구수 변화 추이"
+							trailingContent={
+								<div className="flex items-center gap-2">
+									<span className="text-label-4 text-label-alternative">
+										분리 보기
+									</span>
+									<Switch
+										size="sm"
+										checked={compareChartSplit}
+										onCheckedChange={setCompareChartSplit}
+									/>
+								</div>
+							}
+						/>
 
-					{/* Chip 필터 */}
-					<div className="flex gap-2">
-						{CHIP_FILTERS.map((chip) => (
-							<Chip
-								key={chip.id}
-								label={chip.label}
-								size="medium"
-								state={activeChip === chip.id ? "active" : "default"}
-								variant="outlined"
-								onClick={() => setActiveChip(chip.id)}
+						{/* Chip 필터 */}
+						<div className="flex gap-2">
+							{CHIP_FILTERS.map((chip) => (
+								<Chip
+									key={chip.id}
+									label={chip.label}
+									size="medium"
+									state={activeChip === chip.id ? "active" : "default"}
+									variant="outlined"
+									onClick={() => setActiveChip(chip.id)}
+								/>
+							))}
+						</div>
+
+						{/* 차트: Grouped Bar or 좌우 분리 */}
+						{compareChartSplit ? (
+							<div className="grid grid-cols-2 gap-6">
+								<div>
+									<p className="text-label-3 font-semibold text-primary mb-4">
+										{MY_REGION.name}
+									</p>
+									<BarChart data={MY_REGION_MONTHLY} config={SINGLE_CHART_CONFIG} />
+								</div>
+								<div>
+									<p className="text-label-3 font-semibold text-status-negative mb-4">
+										{selectedRegion.fullName}
+									</p>
+									<BarChart
+										data={SELECTED_REGION_MONTHLY}
+										config={{
+											...SINGLE_CHART_CONFIG,
+											series: [{ key: "population", label: "인구수", color: "#FF6B6B" }],
+										}}
+									/>
+								</div>
+							</div>
+						) : (
+							<BarChart
+								data={mergeMonthlyData(MY_REGION_MONTHLY, SELECTED_REGION_MONTHLY)}
+								config={compareChartConfig}
 							/>
-						))}
-					</div>
-
-					{/* BarChart */}
-					<BarChart data={MOCK_MONTHLY_DATA} config={CHART_CONFIG} />
-				</section>
+						)}
+					</section>
+				) : (
+					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
+						<CardSectionHeader
+							title={chartTitle}
+							description="월별 인구수 변화 추이"
+						/>
+						<div className="flex gap-2">
+							{CHIP_FILTERS.map((chip) => (
+								<Chip
+									key={chip.id}
+									label={chip.label}
+									size="medium"
+									state={activeChip === chip.id ? "active" : "default"}
+									variant="outlined"
+									onClick={() => setActiveChip(chip.id)}
+								/>
+							))}
+						</div>
+						<BarChart data={currentChartData} config={SINGLE_CHART_CONFIG} />
+					</section>
+				)}
 			</div>
 		</>
 	);
