@@ -180,4 +180,8 @@ Never use grep/ripgrep when serena can do semantic search. Never read entire fil
 
 ---
 
+## 10. 작업 방식 (필수)
+
+모든 기능 구현은 brainstorming → writing-plans → subagent-driven-development 순서를 따른다.
+
 _이 CLAUDE.md는 MVP 동안 계속 수정될 예정입니다._

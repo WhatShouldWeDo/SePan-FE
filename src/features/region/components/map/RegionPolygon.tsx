@@ -59,16 +59,20 @@ export const RegionPolygon = React.memo(function RegionPolygon({
 			? mapColors.fillHover
 			: (fillOverride ?? mapColors.fill);
 
+	const strokeColor = isHovered || isSelected
+		? mapColors.strokeHover
+		: mapColors.stroke;
+
 	return (
 		<g>
 			<path
 				d={pathD}
 				fill={fill}
-				stroke={mapColors.stroke}
-				strokeWidth={0.5}
+				stroke={strokeColor}
+				strokeWidth={isHovered || isSelected ? 3 : 0.5}
 				vectorEffect="non-scaling-stroke"
 				cursor="pointer"
-				style={{ transition: "fill 150ms ease-out" }}
+				style={{ transition: "fill 150ms ease-out, stroke 150ms ease-out, stroke-width 150ms ease-out" }}
 				onPointerEnter={(e) => onHover(region, e)}
 				onPointerMove={(e) => onHover(region, e)}
 				onPointerLeave={(e) => onHover(null, e)}

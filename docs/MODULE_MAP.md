@@ -1,6 +1,6 @@
 # Module Map
 
-> 최종 업데이트: 2026-03-11 (지역분석 결과 페이지 Figma R.2.0 퍼블리싱)
+> 최종 업데이트: 2026-03-15 (비교 추이 차트 Figma 디자인 반영, 지도 hover stroke, 초기 줌 150%)
 
 ---
 
@@ -48,7 +48,7 @@
   - `hooks/useMapZoom.ts` — D3 줌 동작 관리
   - `hooks/useMapTransition.ts` — D3 전환 애니메이션
   - `lib/choropleth-utils.ts` — oklch 색상 보간, choropleth 색상 매핑, 범례 생성
-  - `lib/map-theme.ts` — 지도 CSS 변수 (fill, hover, selected, stroke 등)
+  - `lib/map-theme.ts` — 지도 CSS 변수 (fill, hover, selected, stroke, strokeHover 등)
   - `lib/sido-utils.ts` — 시도 코드 ↔ 이름 매핑
   - `lib/sigun-utils.ts` — 시군 유틸리티
   - `lib/__tests__/choropleth-utils.test.ts` — Choropleth 유닛 테스트
@@ -58,13 +58,13 @@
   - `components/MetricComparisonCard.tsx` — 비교 모드 좌우 분할 메트릭 카드 — compare 모드에서 사용
   - `components/ComparisonSummaryBox.tsx` — 비교 해석 텍스트 박스 — MetricComparisonCard에서 사용
   - `data/categories.ts` — 분석 지표 카테고리 정의 (9개 카테고리 + 서브카테고리 + Figma 아이콘 에셋 경로)
-  - `data/mock-comparison.ts` — 비교분석 Mock 데이터 (내 선거구/선택 지역 메트릭·월별추이, 비교 해석 텍스트)
+  - `data/mock-comparison.ts` — 비교분석 Mock 데이터 (내 선거구/선택 지역 메트릭·월별추이, 비교 해석 텍스트, 인사이트 카드, 하단 메트릭)
   - `data/*.topojson.json` — 시도/시군/시군구/읍면동 지리 데이터
-- **의존하는 모듈**: `types/map`, `lib/utils`, `components/ui`, `components/icons` (WantedCaretUp, WantedMagicWand)
+- **의존하는 모듈**: `types/map`, `lib/utils`, `components/ui`, `components/icons` (WantedCaretUp, WantedMagicWand, WantedFillMessage)
 - **외부 의존성**: d3-geo, d3-zoom, d3-transition, d3-selection, topojson-client
 - **관련 ADR**: [ADR-003](decisions/003-map-rendering-stack.md), [ADR-004](decisions/004-pointer-events-migration.md), [ADR-005](decisions/005-topojson-dynamic-import.md), [ADR-006](decisions/006-hangul-chosung-search.md), [ADR-007](decisions/007-oklch-choropleth.md), [ADR-008](decisions/008-d3-transition-reversal.md), [ADR-011](decisions/011-constituency-to-admin-code.md), [ADR-012](decisions/012-conditional-4level-drilldown.md)
 - **상세 문서**: [`docs/architecture/region.md`](architecture/region.md)
-- **상태**: RegionResultPage Figma R.2.0 퍼블리싱 완료, 데이터는 하드코딩 (API 연동 전)
+- **상태**: RegionResultPage Figma R.2.0 퍼블리싱 완료 + 비교 추이 차트 Figma 반영 완료, 데이터는 하드코딩 (API 연동 전)
 
 ### Dashboard
 
@@ -157,7 +157,7 @@
 
 | 파일 | 역할 |
 |------|------|
-| `BarChart.tsx` | Recharts 바 차트 래퍼 |
+| `BarChart.tsx` | Recharts 바 차트 래퍼 (barSize/barGap/barRadius/darkTooltip 지원) |
 | `LineChart.tsx` | Recharts 라인 차트 래퍼 |
 | `index.ts` | re-export |
 
@@ -239,7 +239,7 @@
 | `api.ts` | `ApiResponse<T>`, `ApiSuccessResponse`, `ApiErrorResponse`, Login/Signup 타입 |
 | `common.ts` | `User`, `UserRole`, `Region`, `PaginationParams`, `PaginatedResponse` |
 | `map.ts` | `MapLevel`, `MapRegion`, `SearchSelectedRegion`, `MapConfig`, `ChoroplethData/Config`, `LegendItem` |
-| `chart.ts` | `ChartData`, `ChartDataPoint`, `ChartSeriesConfig`, `ChartConfig`, `ChartFormatter` |
+| `chart.ts` | `ChartData`, `ChartDataPoint`, `ChartSeriesConfig`, `ChartConfig` (barSize/barGap/barRadius 포함), `ChartFormatter` |
 
 ---
 
@@ -278,7 +278,7 @@
 | `DashboardPage.tsx` | 대시보드 홈 (Figma H.1.0.Main), 바로가기 네비게이션(`/region`, `/policy`), 주간 일정 탐색. InsightListItem 그리드 2곳에 Container Query(`@container` + `@lg:grid-cols-2`) 적용 — 컨테이너 512px 미만 시 1열 전환 | `features/dashboard/components`, `components/ui`, `DashboardCardSkeleton`, `components/icons` (WantedFill*), `react-router-dom` |
 | `LoginPage.tsx` | 로그인 (자체 전체화면 레이아웃: 좌 62.5% Primary 배경 / 우 37.5% 폼 영역, AuthLayout 미사용) | `auth/components/LoginForm`, `lucide-react` |
 | `SignupPage.tsx` | 회원가입 | `auth/components/Signup*` |
-| `RegionResultPage.tsx` | 지역분석 (`/region`): 4가지 ViewMode(default/preview/analysis/compare) + CategoryNav×2 + AI분석 + 폴리곤지도/MetricList 2열 + 비교모드(좌우카드+Grouped/분리차트) | `region/components/*`, `region/data/*`, `components/ui`, `components/charts`, `contexts/useNavigation` |
+| `RegionResultPage.tsx` | 지역분석 (`/region`): 4가지 ViewMode + 비교모드(통합/분리 뷰, 뷰탭, 메트릭요약, 인사이트카드+hover CTA, 하단메트릭, 인사이트카드섹션) | `region/components/*`, `region/data/*`, `components/ui`, `components/charts`, `components/icons`, `contexts/useNavigation` |
 | `PolicyPage.tsx` | 정책 관리 (탭 기반, MVP 목업) | `components/ui/tabs`, `PolicyStatusBadge` |
 | `PolicyFormPage.tsx` | 정책 작성/수정 폼 | `components/ui` |
 | `TestPage.tsx` | 컴포넌트 쇼케이스 | `test/sections/*` |

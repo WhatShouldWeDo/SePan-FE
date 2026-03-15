@@ -13,6 +13,8 @@ export const mapColors = {
 	fillSelected: "oklch(var(--map-fill-selected))",
 	/** 폴리곤 테두리 */
 	stroke: "oklch(var(--map-stroke))",
+	/** hover 시 폴리곤 테두리 (고채도) */
+	strokeHover: "oklch(var(--map-stroke-hover))",
 	/** 라벨 텍스트 */
 	label: "oklch(var(--map-label))",
 	/** 검색 결과 하이라이트 */

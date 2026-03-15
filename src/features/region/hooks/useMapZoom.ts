@@ -7,6 +7,9 @@ import "d3-transition"; // Selection.prototype.transition() 활성화
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 8;
 
+/** 초기 줌 레벨 */
+const INITIAL_ZOOM = 1.5;
+
 /** 줌 버튼 클릭 시 확대/축소 비율 */
 const ZOOM_STEP = 1.5;
 
@@ -57,7 +60,7 @@ export function useMapZoom(enabled: boolean = true): UseMapZoomReturn {
 	const zoomBehaviorRef = useRef<ZoomBehavior<SVGSVGElement, unknown> | null>(
 		null,
 	);
-	const [zoomLevel, setZoomLevel] = useState(1);
+	const [zoomLevel, setZoomLevel] = useState(INITIAL_ZOOM);
 
 	// d3-zoom 초기화 — svgNode가 바뀔 때(마운트될 때) 다시 실행
 	useEffect(() => {
@@ -83,6 +86,14 @@ export function useMapZoom(enabled: boolean = true): UseMapZoomReturn {
 		// 더블클릭 줌 비활성화 (드릴다운과 충돌)
 		svgSelection.on("dblclick.zoom", null);
 
+		// 초기 줌 레벨 적용 (SVG 중심 기준)
+		const { width, height } = svgNode.getBoundingClientRect();
+		const initialTransform = zoomIdentity
+			.translate(width / 2, height / 2)
+			.scale(INITIAL_ZOOM)
+			.translate(-width / 2, -height / 2);
+		zoomBehavior.transform(svgSelection, initialTransform);
+
 		zoomBehaviorRef.current = zoomBehavior;
 
 		return () => {
@@ -90,6 +101,17 @@ export function useMapZoom(enabled: boolean = true): UseMapZoomReturn {
 			zoomBehaviorRef.current = null;
 		};
 	}, [enabled, svgNode]);
+
+
+	// 초기 줌(150%) transform 계산 헬퍼
+	const getInitialTransform = useCallback(() => {
+		if (!svgNode) return zoomIdentity;
+		const { width, height } = svgNode.getBoundingClientRect();
+		return zoomIdentity
+			.translate(width / 2, height / 2)
+			.scale(INITIAL_ZOOM)
+			.translate(-width / 2, -height / 2);
+	}, [svgNode]);
 
 	// 뷰포트 중심 기준 확대 — smooth transition 적용
 	const zoomIn = useCallback(() => {
@@ -110,16 +132,16 @@ export function useMapZoom(enabled: boolean = true): UseMapZoomReturn {
 
 	const zoomReset = useCallback(() => {
 		if (!svgNode || !zoomBehaviorRef.current) return;
-		zoomBehaviorRef.current.transform(select(svgNode), zoomIdentity);
-	}, [svgNode]);
+		zoomBehaviorRef.current.transform(select(svgNode), getInitialTransform());
+	}, [svgNode, getInitialTransform]);
 
 	const smoothZoomReset = useCallback(() => {
 		if (!svgNode || !zoomBehaviorRef.current) return;
 		select(svgNode)
 			.transition()
 			.duration(SMOOTH_ZOOM_DURATION)
-			.call(zoomBehaviorRef.current.transform, zoomIdentity);
-	}, [svgNode]);
+			.call(zoomBehaviorRef.current.transform, getInitialTransform());
+	}, [svgNode, getInitialTransform]);
 
 	return {
 		svgRef,
