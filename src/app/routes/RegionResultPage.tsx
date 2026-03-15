@@ -16,6 +16,7 @@ import { CATEGORIES, SUBCATEGORIES } from "@/features/region/data/categories";
 import { useBreadcrumb, useGnbPanel } from "@/contexts/useNavigation";
 import {
 	MY_REGION,
+	MY_REGION_NAV,
 	MY_REGION_METRICS,
 	MY_REGION_MONTHLY,
 	SELECTED_REGION_METRICS,
@@ -226,6 +227,7 @@ export function RegionResultPage() {
 						/>
 						<div className="flex items-center justify-center">
 							<KoreaAdminMap
+								searchNavigation={MY_REGION_NAV}
 								onRegionSelect={handleRegionSelect}
 								className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full"
 							/>

@@ -1,6 +1,7 @@
 // src/features/region/data/mock-comparison.ts
 import type { ChartData } from "@/types/chart";
 import type { DeltaInfo } from "@/features/region/components/MetricListRow";
+import type { SearchSelectedRegion } from "@/types/map";
 
 export type { DeltaInfo };
 
@@ -18,6 +19,13 @@ export const MY_REGION = {
 	fullName: "서울 강남구 갑",
 	districtName: "강남구",
 } as const;
+
+/** 내 선거구 지도 초기 네비게이션 (추후 서버에서 사용자별 기본 지역구를 받아옴) */
+export const MY_REGION_NAV: SearchSelectedRegion = {
+	sido: "서울",
+	cityCode: "11680",
+	guCode: null,
+};
 
 /** 내 선거구 메트릭 */
 export const MY_REGION_METRICS: MetricRowData[] = [
