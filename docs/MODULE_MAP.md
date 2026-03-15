@@ -83,14 +83,22 @@
 - **상세 문서**: [`docs/architecture/dashboard.md`](architecture/dashboard.md)
 - **상태**: Figma H.1.0.Main 디자인 반영 완료, 데이터는 하드코딩 (API 연동 전)
 
+### Pledges (역대공약분석)
+
+- **경로**: `src/app/routes/PledgesOverviewPage.tsx`, `PledgesPlaceholderPage.tsx`
+- **역할**: 역대공약분석 개요 페이지 (선거 유형 선택 + 빠른시작)
+- **핵심 파일**:
+  - `PledgesOverviewPage.tsx` — 개요 랜딩 페이지 (선거 유형 카드 3개 + 빠른시작 카드 3개)
+  - `PledgesPlaceholderPage.tsx` — 하위 선거 페이지 placeholder (대통령/국회의원/지방)
+- **에셋**: `src/assets/pledges/` (election-icon.png, location-fill.svg)
+- **의존하는 모듈**: `contexts/useNavigation` (useBreadcrumb), react-router-dom
+- **상태**: 개요 페이지 완료, 하위 선거 페이지는 placeholder
+
 ### Policy
 
 - **경로**: `src/features/policy/` (빈 디렉토리)
-- **역할**: 정책/공약 관리 (현재 페이지 수준만 존재)
-- **핵심 파일**:
-  - `(없음)` — 로직이 `app/routes/PolicyPage.tsx`, `PolicyFormPage.tsx`에 직접 작성됨 (MVP 목업)
-- **의존하는 모듈**: `components/ui` (Tabs, Card), `components/PolicyStatusBadge`
-- **상태**: MVP 목업. feature 분리 전 단계
+- **역할**: 정책/공약 관리 (라우트에서 제거됨, 파일 보존)
+- **상태**: 라우트 비활성 (`/pledges`로 대체)
 
 ### Test
 
@@ -259,9 +267,8 @@
 | `/signup` | SignupPage | 불필요 |
 | `/` | DashboardPage | 필요 |
 | `/region` | RegionResultPage | 필요 |
-| `/policy` | PolicyPage | 필요 |
-| `/policy/new` | PolicyFormPage | 필요 |
-| `/policy/:id/edit` | PolicyFormPage | 필요 |
+| `/pledges` | PledgesOverviewPage | 필요 |
+| `/pledges/:type` | PledgesPlaceholderPage | 필요 |
 | `/test` | TestPage | 필요 |
 
 #### 레이아웃 (`layouts/`)
@@ -280,8 +287,8 @@
 | `LoginPage.tsx` | 로그인 (자체 전체화면 레이아웃: 좌 62.5% Primary 배경 / 우 37.5% 폼 영역, AuthLayout 미사용) | `auth/components/LoginForm`, `lucide-react` |
 | `SignupPage.tsx` | 회원가입 | `auth/components/Signup*` |
 | `RegionResultPage.tsx` | 지역분석 (`/region`): 4가지 ViewMode + 비교모드(통합/분리 뷰, 뷰탭, 메트릭요약, 인사이트카드+hover CTA, 하단메트릭, 인사이트카드섹션) | `region/components/*`, `region/data/*`, `components/ui`, `components/charts`, `components/icons`, `contexts/useNavigation` |
-| `PolicyPage.tsx` | 정책 관리 (탭 기반, MVP 목업) | `components/ui/tabs`, `PolicyStatusBadge` |
-| `PolicyFormPage.tsx` | 정책 작성/수정 폼 | `components/ui` |
+| `PledgesOverviewPage.tsx` | 역대공약분석 개요 (선거 유형 카드 + 빠른시작 카드) | `contexts/useNavigation`, `assets/pledges/*`, `react-router-dom` |
+| `PledgesPlaceholderPage.tsx` | 역대공약분석 하위 선거 페이지 placeholder | `contexts/useNavigation`, `react-router-dom` |
 | `TestPage.tsx` | 컴포넌트 쇼케이스 | `test/sections/*` |
 | `NotFoundPage.tsx` | 404 페이지 | — |
 

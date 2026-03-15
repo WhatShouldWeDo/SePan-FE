@@ -187,9 +187,8 @@ Form (react-hook-form) → Zod 검증 → useApiMutation → API 호출
 | `/signup` | SignupPage | 불필요 |
 | `/` | DashboardPage | 필요 |
 | `/region` | RegionResultPage | 필요 |
-| `/policy` | PolicyPage | 필요 |
-| `/policy/new` | PolicyFormPage | 필요 |
-| `/policy/:id/edit` | PolicyFormPage | 필요 |
+| `/pledges` | PledgesOverviewPage | 필요 |
+| `/pledges/:type` | PledgesPlaceholderPage | 필요 |
 
 ---
 
