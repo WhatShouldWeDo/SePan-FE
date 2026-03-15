@@ -73,21 +73,11 @@ function ElectionTypeCard({ to, title, description }: ElectionTypeItem) {
 		>
 			{/* 상단 아이콘 영역 */}
 			<div className="flex items-center justify-center bg-[rgba(181,29,82,0.08)] px-6 py-8">
-				<div className="size-12 overflow-hidden rounded-[18px]">
-					<div
-						className="size-full bg-[#b51d52]"
-						style={{
-							maskImage: `url('${electionIcon}')`,
-							maskSize: "contain",
-							maskRepeat: "no-repeat",
-							maskPosition: "center",
-							WebkitMaskImage: `url('${electionIcon}')`,
-							WebkitMaskSize: "contain",
-							WebkitMaskRepeat: "no-repeat",
-							WebkitMaskPosition: "center",
-						}}
-					/>
-				</div>
+				<img
+					src={electionIcon}
+					alt=""
+					className="size-12 rounded-[18px]"
+				/>
 			</div>
 			{/* 하단 텍스트 영역 */}
 			<div className="flex flex-col items-center gap-1 px-6 py-5">
@@ -116,18 +106,10 @@ function QuickStartCard({
 		<div className="flex flex-1 items-center gap-4 rounded-3xl bg-white p-6 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.06)]">
 			{/* 좌측 아이콘 */}
 			<div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[rgba(181,29,82,0.08)]">
-				<div
-					className="size-12 bg-[#b51d52]"
-					style={{
-						maskImage: `url('${electionIcon}')`,
-						maskSize: "contain",
-						maskRepeat: "no-repeat",
-						maskPosition: "center",
-						WebkitMaskImage: `url('${electionIcon}')`,
-						WebkitMaskSize: "contain",
-						WebkitMaskRepeat: "no-repeat",
-						WebkitMaskPosition: "center",
-					}}
+				<img
+					src={electionIcon}
+					alt=""
+					className="size-12 rounded-[18px]"
 				/>
 			</div>
 			{/* 우측 정보 */}
