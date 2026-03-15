@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { useParams } from "react-router-dom";
 
 import { CategoryNav } from "@/components/ui/category-nav";
 import { CardSectionHeader } from "@/components/ui/card-section-header";
@@ -59,8 +58,6 @@ const CHIP_FILTERS: { id: ChipFilter; label: string }[] = [
 type ViewMode = "default" | "preview" | "analysis" | "compare";
 
 export function RegionResultPage() {
-	const { regionId } = useParams();
-
 	const [selectedCategoryId, setSelectedCategoryId] = useState("voter");
 	const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<
 		string | null
@@ -157,9 +154,6 @@ export function RegionResultPage() {
 		height: 400,
 		showLegend: true,
 	};
-
-	// TODO: regionId로 API 조회 후 실제 지역명 표시
-	void regionId;
 
 	const selectedCategoryLabel =
 		CATEGORIES.find((c) => c.id === selectedCategoryId)?.label ??
