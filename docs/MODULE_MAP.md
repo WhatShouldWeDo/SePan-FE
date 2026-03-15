@@ -90,7 +90,7 @@
 - **핵심 파일**:
   - `PledgesOverviewPage.tsx` — 개요 랜딩 페이지 (선거 유형 카드 3개 + 빠른시작 카드 3개)
   - `PledgesPlaceholderPage.tsx` — 하위 선거 페이지 placeholder (대통령/국회의원/지방)
-- **에셋**: `src/assets/pledges/` (election-icon.png, location-fill.svg)
+- **에셋**: `src/assets/pledges/location-fill.svg`, `src/assets/category-icons/aging.png` (재사용, mask-luminance)
 - **의존하는 모듈**: `contexts/useNavigation` (useBreadcrumb), react-router-dom
 - **상태**: 개요 페이지 완료, 하위 선거 페이지는 placeholder
 
