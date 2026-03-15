@@ -4,7 +4,6 @@ import { ChevronUp, ChevronRight } from "lucide-react";
 
 import { CategoryNav } from "@/components/ui/category-nav";
 import { CardSectionHeader } from "@/components/ui/card-section-header";
-import { Chip } from "@/components/ui/chip";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { BarChart } from "@/components/charts";
@@ -12,7 +11,6 @@ import { WantedFillMessage } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { KoreaAdminMap } from "@/features/region/components/map";
 import { MetricListRow } from "@/features/region/components/MetricListRow";
-import { AiAnalysisBox } from "@/features/region/components/AiAnalysisBox";
 import { MetricActionButtons } from "@/features/region/components/MetricActionButtons";
 import { MetricComparisonCard } from "@/features/region/components/MetricComparisonCard";
 import { CATEGORIES, SUBCATEGORIES } from "@/features/region/data/categories";
@@ -24,7 +22,6 @@ import {
 	MY_REGION_MONTHLY,
 	SELECTED_REGION_METRICS,
 	SELECTED_REGION_MONTHLY,
-	MOCK_AI_ANALYSIS,
 	mergeMonthlyData,
 	MOCK_COMPARISON_SUMMARY,
 	COMPARE_METRIC_SUMMARIES,
@@ -258,23 +255,20 @@ export function RegionResultPage() {
 	const [compareChartSplit, setCompareChartSplit] = useState(false);
 	const [activeViewTab, setActiveViewTab] = useState<CompareViewTab>("graph");
 
-	const handleRegionSelect = useCallback(
-		(region: MapRegion) => {
-			if (region.fullName === MY_REGION.fullName) {
-				setViewMode("default");
-				setSelectedRegion(null);
-			} else {
-				setViewMode("preview");
-				setSelectedRegion({
-					code: region.code,
-					name: region.name,
-					fullName: region.fullName,
-				});
-			}
-			setCompareChartSplit(false);
-		},
-		[],
-	);
+	const handleRegionSelect = useCallback((region: MapRegion) => {
+		if (region.fullName === MY_REGION.fullName) {
+			setViewMode("default");
+			setSelectedRegion(null);
+		} else {
+			setViewMode("preview");
+			setSelectedRegion({
+				code: region.code,
+				name: region.name,
+				fullName: region.fullName,
+			});
+		}
+		setCompareChartSplit(false);
+	}, []);
 
 	const handleAnalysis = useCallback(() => {
 		setViewMode("analysis");
@@ -339,7 +333,11 @@ export function RegionResultPage() {
 		xKey: "month",
 		series: [
 			{ key: "myPopulation", label: MY_REGION.name, color: "#6B5CFF" },
-			{ key: "selectedPopulation", label: selectedRegion?.fullName ?? "", color: "#2accd8" },
+			{
+				key: "selectedPopulation",
+				label: selectedRegion?.fullName ?? "",
+				color: "#2accd8",
+			},
 		],
 		height: 560,
 		showLegend: false,
@@ -406,13 +404,10 @@ export function RegionResultPage() {
 					</p>
 				</div>
 
-				{/* ── AI 분석 결과 ── */}
-				<AiAnalysisBox text={MOCK_AI_ANALYSIS} />
-
 				{/* ── 2열 카드 섹션: 지도 + 지표 ── */}
 				<div className="grid grid-cols-2 gap-4 2xl:gap-6">
 					{/* 좌측: 폴리곤 지도 */}
-					<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
+					<section className="flex flex-col rounded-3xl border border-line-neutral p-8">
 						<CardSectionHeader
 							title={MY_REGION.districtName}
 							description="선거구 단위"
@@ -439,7 +434,11 @@ export function RegionResultPage() {
 					) : (
 						<section className="flex flex-col gap-8 rounded-3xl border border-line-neutral p-8">
 							<CardSectionHeader
-								title={viewMode === "default" ? MY_REGION.name : (selectedRegion?.fullName ?? MY_REGION.name)}
+								title={
+									viewMode === "default"
+										? MY_REGION.name
+										: (selectedRegion?.fullName ?? MY_REGION.name)
+								}
 								description="행정안전부 2026년 1월"
 								trailingContent={
 									viewMode === "default" ? (
@@ -482,12 +481,6 @@ export function RegionResultPage() {
 						<CardSectionHeader
 							title={chartTitle}
 							description="행정안전부 2026년 1월"
-						/>
-
-						{/* AI 분석 결과 */}
-						<AiAnalysisBox
-							text={MOCK_AI_ANALYSIS}
-							className="border-[1.5px] border-primary"
 						/>
 
 						{/* 뷰 탭 + 통합 보기 토글 */}
@@ -546,20 +539,12 @@ export function RegionResultPage() {
 								<div className="flex gap-6">
 									<div className="flex flex-1 flex-col gap-3">
 										{MY_REGION_INSIGHTS.map((insight, i) => (
-											<InsightCard
-												key={i}
-												data={insight}
-												iconColor="blue"
-											/>
+											<InsightCard key={i} data={insight} iconColor="blue" />
 										))}
 									</div>
 									<div className="flex flex-1 flex-col gap-3">
 										{SELECTED_REGION_INSIGHTS.map((insight, i) => (
-											<InsightCard
-												key={i}
-												data={insight}
-												iconColor="red"
-											/>
+											<InsightCard key={i} data={insight} iconColor="red" />
 										))}
 									</div>
 								</div>
@@ -590,11 +575,7 @@ export function RegionResultPage() {
 									/>
 									<div className="flex flex-col gap-3">
 										{MY_REGION_INSIGHTS.map((insight, i) => (
-											<InsightCard
-												key={i}
-												data={insight}
-												iconColor="blue"
-											/>
+											<InsightCard key={i} data={insight} iconColor="blue" />
 										))}
 									</div>
 									{/* 인사이트 카드 (bordered) */}
@@ -638,11 +619,7 @@ export function RegionResultPage() {
 									/>
 									<div className="flex flex-col gap-3">
 										{SELECTED_REGION_INSIGHTS.map((insight, i) => (
-											<InsightCard
-												key={i}
-												data={insight}
-												iconColor="red"
-											/>
+											<InsightCard key={i} data={insight} iconColor="red" />
 										))}
 									</div>
 									{/* 하단 메트릭 (카드 없이) */}
@@ -674,14 +651,19 @@ export function RegionResultPage() {
 						/>
 						<div className="flex gap-2">
 							{CHIP_FILTERS.map((chip) => (
-								<Chip
+								<button
 									key={chip.id}
-									label={chip.label}
-									size="medium"
-									state={activeChip === chip.id ? "active" : "default"}
-									variant="outlined"
+									type="button"
+									className={cn(
+										"rounded-full px-3.5 py-2 text-[16px] font-semibold leading-[1.3] transition-colors",
+										activeChip === chip.id
+											? "bg-surface-inverse text-label-inverse"
+											: "bg-surface-primary text-label-alternative",
+									)}
 									onClick={() => setActiveChip(chip.id)}
-								/>
+								>
+									{chip.label}
+								</button>
 							))}
 						</div>
 						<BarChart data={currentChartData} config={SINGLE_CHART_CONFIG} />
