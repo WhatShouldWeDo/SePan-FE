@@ -1,6 +1,6 @@
 # Region 모듈 상세 구조
 
-> 최종 업데이트: 2026-03-15 (지도 초기 드릴다운 + 차트 제목 로직 + MetricListRow 반응형)
+> 최종 업데이트: 2026-03-15 (비교 추이 차트 Figma 반영, 지도 hover stroke 3px, 초기 줌 150%)
 
 ---
 
@@ -34,18 +34,18 @@ features/region/
 │   ├── useMapDrillDown.ts        # 4단계 드릴다운 상태 관리
 │   ├── useTopoJsonData.ts        # TopoJSON 동적 import + GeoJSON 변환
 │   ├── useProjection.ts          # D3 geoMercator (fitExtent)
-│   ├── useMapZoom.ts             # D3 줌 동작
+│   ├── useMapZoom.ts             # D3 줌 동작 (초기 150%, 리셋 150%)
 │   └── useMapTransition.ts       # D3 전환 애니메이션
 ├── lib/
 │   ├── choropleth-utils.ts       # oklch 색상 보간, 범례 생성
-│   ├── map-theme.ts              # 지도 CSS 변수
+│   ├── map-theme.ts              # 지도 CSS 변수 (fill, hover, stroke, strokeHover)
 │   ├── sido-utils.ts             # 시도 코드 ↔ 이름
 │   ├── sigun-utils.ts            # 시군 유틸리티
 │   └── __tests__/
 │       └── choropleth-utils.test.ts
 └── data/
     ├── categories.ts             # 9개 카테고리 + 서브카테고리 + 아이콘 에셋
-    ├── mock-comparison.ts        # 비교분석 Mock 데이터 (메트릭, 월별추이, 해석 텍스트)
+    ├── mock-comparison.ts        # 비교분석 Mock 데이터
     ├── sido.topojson.json
     ├── sigun.topojson.json
     ├── sigungu.topojson.json
@@ -80,21 +80,42 @@ interface MetricListRowProps {
 - 델타 화살표: `WantedCaretUp` 아이콘 + `direction=down`일 때 `rotate-180`
 - 컬러: `text-party-dpk` (blue) / `text-party-ppp` (red) CSS 변수 사용
 - SubValue 뱃지: `bg-status-positive` + `opacity-[0.08]` 오버레이 기법
-- 반응형: Body 영역 `flex-wrap` + `gap-y-1` — 너비 부족 시 subValueBadge와 deltas가 줄바꿈 (비교 모드 좌우 분할 시 필요)
+- 반응형: Body 영역 `flex-wrap` + `gap-y-1` — 너비 부족 시 subValueBadge와 deltas가 줄바꿈
 
 ### AiAnalysisBox
 
 AI 분석 결과 표시. `WantedMagicWand` 아이콘 + primary 배경.
 
-```typescript
-interface AiAnalysisBoxProps {
-  label?: string;  // 기본값 "기본 분석 결과"
-  text: string;
-}
-```
-
 - 배경: `bg-primary-alpha-5`
-- 테두리: `border-primary` 1.5px + `rounded-2xl`
+- 비교 차트 카드 내부에서는 `border-[1.5px] border-primary` 추가
+
+---
+
+## 지도 (Map)
+
+### RegionPolygon hover/selected stroke
+
+- **기본 상태**: `strokeWidth: 0.5`, `stroke: mapColors.stroke` (무채색)
+- **hover/selected 상태**: `strokeWidth: 3`, `stroke: mapColors.strokeHover` (고채도 파란색)
+- CSS 변수: `--map-stroke-hover` (Light: `oklch(0.45 0.2 250)`, Dark: `oklch(0.7 0.2 250)`)
+- 전환 애니메이션: `transition: fill 150ms, stroke 150ms, stroke-width 150ms`
+
+### SVG 렌더링 순서 (z-index 대체)
+
+SVG는 CSS z-index가 아닌 DOM 순서로 렌더링 우선순위가 결정됨. `KoreaAdminMap`에서 `regionData.map()`을 두 번 순회:
+
+1. **1차 패스**: hover/selected가 아닌 폴리곤 렌더링 (일반 레이어)
+2. **2차 패스**: hover/selected 폴리곤만 렌더링 (최상위 레이어)
+
+이를 통해 hover된 폴리곤의 3px stroke가 인접 폴리곤 위에 항상 표시됨.
+
+### 초기 줌 레벨
+
+`useMapZoom.ts`의 `INITIAL_ZOOM = 1.5` — 모든 드릴다운 레벨에서 150% 기본 확대.
+
+- 초기화 시 SVG 중심 기준 `zoomIdentity.translate(cx, cy).scale(1.5).translate(-cx, -cy)` 적용
+- `zoomReset` / `smoothZoomReset`도 동일한 150% transform으로 리셋 (1x가 아닌 1.5x)
+- 줌 범위: 1x ~ 8x (MIN_ZOOM ~ MAX_ZOOM)
 
 ---
 
@@ -113,24 +134,16 @@ mask-position: 5.5px 5.5px;
 ```
 
 - `mask-mode: luminance` — 마스크 PNG의 밝기(luminance)로 불투명도 결정
-  - 밝은(흰) 영역 → 완전 불투명 (배경색 표시)
-  - 어두운 영역 → 반투명 (배경색이 연하게 표시)
-  - 검은 영역 → 투명 (숨김)
-- 이 방식으로 단일 배경색 + 단일 마스크 PNG만으로 다층 톤 아이콘 표현
 - 컨테이너 크기: 50×50px
 - 에셋 경로: `src/assets/category-icons/{id}.png`
 
-### 아이콘 에셋 없을 때 폴백
-
-`iconAsset`이 없으면 이니셜 원형(배경색 원 + 첫 글자) 렌더링.
-
 ### SubcategoryPanel hover 동작
 
-- **표시 조건**: `hoveredCategoryId`가 설정된 경우에만 패널 표시. `selectedCategoryId`로 폴백하지 않음.
-- **숨김**: wrapper div의 `onPointerLeave`에서 `hoveredCategoryId`를 `null`로 초기화하여 패널 숨김.
-- **스크롤 시 숨김**: `window` scroll 이벤트 리스너로 `hoveredCategoryId`를 `null`로 초기화. GNB 패널 슬라이드 닫힘과 SubcategoryPanel 숨김이 동기화됨.
-- **Hover gap 방지**: wrapper div에 `pb-2` 추가, SubcategoryPanel에서 `mt-2` 제거. 이를 통해 카테고리 행과 패널 사이에 커서가 wrapper 밖으로 벗어나지 않음.
-- **z-index**: `z-20` — GNB sticky 컨테이너(`z-30`)보다 낮아 스크롤 시 GNB 아래로 가려짐.
+- **표시 조건**: `hoveredCategoryId`가 설정된 경우에만 패널 표시
+- **숨김**: wrapper div의 `onPointerLeave`에서 `hoveredCategoryId`를 `null`로 초기화
+- **스크롤 시 숨김**: `window` scroll 이벤트 리스너로 `hoveredCategoryId` 초기화
+- **Hover gap 방지**: wrapper div에 `pb-2` 추가, SubcategoryPanel에서 `mt-2` 제거
+- **z-index**: `z-20` — GNB sticky 컨테이너(`z-30`)보다 낮음
 
 ---
 
@@ -159,44 +172,79 @@ default ──(지도 타 지역 클릭)──→ preview
 | **default** | 내 선거구 데이터 + "내 선거구" 뱃지 | 내 선거구 추이 | 없음 |
 | **preview** | 선택 지역 데이터 | 내 선거구 추이 (유지) | "분석 결과 보기" + "비교분석 하기" |
 | **analysis** | 선택 지역 데이터 | 선택 지역 추이 | "비교분석 하기" |
-| **compare** | 좌우 분할 카드 + 비교 해석 박스 | Switch 토글 (Grouped Bar / 분리) | "초기화" 우상단 |
+| **compare** | 좌우 분할 카드 + 비교 해석 박스 | 뷰탭 + 통합/분리 토글 | "초기화" 우상단 |
 
-### 레이아웃 (default/preview/analysis)
+### 비교 모드 추이 차트 카드 구조
 
-```
-┌──────────────────────────────────────────────────┐
-│  [GNB] Header (sticky) + Chevron → GnbPanel      │
-├──────────────────────────────────────────────────┤
-│  CategoryNav (9개 카테고리 + 서브카테고리 패널)     │
-├──────────────────────────────────────────────────┤
-│  Heading: {서브카테고리명} + Badge{지역명}          │
-├──────────────────────────────────────────────────┤
-│  AiAnalysisBox: AI 분석 텍스트                    │
-├───────────────────────┬──────────────────────────┤
-│  CardSection (지도)    │  CardSection (지표)       │
-│  KoreaAdminMap        │  MetricListRow × 5        │
-│                       │  [MetricActionButtons]    │
-├───────────────────────┴──────────────────────────┤
-│  CardSection (차트)                               │
-│  Chip 필터 3개 + BarChart                         │
-└──────────────────────────────────────────────────┘
-```
-
-### 레이아웃 (compare)
+비교 모드(`compare`)의 하단 추이 차트 카드는 다음 구조로 구성:
 
 ```
-├───────────────────────┬──────────────────────────┤
-│  CardSection (지도)    │  MetricComparisonCard     │
-│  KoreaAdminMap        │  ┌────────┬────────┐     │
-│                       │  │ 내 선거구│ 선택 지역│    │
-│                       │  └────────┴────────┘     │
-│                       │  ComparisonSummaryBox     │
-│                       │  [초기화] 우상단           │
-├───────────────────────┴──────────────────────────┤
-│  CardSection (비교 차트)              [Switch 토글] │
-│  Grouped Bar (off) / 좌우 분리 (on)               │
-└──────────────────────────────────────────────────┘
+CardSection (비교 추이 차트)
+├── CardSectionHeader ("강남구 갑 vs 강남구 병" / "행정안전부 2026년 1월")
+├── AiAnalysisBox (border-primary 1.5px)
+├── ControlSection
+│   ├── ViewTabs: "그래프 보기" | "표 보기" | "트리맵 보기" (rounded-full solid pills)
+│   └── "통합 보기" Switch (ON=통합, OFF=분리)
+├── [통합 보기]
+│   ├── MetricSummaryCard × 2 (중위연령 비교, 2열)
+│   ├── BarChart (Grouped Bar, primary + #2accd8)
+│   ├── InsightCard × 3 + InsightCard × 3 (2열, hover CTA)
+│   └── BottomMetricCell 2×2 그리드
+├── [분리 보기]
+│   ├── 좌측 컬럼 (내 선거구, primary 바)
+│   │   ├── MetricSummaryCard
+│   │   ├── BarChart (단색)
+│   │   ├── InsightCard × 3
+│   │   └── "인사이트" 카드 (bordered, "전체보기 >" 링크 + 2×2 메트릭)
+│   ├── 세로 구분선 (w-px bg-line-neutral, my-4)
+│   └── 우측 컬럼 (비교 선거구, #2accd8 바)
+│       ├── MetricSummaryCard
+│       ├── BarChart (단색)
+│       ├── InsightCard × 3
+│       └── 2×2 메트릭 (카드 없이)
+└── BottomCaption ("인구수[단위:천], 인구비율[단위:%]")
 ```
+
+### 뷰 탭 (CompareViewTab)
+
+"그래프 보기" / "표 보기" / "트리맵 보기" 3개 pill 버튼. `rounded-full`, `bg-surface-inverse` (active) / `bg-surface-primary` (default). 기존 "연도별/분기별/월별" Chip 필터 대체.
+
+### 통합 보기 토글
+
+- 라벨: "통합 보기" (18px semibold, label-alternative)
+- Switch: `checked={!compareChartSplit}`, `onCheckedChange={(val) => setCompareChartSplit(!val)}`
+- ON (기본) = 통합 (Grouped Bar), OFF = 분리 (좌우 독립 컬럼)
+
+### InsightCard (인라인 서브컴포넌트)
+
+```typescript
+interface InsightCardData {
+  label: string;    // "라벨 내용이 들어갑니다"
+  value: string;    // "인사이트 값 내용이 들어갑니다"
+  trailing: string; // "29%"
+}
+```
+
+- 아이콘: `WantedFillMessage` (32×32, white) in 48×48 colored circle (`bg-party-dpk` / `bg-party-ppp`)
+- 배경: `bg-fill-alt`, `rounded-2xl`, `p-6`
+- **Hover CTA**: `group-hover:block` — 호버 시 "이 정책 채택하기" 버튼 출현 (`bg-primary`, `rounded-[10px]`, white text)
+
+### BottomMetricCell (인라인 서브컴포넌트)
+
+하단 메트릭 요약. 두 가지 trailing 타입:
+- `type: "badge"` — "+10.1%" 뱃지 (`bg-party-dpk/8 text-party-dpk`)
+- `type: "delta"` — "전년대비 ▲ 8.4%" (`ChevronUp` 아이콘 + party 색상)
+
+### 차트 설정
+
+| 속성 | 값 | 설명 |
+|------|-----|------|
+| `barSize` | `20` | 바 너비 고정 20px |
+| `barGap` | `4` | 같은 카테고리 내 바 간격 4px |
+| `barRadius` | `6` | 바 상단 모서리 둥글기 6px |
+| `height` | `560` | 차트 높이 560px |
+| `darkTooltip` | `true` | 다크 배경 (#374151) 툴팁 |
+| 비교 선거구 색상 | `#2accd8` | 틸/시안 |
 
 ### 상태 관리 (useState)
 
@@ -204,49 +252,26 @@ default ──(지도 타 지역 클릭)──→ preview
 |------|------|--------|------|
 | `selectedCategoryId` | `string` | `"voter"` | 카테고리 선택 |
 | `selectedSubcategoryId` | `string \| null` | `"population"` | 서브카테고리 선택 |
-| `activeChip` | `ChipFilter` | `"monthly"` | 차트 필터 |
+| `activeChip` | `ChipFilter` | `"monthly"` | 차트 필터 (비교 외 모드) |
 | `viewMode` | `ViewMode` | `"default"` | 4가지 뷰 모드 |
 | `selectedRegion` | `{ code, name, fullName } \| null` | `null` | 지도에서 선택한 지역 |
 | `compareChartSplit` | `boolean` | `false` | 비교 차트 분리 보기 토글 |
-
-- `handleSubcategorySelect`는 `categoryId`도 함께 받아 `selectedCategoryId`를 동기화.
-- `handleRegionSelect`는 내 선거구 클릭 시 `default`, 타 지역 클릭 시 `preview`로 전환.
-- 파생 값: `regionDisplayName`, `currentMetrics`, `currentChartData`, `chartTitle`, `compareChartConfig`
+| `activeViewTab` | `CompareViewTab` | `"graph"` | 비교 모드 뷰 탭 |
 
 ### 지도 초기 드릴다운
 
-`KoreaAdminMap`에 `searchNavigation={MY_REGION_NAV}`를 전달하여 페이지 로딩 시 전국 지도 대신 기본 선거구(강남구) 읍면동 레벨로 자동 드릴다운. 지도 CardSectionHeader title은 항상 `MY_REGION.districtName` ("강남구") — 지도가 표시하는 전체 지역명.
-
-### 차트 제목 로직
-
-- default/preview: 내 선거구명 (예: "강남구 갑")
-- analysis: 선택 지역명 (예: "서울 종로")
-- compare: "{내 선거구} vs {선택 지역}" (예: "강남구 갑 vs 서울 종로")
-
-### 비교 모드 컴포넌트
-
-- **MetricActionButtons** — `showAnalysis` prop으로 "분석 결과 보기" 버튼 조건부 표시. Button `default` + `outline` variant 사용.
-- **MetricComparisonCard** — 좌우 분할 카드 (`grid-cols-2`). 내 선거구(primary 색상) vs 선택 지역(status-negative 색상). 하단에 ComparisonSummaryBox. 우상단 "초기화" 텍스트 버튼.
-- **ComparisonSummaryBox** — `bg-primary-alpha-5` 배경 + primary 제목. 디자인 추후 Figma 확정.
-
-### 차트 비교 모드
-
-- **Grouped Bar** (Switch off) — `mergeMonthlyData()`로 두 데이터셋을 합산. `ChartConfig.series`에 2개 시리즈(primary + red) 지정.
-- **분리 보기** (Switch on) — `grid-cols-2`로 각 지역 독립 BarChart 렌더링.
-- Switch 위치: `CardSectionHeader.trailingContent`
+`KoreaAdminMap`에 `searchNavigation={MY_REGION_NAV}`를 전달하여 페이지 로딩 시 기본 선거구(강남구) 읍면동 레벨로 자동 드릴다운.
 
 ### 데이터
 
 현재 모든 데이터는 `mock-comparison.ts`의 하드코딩 Mock 상수. API 연동 전 단계.
-- `MY_REGION` — 내 선거구 정보 (name, fullName, districtName)
+- `MY_REGION` — 내 선거구 정보
 - `MY_REGION_METRICS` / `SELECTED_REGION_METRICS` — 각 지역 메트릭
 - `MY_REGION_MONTHLY` / `SELECTED_REGION_MONTHLY` — 월별 추이 데이터
-- `MY_REGION_NAV` — 내 선거구 지도 초기 네비게이션 (`SearchSelectedRegion` 타입, 강남구 `cityCode: "11680"`)
-- `mergeMonthlyData()` — 두 데이터셋을 월 기준으로 인덱스 매칭 (API 연동 시 키 기반 조인으로 변경 필요)
-
-### 카드 스타일
-
-Dashboard의 `CardSection`(shadow 기반)과 달리, Region 결과 페이지는 `border border-line-neutral rounded-3xl` 스타일 사용.
+- `MY_REGION_NAV` — 내 선거구 지도 초기 네비게이션
+- `COMPARE_METRIC_SUMMARIES` — 비교 메트릭 요약 (중위연령 카드)
+- `MY_REGION_INSIGHTS` / `SELECTED_REGION_INSIGHTS` — 인사이트 카드 데이터
+- `COMPARE_BOTTOM_METRICS` — 하단 메트릭 요약 행
 
 ---
 
@@ -254,24 +279,22 @@ Dashboard의 `CardSection`(shadow 기반)과 달리, Region 결과 페이지는 
 
 ```
 RegionResultPage
-├── CategoryNav (components/ui) × 2 — 페이지 내 + GnbPanel 포탈 (상태 공유)
+├── CategoryNav (components/ui) × 2 — 페이지 내 + GnbPanel 포탈
 ├── CardSectionHeader (components/ui)
-├── Chip (components/ui)
+├── Chip (components/ui) — 비교 외 모드 차트 필터
 ├── Badge (components/ui)
-├── Switch (components/ui) — 비교 차트 분리 보기 토글
-├── BarChart (components/charts)
-├── KoreaAdminMap (region/components/map)
+├── Switch (components/ui) — 통합 보기 토글
+├── BarChart (components/charts) — darkTooltip, barSize/barGap/barRadius
+├── KoreaAdminMap (region/components/map) — hover stroke 3px, 초기 줌 150%
 ├── MetricListRow (region/components)
-│   └── WantedCaretUp (components/icons)
-├── AiAnalysisBox (region/components)
-│   └── WantedMagicWand (components/icons)
-├── MetricActionButtons (region/components) — 분석/비교 버튼
-│   └── Button (components/ui)
-├── MetricComparisonCard (region/components) — 비교 모드 좌우 카드
-│   ├── CardSectionHeader (components/ui)
-│   ├── MetricListRow (region/components)
-│   └── ComparisonSummaryBox (region/components)
+├── AiAnalysisBox (region/components) — 비교 카드 내부에서 border 추가
+├── MetricActionButtons (region/components)
+├── MetricComparisonCard (region/components)
+├── WantedFillMessage (components/icons) — InsightCard 아이콘
+├── ChevronUp, ChevronRight (lucide-react)
+├── InsightCard (인라인) — hover CTA "이 정책 채택하기"
+├── MetricSummaryCard (인라인) — 중위연령 비교 카드
+├── BottomMetricCell (인라인) — 하단 메트릭 요약
 ├── CATEGORIES, SUBCATEGORIES (region/data/categories)
-│   └── category-icons/*.png (assets)
-└── mock-comparison.ts (region/data) — Mock 데이터 + 유틸리티
+└── mock-comparison.ts (region/data)
 ```
