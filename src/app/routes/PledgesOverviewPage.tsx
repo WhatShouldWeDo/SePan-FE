@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import { useBreadcrumb } from "@/contexts/useNavigation"
-import electionIcon from "@/assets/pledges/election-icon.png"
+import electionIcon from "@/assets/pledges/election-icon.svg"
 import locationFillIcon from "@/assets/pledges/location-fill.svg"
 
 /* ─── Types ─── */
