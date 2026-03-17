@@ -69,7 +69,7 @@ export function RegionSigunguFilter({
 			/>
 
 			{isOpen && (
-				<div className="absolute top-full left-0 z-10 mt-2 max-h-[320px] overflow-y-auto rounded-xl bg-white p-4 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.12)]">
+				<div className="absolute top-full left-0 z-10 mt-2 min-w-[520px] max-h-[320px] overflow-y-auto rounded-xl bg-white p-4 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.12)]">
 					<div className="mb-3 text-label-4 font-medium text-label-alternative">
 						시/군/구
 					</div>
