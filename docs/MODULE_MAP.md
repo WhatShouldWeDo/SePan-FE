@@ -85,14 +85,19 @@
 
 ### Pledges (역대공약분석)
 
-- **경로**: `src/app/routes/PledgesOverviewPage.tsx`, `PledgesPlaceholderPage.tsx`
-- **역할**: 역대공약분석 개요 페이지 (선거 유형 선택 + 빠른시작)
+- **경로**: `src/features/pledges/`, `src/app/routes/PledgesOverviewPage.tsx`, `PresidentialPledgesPage.tsx`, `PledgesPlaceholderPage.tsx`
+- **역할**: 역대공약분석 개요 + 대통령선거 후보자 목록 페이지
 - **핵심 파일**:
   - `PledgesOverviewPage.tsx` — 개요 랜딩 페이지 (선거 유형 카드 3개 + 빠른시작 카드 3개)
-  - `PledgesPlaceholderPage.tsx` — 하위 선거 페이지 placeholder (대통령/국회의원/지방)
-- **에셋**: `src/assets/pledges/location-fill.svg`, `src/assets/category-icons/aging.png` (재사용, mask-luminance)
-- **의존하는 모듈**: `contexts/useNavigation` (useBreadcrumb), react-router-dom
-- **상태**: 개요 페이지 완료, 하위 선거 페이지는 placeholder
+  - `PresidentialPledgesPage.tsx` — 대통령선거 후보자 목록 (2열 그리드, 선거회차 필터, 탭)
+  - `PledgesPlaceholderPage.tsx` — 하위 선거 페이지 placeholder (국회의원/지방)
+  - `features/pledges/components/CandidateCard.tsx` — 후보자 프로필 카드
+  - `features/pledges/components/CandidateGrid.tsx` — 2열 그리드 + 검색결과 헤더 + 빈 상태
+  - `features/pledges/components/ElectionTermFilter.tsx` — 선거회차 Chip 드롭다운 필터
+  - `features/pledges/data/mock-candidates.ts` — Mock 후보자 데이터 + 타입 + 정당 색상 매핑
+- **에셋**: `src/assets/pledges/location-fill.svg`, `src/assets/category-icons/aging.png` (재사용)
+- **의존하는 모듈**: `contexts/useNavigation`, `components/ui` (Chip, Tabs), react-router-dom
+- **상태**: 대통령선거 후보자 목록 페이지 완료 (mock 데이터), 통계분석 탭 placeholder, 국회의원/지방선거 placeholder
 
 ### Policy
 
@@ -268,6 +273,7 @@
 | `/` | DashboardPage | 필요 |
 | `/region` | RegionResultPage | 필요 |
 | `/pledges` | PledgesOverviewPage | 필요 |
+| `/pledges/presidential` | PresidentialPledgesPage | 필요 |
 | `/pledges/:type` | PledgesPlaceholderPage | 필요 |
 | `/test` | TestPage | 필요 |
 
@@ -288,6 +294,7 @@
 | `SignupPage.tsx` | 회원가입 | `auth/components/Signup*` |
 | `RegionResultPage.tsx` | 지역분석 (`/region`): 4가지 ViewMode + 비교모드(통합/분리 뷰, 뷰탭, 메트릭요약, 인사이트카드+hover CTA, 하단메트릭, 인사이트카드섹션) | `region/components/*`, `region/data/*`, `components/ui`, `components/charts`, `components/icons`, `contexts/useNavigation` |
 | `PledgesOverviewPage.tsx` | 역대공약분석 개요 (선거 유형 카드 + 빠른시작 카드) | `contexts/useNavigation`, `assets/pledges/*`, `react-router-dom` |
+| `PresidentialPledgesPage.tsx` | 대통령선거 역대공약분석 (후보자 목록 2열 그리드, 선거회차 필터, 탭) | `features/pledges/components`, `features/pledges/data`, `components/ui` (Tabs, Chip), `contexts/useNavigation` |
 | `PledgesPlaceholderPage.tsx` | 역대공약분석 하위 선거 페이지 placeholder | `contexts/useNavigation`, `react-router-dom` |
 | `TestPage.tsx` | 컴포넌트 쇼케이스 | `test/sections/*` |
 | `NotFoundPage.tsx` | 404 페이지 | — |
