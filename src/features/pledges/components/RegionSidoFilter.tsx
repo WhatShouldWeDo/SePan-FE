@@ -55,7 +55,7 @@ export function RegionSidoFilter({
 			/>
 
 			{isOpen && (
-				<div className="absolute top-full left-0 z-10 mt-2 rounded-xl bg-white p-4 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.12)]">
+				<div className="absolute top-full left-0 z-10 mt-2 min-w-[520px] rounded-xl bg-white p-4 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.12)]">
 					<div className="mb-3 text-label-4 font-medium text-label-alternative">
 						시/도
 					</div>
