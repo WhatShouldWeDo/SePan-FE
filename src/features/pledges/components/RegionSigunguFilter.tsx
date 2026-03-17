@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react"
 import { Chip } from "@/components/ui/chip"
 
+const MAX_COLS = 5
+const BTN_W = 130
+const GAP = 8
+
 interface RegionSigunguFilterProps {
 	sigungus: string[]
 	selectedSigungu: string[]
@@ -57,6 +61,9 @@ export function RegionSigunguFilter({
 	}
 
 	const isAllSelected = selectedSigungu.length === 0
+	const itemCount = sigungus.length + 1 // +1 for "전체"
+	const cols = Math.min(MAX_COLS, itemCount)
+	const gridWidth = cols * BTN_W + (cols - 1) * GAP
 
 	return (
 		<div ref={containerRef} className="relative inline-block">
@@ -69,14 +76,20 @@ export function RegionSigunguFilter({
 			/>
 
 			{isOpen && (
-				<div className="absolute top-full left-0 z-10 mt-2 min-w-[520px] max-h-[320px] overflow-y-auto rounded-xl bg-white p-4 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.12)]">
+				<div className="absolute top-full left-0 z-10 mt-2 max-h-[320px] overflow-y-auto rounded-xl bg-white p-4 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.12)]">
 					<div className="mb-3 text-label-4 font-medium text-label-alternative">
 						시/군/구
 					</div>
-					<div className="grid grid-cols-5 gap-2">
+					<div
+						className="grid gap-2"
+						style={{
+							gridTemplateColumns: `repeat(${cols}, 1fr)`,
+							width: `${gridWidth}px`,
+						}}
+					>
 						<button
 							type="button"
-							className={`rounded-lg px-3 py-2 text-center text-label-3 font-medium transition-colors ${
+							className={`whitespace-nowrap rounded-lg py-3 text-center text-label-3 font-medium transition-colors ${
 								isAllSelected
 									? "bg-primary text-white"
 									: "bg-fill-normal text-label-normal hover:bg-fill-strong"
@@ -89,7 +102,7 @@ export function RegionSigunguFilter({
 							<button
 								key={sigungu}
 								type="button"
-								className={`rounded-lg px-3 py-2 text-center text-label-3 font-medium transition-colors ${
+								className={`whitespace-nowrap rounded-lg py-3 text-center text-label-3 font-medium transition-colors ${
 									selectedSigungu.includes(sigungu)
 										? "bg-primary text-white"
 										: "bg-fill-normal text-label-normal hover:bg-fill-strong"

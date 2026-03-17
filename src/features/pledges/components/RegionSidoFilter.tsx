@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react"
 import { Chip } from "@/components/ui/chip"
 
+const COLS = 5
+const BTN_W = 150
+const GAP = 8
+
 interface RegionSidoFilterProps {
 	sidos: string[]
 	selectedSido: string | null
@@ -44,6 +48,8 @@ export function RegionSidoFilter({
 		setIsOpen(false)
 	}
 
+	const gridWidth = COLS * BTN_W + (COLS - 1) * GAP
+
 	return (
 		<div ref={containerRef} className="relative inline-block">
 			<Chip
@@ -55,16 +61,22 @@ export function RegionSidoFilter({
 			/>
 
 			{isOpen && (
-				<div className="absolute top-full left-0 z-10 mt-2 min-w-[520px] rounded-xl bg-white p-4 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.12)]">
+				<div className="absolute top-full left-0 z-10 mt-2 rounded-xl bg-white p-5 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.12)]">
 					<div className="mb-3 text-label-4 font-medium text-label-alternative">
 						시/도
 					</div>
-					<div className="grid grid-cols-5 gap-2">
+					<div
+						className="grid gap-2"
+						style={{
+							gridTemplateColumns: `repeat(${COLS}, 1fr)`,
+							width: `${gridWidth}px`,
+						}}
+					>
 						{sidos.map((sido) => (
 							<button
 								key={sido}
 								type="button"
-								className={`rounded-lg px-3 py-2 text-center text-label-3 font-medium transition-colors ${
+								className={`whitespace-nowrap rounded-lg py-3 text-center text-label-3 font-medium transition-colors ${
 									selectedSido === sido
 										? "bg-primary text-white"
 										: "bg-fill-normal text-label-normal hover:bg-fill-strong"
