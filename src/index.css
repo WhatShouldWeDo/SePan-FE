@@ -83,6 +83,10 @@
 	--color-material-dimmer: var(--material-dimmer);
 	--color-party-dpk: var(--party-dpk);
 	--color-party-ppp: var(--party-ppp);
+	--color-justice-500: var(--justice-500);
+	--color-reform-500: var(--reform-500);
+	--color-party-justice: var(--party-justice);
+	--color-party-reform: var(--party-reform);
 
 	--font-sans: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
 
@@ -259,6 +263,8 @@
 	/* Party */
 	--dpk-500: #0065F4;
 	--ppp-500: #FF2B3A;
+	--justice-500: #ffcc00;
+	--reform-500: #ef6e1b;
 
 	/* ── shadcn 호환 변수 (Figma 값으로 매핑) ── */
 	--background: var(--cool-neutral-0);             /* Background/Normal */
@@ -354,6 +360,8 @@
 	/* Party (정당 컬러) */
 	--party-dpk: var(--dpk-500);                 /* 더불어민주당 */
 	--party-ppp: var(--ppp-500);                 /* 국민의힘 */
+	--party-justice: var(--justice-500);          /* 정의당 */
+	--party-reform: var(--reform-500);           /* 개혁신당 */
 
 	/* Map (지도 전용 — oklch) */
 	--map-fill: 0.92 0.02 250;

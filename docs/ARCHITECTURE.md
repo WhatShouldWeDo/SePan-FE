@@ -188,6 +188,7 @@ Form (react-hook-form) → Zod 검증 → useApiMutation → API 호출
 | `/` | DashboardPage | 필요 |
 | `/region` | RegionResultPage | 필요 |
 | `/pledges` | PledgesOverviewPage | 필요 |
+| `/pledges/presidential` | PresidentialPledgesPage | 필요 |
 | `/pledges/:type` | PledgesPlaceholderPage | 필요 |
 
 ---
