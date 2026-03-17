@@ -12,6 +12,10 @@ export interface Candidate {
 	careers: string[]
 	photoUrl?: string
 	electionTerm: number
+	// 국회의원선거 전용 (optional)
+	electionType?: "national" | "proportional"
+	sido?: string
+	sigungu?: string
 }
 
 export interface ElectionTerm {
