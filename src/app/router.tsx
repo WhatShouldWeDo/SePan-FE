@@ -31,7 +31,7 @@ export const router = createBrowserRouter([
 					{ path: "/region", element: <RegionResultPage /> },
 					{ path: "/pledges", element: <PledgesOverviewPage /> },
 					{ path: "/pledges/presidential", element: <PresidentialPledgesPage /> },
-				{ path: "/pledges/:type", element: <PledgesPlaceholderPage /> },
+					{ path: "/pledges/:type", element: <PledgesPlaceholderPage /> },
 					{ path: "/test", element: <TestPage /> },
 				],
 			},
