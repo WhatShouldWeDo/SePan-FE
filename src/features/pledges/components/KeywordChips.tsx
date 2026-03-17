@@ -10,7 +10,7 @@ export function KeywordChips({ keywords }: KeywordChipsProps) {
 			{keywords.map((keyword) => (
 				<span
 					key={keyword}
-					className="inline-flex items-center rounded-lg border border-line-neutral px-2.5 py-1.5 text-label-4 font-medium text-label-normal"
+					className="inline-flex items-center rounded-full bg-surface-primary px-[14px] py-2 font-medium text-label-alternative"
 				>
 					{keyword}
 				</span>
