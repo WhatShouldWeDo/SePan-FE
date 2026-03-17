@@ -1,6 +1,6 @@
 # Module Map
 
-> 최종 업데이트: 2026-03-15 (지도 auto-fit zoom — 동적 컨테이너 크기 감지, fitExtent 전체 영역 적용)
+> 최종 업데이트: 2026-03-17 (국회의원선거 역대공약분석 페이지 — 4단계 캐스케이딩 필터, 키워드 칩)
 
 ---
 
@@ -85,19 +85,26 @@
 
 ### Pledges (역대공약분석)
 
-- **경로**: `src/features/pledges/`, `src/app/routes/PledgesOverviewPage.tsx`, `PresidentialPledgesPage.tsx`, `PledgesPlaceholderPage.tsx`
-- **역할**: 역대공약분석 개요 + 대통령선거 후보자 목록 페이지
+- **경로**: `src/features/pledges/`, `src/app/routes/PledgesOverviewPage.tsx`, `PresidentialPledgesPage.tsx`, `ParliamentaryPledgesPage.tsx`, `PledgesPlaceholderPage.tsx`
+- **역할**: 역대공약분석 개요 + 대통령선거/국회의원선거 후보자 목록 페이지
 - **핵심 파일**:
   - `PledgesOverviewPage.tsx` — 개요 랜딩 페이지 (선거 유형 카드 3개 + 빠른시작 카드 3개)
   - `PresidentialPledgesPage.tsx` — 대통령선거 후보자 목록 (2열 그리드, 선거회차 필터, 탭)
-  - `PledgesPlaceholderPage.tsx` — 하위 선거 페이지 placeholder (국회의원/지방)
+  - `ParliamentaryPledgesPage.tsx` — 국회의원선거 후보자 목록 (4단계 캐스케이딩 필터, 키워드 칩, 탭)
+  - `PledgesPlaceholderPage.tsx` — 하위 선거 페이지 placeholder (지방선거)
   - `features/pledges/components/CandidateCard.tsx` — 후보자 프로필 카드
   - `features/pledges/components/CandidateGrid.tsx` — 2열 그리드 + 검색결과 헤더 + 빈 상태
   - `features/pledges/components/ElectionTermFilter.tsx` — 선거회차 Chip 드롭다운 필터
+  - `features/pledges/components/ElectionTypeFilter.tsx` — 선거종류 Chip 드롭다운 필터 (국회의원/비례대표)
+  - `features/pledges/components/RegionSidoFilter.tsx` — 시/도 버튼 그리드 팝오버 필터
+  - `features/pledges/components/RegionSigunguFilter.tsx` — 시/군/구 버튼 그리드 팝오버 필터 (멀티셀렉트 최대 3개)
+  - `features/pledges/components/KeywordChips.tsx` — 상위 키워드 칩 (정보 표시용)
   - `features/pledges/data/mock-candidates.ts` — Mock 후보자 데이터 + 타입 + 정당 색상 매핑
+  - `features/pledges/data/mock-parliamentary.ts` — 국회의원선거 Mock 후보자 데이터 (12명)
+  - `features/pledges/data/region-data.ts` — 시/도 목록, 시/군/구 매핑, 키워드 매핑, 선거종류/회차 상수
 - **에셋**: `src/assets/pledges/location-fill.svg`, `src/assets/category-icons/aging.png` (재사용)
 - **의존하는 모듈**: `contexts/useNavigation`, `components/ui` (Chip, Tabs), react-router-dom
-- **상태**: 대통령선거 후보자 목록 페이지 완료 (mock 데이터), 통계분석 탭 placeholder, 국회의원/지방선거 placeholder
+- **상태**: 대통령선거 + 국회의원선거 후보자 목록 페이지 완료 (mock 데이터), 통계분석 탭 placeholder, 지방선거 placeholder
 
 ### Policy
 
@@ -274,6 +281,7 @@
 | `/region` | RegionResultPage | 필요 |
 | `/pledges` | PledgesOverviewPage | 필요 |
 | `/pledges/presidential` | PresidentialPledgesPage | 필요 |
+| `/pledges/parliamentary` | ParliamentaryPledgesPage | 필요 |
 | `/pledges/:type` | PledgesPlaceholderPage | 필요 |
 | `/test` | TestPage | 필요 |
 
@@ -295,7 +303,8 @@
 | `RegionResultPage.tsx` | 지역분석 (`/region`): 4가지 ViewMode + 비교모드(통합/분리 뷰, 뷰탭, 메트릭요약, 인사이트카드+hover CTA, 하단메트릭, 인사이트카드섹션) | `region/components/*`, `region/data/*`, `components/ui`, `components/charts`, `components/icons`, `contexts/useNavigation` |
 | `PledgesOverviewPage.tsx` | 역대공약분석 개요 (선거 유형 카드 + 빠른시작 카드) | `contexts/useNavigation`, `assets/pledges/*`, `react-router-dom` |
 | `PresidentialPledgesPage.tsx` | 대통령선거 역대공약분석 (후보자 목록 2열 그리드, 선거회차 필터, 탭) | `features/pledges/components`, `features/pledges/data`, `components/ui` (Tabs, Chip), `contexts/useNavigation` |
-| `PledgesPlaceholderPage.tsx` | 역대공약분석 하위 선거 페이지 placeholder | `contexts/useNavigation`, `react-router-dom` |
+| `ParliamentaryPledgesPage.tsx` | 국회의원선거 역대공약분석 (4단계 캐스케이딩 필터, 키워드 칩, 후보자 목록, 탭) | `features/pledges/components`, `features/pledges/data`, `components/ui` (Tabs, Chip), `contexts/useNavigation` |
+| `PledgesPlaceholderPage.tsx` | 역대공약분석 하위 선거 페이지 placeholder (지방선거) | `contexts/useNavigation`, `react-router-dom` |
 | `TestPage.tsx` | 컴포넌트 쇼케이스 | `test/sections/*` |
 | `NotFoundPage.tsx` | 404 페이지 | — |
 
