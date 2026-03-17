@@ -48,9 +48,9 @@ export function ParliamentaryPledgesPage() {
 
 	// ─── 필터링 로직 ───
 	const filteredCandidates = MOCK_PARLIAMENTARY_CANDIDATES.filter((c) => {
-		if (selectedTerm && c.electionTerm !== selectedTerm) return false
-		if (selectedElectionType && c.electionType !== selectedElectionType) return false
-		if (selectedSido && c.sido !== selectedSido) return false
+		if (selectedTerm !== null && c.electionTerm !== selectedTerm) return false
+		if (selectedElectionType !== null && c.electionType !== selectedElectionType) return false
+		if (selectedSido !== null && c.sido !== selectedSido) return false
 		if (selectedSigungu.length > 0 && !selectedSigungu.includes(c.sigungu ?? "")) return false
 		return true
 	})
