@@ -1,6 +1,6 @@
 # Region 모듈 상세 구조
 
-> 최종 업데이트: 2026-03-15 (지도 auto-fit zoom, label 3-layer 렌더링)
+> 최종 업데이트: 2026-03-19
 
 ---
 
@@ -35,7 +35,8 @@ features/region/
 │   ├── useTopoJsonData.ts        # TopoJSON 동적 import + GeoJSON 변환
 │   ├── useProjection.ts          # D3 geoMercator (fitExtent 전체 영역)
 │   ├── useMapZoom.ts             # D3 줌 동작 (identity 리셋, 1x~8x)
-│   └── useMapTransition.ts       # D3 전환 애니메이션
+│   ├── useMapTransition.ts       # D3 전환 애니메이션
+│   └── useHeatmapMode.ts        # 히트맵 모드 상태 관리 (카테고리→choropleth)
 ├── lib/
 │   ├── choropleth-utils.ts       # oklch 색상 보간, 범례 생성
 │   ├── map-theme.ts              # 지도 CSS 변수 (fill, hover, stroke, strokeHover)
@@ -45,8 +46,10 @@ features/region/
 │       └── choropleth-utils.test.ts
 └── data/
     ├── categories.ts             # 9개 카테고리 + 서브카테고리 + 아이콘 에셋
+    ├── heatmap-configs.ts        # 히트맵 카테고리 설정 + mock 데이터 생성 함수
     ├── mock-comparison.ts        # 비교분석 Mock 데이터
     ├── sido.topojson.json
+    ├── constituencies.topojson.json
     ├── sigun.topojson.json
     ├── sigungu.topojson.json
     └── emd.topojson.json
@@ -212,9 +215,15 @@ CardSection (비교 추이 차트)
 └── BottomCaption ("인구수[단위:천], 인구비율[단위:%]")
 ```
 
-### 뷰 탭 (CompareViewTab)
+### 뷰 탭 (ViewTab)
 
-"그래프 보기" / "표 보기" / "트리맵 보기" 3개 pill 버튼. `rounded-full`, `bg-surface-inverse` (active) / `bg-surface-primary` (default). 기존 "연도별/분기별/월별" Chip 필터 대체.
+"그래프 보기" / "표 보기" / "트리맵 보기" 3개 pill 버튼. `rounded-full`, `bg-surface-inverse` (active) / `bg-surface-primary` (default). 기존 `CHIP_FILTERS` (연도별/분기별/월별)를 `VIEW_TABS`로 대체. 모든 ViewMode의 차트 영역에서 공통 사용.
+
+| ViewTab | 렌더링 |
+|---------|--------|
+| `"graph"` | `BarChart` (기존 차트) |
+| `"table"` | `DataTable` (`components/tables`) — `ChartData`/`ChartConfig` 타입 재사용 |
+| `"treemap"` | placeholder (Coming Soon) |
 
 ### 통합 보기 토글
 
@@ -259,11 +268,10 @@ interface InsightCardData {
 |------|------|--------|------|
 | `selectedCategoryId` | `string` | `"voter"` | 카테고리 선택 |
 | `selectedSubcategoryId` | `string \| null` | `"population"` | 서브카테고리 선택 |
-| `activeChip` | `ChipFilter` | `"monthly"` | 차트 필터 (비교 외 모드) |
+| `activeViewTab` | `ViewTab` | `"graph"` | 뷰 탭 (graph/table/treemap, 모든 모드 공통) |
 | `viewMode` | `ViewMode` | `"default"` | 4가지 뷰 모드 |
 | `selectedRegion` | `{ code, name, fullName } \| null` | `null` | 지도에서 선택한 지역 |
 | `compareChartSplit` | `boolean` | `false` | 비교 차트 분리 보기 토글 |
-| `activeViewTab` | `CompareViewTab` | `"graph"` | 비교 모드 뷰 탭 |
 
 ### 지도 초기 드릴다운
 
@@ -288,7 +296,7 @@ interface InsightCardData {
 RegionResultPage
 ├── CategoryNav (components/ui) × 2 — 페이지 내 + GnbPanel 포탈
 ├── CardSectionHeader (components/ui)
-├── Chip (components/ui) — 비교 외 모드 차트 필터
+├── DataTable (components/tables) — 표 보기 탭
 ├── Badge (components/ui)
 ├── Switch (components/ui) — 통합 보기 토글
 ├── BarChart (components/charts) — darkTooltip, barSize/barGap/barRadius
