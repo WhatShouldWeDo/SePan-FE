@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { ChevronUp, ChevronRight } from "lucide-react";
+import { ChevronUp, ChevronRight, X } from "lucide-react";
 
 import { CategoryNav } from "@/components/ui/category-nav";
 import { CardSectionHeader } from "@/components/ui/card-section-header";
@@ -10,6 +10,8 @@ import { BarChart } from "@/components/charts";
 import { WantedFillMessage } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { KoreaAdminMap } from "@/features/region/components/map";
+import { useHeatmapMode } from "@/features/region/hooks/useHeatmapMode";
+import type { MapTooltipData } from "@/features/region/components/map/MapTooltip";
 import { MetricListRow } from "@/features/region/components/MetricListRow";
 import { MetricActionButtons } from "@/features/region/components/MetricActionButtons";
 import { MetricComparisonCard } from "@/features/region/components/MetricComparisonCard";
@@ -36,7 +38,7 @@ import type {
 	CompareMetricSummary,
 } from "@/features/region/data/mock-comparison";
 import type { ChartConfig } from "@/types/chart";
-import type { MapRegion } from "@/types/map";
+import type { MapRegion, MapLevel } from "@/types/map";
 
 /* ═══════════════════════════════════════════════════════════
    Chart Configs
@@ -255,6 +257,29 @@ export function RegionResultPage() {
 	const [compareChartSplit, setCompareChartSplit] = useState(false);
 	const [activeViewTab, setActiveViewTab] = useState<CompareViewTab>("graph");
 
+	const [mapLevel, setMapLevel] = useState<MapLevel>("sido");
+	const [visibleCodes, setVisibleCodes] = useState<string[]>([]);
+
+	const heatmap = useHeatmapMode(selectedCategoryId, mapLevel, visibleCodes);
+
+	const tooltipDataProvider = useCallback(
+		(code: string): MapTooltipData | undefined => {
+			if (!heatmap.isHeatmapActive || !heatmap.choroplethData) return undefined;
+			const { heatmapLabel, heatmapUnit } = heatmap;
+			if (!heatmapLabel || !heatmapUnit) return undefined;
+			const value = heatmap.choroplethData.values[code];
+			if (value === undefined) return undefined;
+			return {
+				heatmap: {
+					label: heatmapLabel,
+					value,
+					unit: heatmapUnit,
+				},
+			};
+		},
+		[heatmap.isHeatmapActive, heatmap.choroplethData, heatmap.heatmapLabel, heatmap.heatmapUnit],
+	);
+
 	const handleRegionSelect = useCallback((region: MapRegion) => {
 		if (region.fullName === MY_REGION.fullName) {
 			setViewMode("default");
@@ -310,6 +335,13 @@ export function RegionResultPage() {
 		viewMode === "default" || !selectedRegion
 			? MY_REGION.name
 			: selectedRegion.fullName;
+
+	// 히트맵 모드에서 선택된 지역의 데이터 미제공 여부
+	const isHeatmapDataMissing =
+		heatmap.isHeatmapActive &&
+		selectedRegion &&
+		heatmap.choroplethData &&
+		heatmap.choroplethData.values[selectedRegion.code] === undefined;
 
 	const currentMetrics: MetricRowData[] =
 		viewMode === "default" ? MY_REGION_METRICS : SELECTED_REGION_METRICS;
@@ -412,10 +444,27 @@ export function RegionResultPage() {
 							title={MY_REGION.districtName}
 							description="선거구 단위"
 						/>
+						{heatmap.isHeatmapActive && (
+							<div className="flex justify-end">
+								<button
+									type="button"
+									onClick={heatmap.deactivateHeatmap}
+									className="flex min-h-[44px] items-center gap-1 rounded-full bg-surface-primary px-3 py-2.5 text-label-3 font-semibold text-label-alternative transition-colors hover:bg-surface-primary/80"
+								>
+									<X className="size-3.5" />
+									히트맵 끄기
+								</button>
+							</div>
+						)}
 						<div className="flex items-center justify-center">
 							<KoreaAdminMap
 								searchNavigation={MY_REGION_NAV}
 								onRegionSelect={handleRegionSelect}
+								choroplethData={heatmap.choroplethData}
+								choroplethConfig={heatmap.choroplethConfig}
+								tooltipDataProvider={heatmap.isHeatmapActive ? tooltipDataProvider : undefined}
+								onLevelChange={setMapLevel}
+								onVisibleCodesChange={setVisibleCodes}
 								className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full"
 							/>
 						</div>
@@ -452,24 +501,42 @@ export function RegionResultPage() {
 									) : undefined
 								}
 							/>
-							<div className="flex flex-col gap-1">
-								{currentMetrics.map((metric) => (
-									<MetricListRow
-										key={metric.label}
-										label={metric.label}
-										value={metric.value}
-										unit={metric.unit}
-										subValueBadge={metric.subValueBadge}
-										deltas={metric.deltas}
-									/>
-								))}
-							</div>
-							{viewMode !== "default" && (
-								<MetricActionButtons
-									showAnalysis={viewMode === "preview"}
-									onAnalysisClick={handleAnalysis}
-									onCompareClick={handleCompare}
-								/>
+							{isHeatmapDataMissing ? (
+								<div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
+									<div className="flex size-12 items-center justify-center rounded-full bg-fill-alt">
+										<X className="size-5 text-label-assistive" />
+									</div>
+									<div className="flex flex-col items-center gap-1">
+										<p className="text-body-1 font-semibold text-label-normal">
+											데이터 미제공
+										</p>
+										<p className="text-body-2 text-label-alternative">
+											해당 지역의 {heatmap.heatmapLabel ?? "카테고리"} 데이터가 제공되지 않습니다.
+										</p>
+									</div>
+								</div>
+							) : (
+								<>
+									<div className="flex flex-col gap-1">
+										{currentMetrics.map((metric) => (
+											<MetricListRow
+												key={metric.label}
+												label={metric.label}
+												value={metric.value}
+												unit={metric.unit}
+												subValueBadge={metric.subValueBadge}
+												deltas={metric.deltas}
+											/>
+										))}
+									</div>
+									{viewMode !== "default" && (
+										<MetricActionButtons
+											showAnalysis={viewMode === "preview"}
+											onAnalysisClick={handleAnalysis}
+											onCompareClick={handleCompare}
+										/>
+									)}
+								</>
 							)}
 						</section>
 					)}

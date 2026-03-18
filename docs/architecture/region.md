@@ -305,3 +305,98 @@ RegionResultPage
 ├── CATEGORIES, SUBCATEGORIES (region/data/categories)
 └── mock-comparison.ts (region/data)
 ```
+
+---
+
+## 히트맵 모드
+
+히트맵 모드는 CategoryNav에서 카테고리를 선택했을 때 지도 위에 Choropleth 색상 오버레이를 표시하는 기능.
+
+### 전환 흐름
+
+```
+CategoryNav 카테고리 선택 (categoryId 변경)
+  ↓
+useHeatmapMode 활성화 (categoryId 인자로 받음)
+  ↓
+카테고리별 mock 데이터 → ChoroplethData/Config 생성
+  ↓
+KoreaAdminMap에 choroplethData 전달 (지도는 mode를 모름)
+  ↓
+RegionPolygon이 choroplethData 활성 여부로 색상 결정
+```
+
+### useHeatmapMode 훅
+
+```typescript
+interface HeatmapModeState {
+  categoryId: string | null;     // 현재 히트맵 카테고리 ID
+  choroplethData: ChoroplethData | null;
+  choroplethConfig: ChoroplethConfig | null;
+  forcedOff: boolean;            // 사용자가 명시적으로 히트맵 끈 상태
+}
+
+function useHeatmapMode() {
+  // categoryId → heatmap-configs.ts의 HEATMAP_CATEGORY_CONFIGS 참조
+  // 선택된 레벨(level)의 지역 코드 목록(visibleCodes) → choropleth 데이터 생성
+  // 결과: ChoroplethData (지역코드→값 매핑) + ChoroplethConfig (범례, 색상 스케일)
+
+  // forcedOff 리셋 로직:
+  // - categoryId가 새로 설정되면 forcedOff = false (자동 활성화)
+  // - 사용자가 "히트맵 끄기" 클릭 시 forcedOff = true
+}
+```
+
+### TooltipDataProvider 콜백 패턴
+
+`KoreaAdminMap`의 `tooltipDataProvider` prop은 모드를 인지하지 않는 순수 함수:
+
+```typescript
+tooltipDataProvider={(regionCode: string) => {
+  // 지역 코드 → 툴팁 데이터
+  // KoreaAdminMap은 이 함수만 호출, mode/heatmap 로직을 모름
+}}
+```
+
+부모 컴포넌트에서:
+- Choropleth 활성 → 함수에서 choroplethData[regionCode]의 값을 포함한 데이터 반환
+- Choropleth 비활성 → 기본 지역 정보만 반환
+
+### Disabled Fill (3-way 로직)
+
+RegionPolygon의 fill 색상 결정:
+
+```
+IF choroplethData 활성 AND 지역코드 in choroplethData:
+  → oklch 스케일 색상
+ELSE IF choroplethData 활성 AND 지역코드 NOT in choroplethData:
+  → mapColors.fillDisabled (약 20% 회색)
+ELSE:
+  → mapColors.fill (기본 중립 색상)
+```
+
+### 히트맵 끄기 버튼
+
+CategoryNav 또는 지도 영역에 "히트맵 끄기" 버튼 배치:
+
+```typescript
+function deactivateHeatmap() {
+  // forcedOff = true (히트맵 시각적 비활성화)
+  // (주의) categoryId는 유지 — 버튼 다시 누르면 자동 복구 가능
+}
+
+// 자동 리셋 트리거:
+// - CategoryNav에서 다른 카테고리 선택
+// - RegionPolygon 선택 (level 변경) → useMapDrillDown 발동 → categoryId 초기화
+```
+
+### 향후 확장
+
+- **HEATMAP_CATEGORY_CONFIGS**: `src/features/region/data/heatmap-configs.ts`
+  - 새 카테고리 추가 시 여기에만 config 및 mock 데이터 생성 함수 추가
+  - 서브카테고리 단위 제어 가능 (e.g., `population.young`, `population.elderly`)
+  - 각 카테고리별 mock 데이터 스키마 통일
+
+- **choroplethData 소스 교체**:
+  - 현재: mock 데이터
+  - 향후: API 연동 시 `useApiQuery` 로 데이터 페칭 + `useHeatmapMode`에서 처리

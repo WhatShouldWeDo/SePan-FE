@@ -47,6 +47,7 @@
   - `hooks/useProjection.ts` — D3 geoMercator 프로젝션 (fitExtent 전체 영역 자동 스케일링)
   - `hooks/useMapZoom.ts` — D3 줌 동작 관리 (identity 리셋, 1x~8x)
   - `hooks/useMapTransition.ts` — D3 전환 애니메이션
+  - `hooks/useHeatmapMode.ts` — 히트맵 모드 상태 관리 훅 (카테고리 선택 → choropleth 데이터 생성, forcedOff 리셋 로직)
   - `lib/choropleth-utils.ts` — oklch 색상 보간, choropleth 색상 매핑, 범례 생성
   - `lib/map-theme.ts` — 지도 CSS 변수 (fill, hover, selected, stroke, strokeHover 등)
   - `lib/sido-utils.ts` — 시도 코드 ↔ 이름 매핑
@@ -58,6 +59,7 @@
   - `components/MetricComparisonCard.tsx` — 비교 모드 좌우 분할 메트릭 카드 — compare 모드에서 사용
   - `components/ComparisonSummaryBox.tsx` — 비교 해석 텍스트 박스 — MetricComparisonCard에서 사용
   - `data/categories.ts` — 분석 지표 카테고리 정의 (9개 카테고리 + 서브카테고리 + Figma 아이콘 에셋 경로)
+  - `data/heatmap-configs.ts` — 히트맵 카테고리 설정 (HeatmapCategoryConfig) + mock 데이터 생성 함수
   - `data/mock-comparison.ts` — 비교분석 Mock 데이터 (내 선거구/선택 지역 메트릭·월별추이, 비교 해석 텍스트, 인사이트 카드, 하단 메트릭)
   - `data/*.topojson.json` — 시도/시군/시군구/읍면동 지리 데이터
 - **의존하는 모듈**: `types/map`, `lib/utils`, `components/ui`, `components/icons` (WantedCaretUp, WantedMagicWand, WantedFillMessage)
