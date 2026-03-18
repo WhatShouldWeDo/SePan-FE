@@ -7,6 +7,7 @@ import { CardSectionHeader } from "@/components/ui/card-section-header";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { BarChart } from "@/components/charts";
+import { DataTable } from "@/components/tables";
 import { WantedFillMessage } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { KoreaAdminMap } from "@/features/region/components/map";
@@ -63,17 +64,9 @@ const TEAL_CHART_CONFIG: ChartConfig = {
    Constants
    ═══════════════════════════════════════════════════════════ */
 
-type ChipFilter = "yearly" | "quarterly" | "monthly";
+type ViewTab = "graph" | "table" | "treemap";
 
-const CHIP_FILTERS: { id: ChipFilter; label: string }[] = [
-	{ id: "yearly", label: "연도별" },
-	{ id: "quarterly", label: "분기별" },
-	{ id: "monthly", label: "월별" },
-];
-
-type CompareViewTab = "graph" | "table" | "treemap";
-
-const VIEW_TABS: { id: CompareViewTab; label: string }[] = [
+const VIEW_TABS: { id: ViewTab; label: string }[] = [
 	{ id: "graph", label: "그래프 보기" },
 	{ id: "table", label: "표 보기" },
 	{ id: "treemap", label: "트리맵 보기" },
@@ -246,8 +239,6 @@ export function RegionResultPage() {
 	const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<
 		string | null
 	>("population");
-	const [activeChip, setActiveChip] = useState<ChipFilter>("monthly");
-
 	const [viewMode, setViewMode] = useState<ViewMode>("default");
 	const [selectedRegion, setSelectedRegion] = useState<{
 		code: string;
@@ -255,7 +246,7 @@ export function RegionResultPage() {
 		fullName: string;
 	} | null>(null);
 	const [compareChartSplit, setCompareChartSplit] = useState(false);
-	const [activeViewTab, setActiveViewTab] = useState<CompareViewTab>("graph");
+	const [activeViewTab, setActiveViewTab] = useState<ViewTab>("graph");
 
 	const [mapLevel, setMapLevel] = useState<MapLevel>("sido");
 	const [visibleCodes, setVisibleCodes] = useState<string[]>([]);
@@ -717,23 +708,38 @@ export function RegionResultPage() {
 							description="월별 인구수 변화 추이"
 						/>
 						<div className="flex gap-2">
-							{CHIP_FILTERS.map((chip) => (
+							{VIEW_TABS.map((tab) => (
 								<button
-									key={chip.id}
+									key={tab.id}
 									type="button"
 									className={cn(
-										"rounded-full px-3.5 py-2 text-[16px] font-semibold leading-[1.3] transition-colors",
-										activeChip === chip.id
+										"min-h-[44px] rounded-full px-3.5 py-2 text-[16px] font-semibold leading-[1.3] transition-colors",
+										activeViewTab === tab.id
 											? "bg-surface-inverse text-label-inverse"
 											: "bg-surface-primary text-label-alternative",
 									)}
-									onClick={() => setActiveChip(chip.id)}
+									onClick={() => setActiveViewTab(tab.id)}
 								>
-									{chip.label}
+									{tab.label}
 								</button>
 							))}
 						</div>
-						<BarChart data={currentChartData} config={SINGLE_CHART_CONFIG} />
+
+						{activeViewTab === "graph" && (
+							<BarChart data={currentChartData} config={SINGLE_CHART_CONFIG} />
+						)}
+
+						{activeViewTab === "table" && (
+							<DataTable data={currentChartData} config={SINGLE_CHART_CONFIG} />
+						)}
+
+						{activeViewTab === "treemap" && (
+							<div className="flex min-h-[200px] items-center justify-center">
+								<p className="text-[16px] font-medium leading-[1.5] text-label-alternative">
+									준비 중입니다
+								</p>
+							</div>
+						)}
 					</section>
 				)}
 			</div>
