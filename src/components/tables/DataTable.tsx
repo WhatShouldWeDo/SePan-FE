@@ -20,12 +20,10 @@ export function DataTable({
   const [rowsPerPage, setRowsPerPage] = useState(defaultPageSize);
 
   const xLabel = config.xLabel ?? config.xKey;
-  const showPagination = data.length > rowsPerPage;
   const totalPages = Math.ceil(data.length / rowsPerPage);
+  const showPageNumbers = totalPages > 1;
   const startIdx = (currentPage - 1) * rowsPerPage;
-  const pageData = showPagination
-    ? data.slice(startIdx, startIdx + rowsPerPage)
-    : data;
+  const pageData = data.slice(startIdx, startIdx + rowsPerPage);
 
   if (data.length === 0) {
     return (
@@ -79,29 +77,29 @@ export function DataTable({
         </tbody>
       </table>
 
-      {/* 페이지네이션 */}
-      {showPagination && (
-        <div className="flex items-center justify-between pt-4">
-          {/* 좌측: rows-per-page */}
-          <div className="flex items-center gap-2">
-            <select
-              value={rowsPerPage}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-              className="min-h-[44px] min-w-[44px] rounded-lg border border-line-neutral px-2 py-1 text-[14px] font-semibold leading-[1.3] text-label-normal"
-            >
-              {[10, 20, 50].map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-            <span className="text-[12px] leading-[1.3] text-label-alternative">
-              씩 보기
-            </span>
-          </div>
+      {/* 페이지네이션 — 항상 표시 (rows-per-page 변경 가능하도록) */}
+      <div className="flex items-center justify-between pt-4">
+        {/* 좌측: rows-per-page */}
+        <div className="flex items-center gap-2">
+          <select
+            value={rowsPerPage}
+            onChange={(e) => {
+              setRowsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="min-h-[44px] min-w-[44px] rounded-lg border border-line-neutral px-2 py-1 text-[14px] font-semibold leading-[1.3] text-label-normal"
+          >
+            {[10, 20, 50].map((n) => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
+          <span className="text-[12px] leading-[1.3] text-label-alternative">
+            씩 보기
+          </span>
+        </div>
 
-          {/* 중앙: 페이지 번호 */}
+        {/* 중앙: 페이지 번호 (2페이지 이상일 때만) */}
+        {showPageNumbers && (
           <div className="flex items-center gap-1">
             <button
               type="button"
@@ -135,32 +133,32 @@ export function DataTable({
               &gt;
             </button>
           </div>
+        )}
 
-          {/* 우측: 페이지 이동 */}
-          <div className="flex items-center gap-2">
-            <span className="text-[12px] leading-[1.3] text-label-alternative">
-              페이지 이동
-            </span>
-            <input
-              type="number"
-              min={1}
-              max={totalPages}
-              defaultValue=""
-              aria-label="페이지 번호 입력"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const val = Number((e.target as HTMLInputElement).value);
-                  if (val >= 1 && val <= totalPages) {
-                    setCurrentPage(val);
-                    (e.target as HTMLInputElement).value = "";
-                  }
+        {/* 우측: 페이지 이동 (현재 페이지 표시) */}
+        <div className="flex items-center gap-2">
+          <span className="text-[12px] leading-[1.3] text-label-alternative">
+            페이지 이동
+          </span>
+          <input
+            type="number"
+            key={currentPage}
+            min={1}
+            max={totalPages}
+            defaultValue={currentPage}
+            aria-label="페이지 번호 입력"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const val = Number((e.target as HTMLInputElement).value);
+                if (val >= 1 && val <= totalPages) {
+                  setCurrentPage(val);
                 }
-              }}
-              className="min-h-[44px] w-[60px] rounded-lg border border-line-neutral px-2 py-1 text-center text-[14px] font-semibold text-label-normal"
-            />
-          </div>
+              }
+            }}
+            className="min-h-[44px] w-[60px] rounded-lg border border-line-neutral px-2 py-1 text-center text-[14px] font-semibold text-label-normal"
+          />
         </div>
-      )}
+      </div>
     </div>
   );
 }
