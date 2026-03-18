@@ -336,6 +336,13 @@ export function RegionResultPage() {
 			? MY_REGION.name
 			: selectedRegion.fullName;
 
+	// 히트맵 모드에서 선택된 지역의 데이터 미제공 여부
+	const isHeatmapDataMissing =
+		heatmap.isHeatmapActive &&
+		selectedRegion &&
+		heatmap.choroplethData &&
+		heatmap.choroplethData.values[selectedRegion.code] === undefined;
+
 	const currentMetrics: MetricRowData[] =
 		viewMode === "default" ? MY_REGION_METRICS : SELECTED_REGION_METRICS;
 
@@ -494,24 +501,42 @@ export function RegionResultPage() {
 									) : undefined
 								}
 							/>
-							<div className="flex flex-col gap-1">
-								{currentMetrics.map((metric) => (
-									<MetricListRow
-										key={metric.label}
-										label={metric.label}
-										value={metric.value}
-										unit={metric.unit}
-										subValueBadge={metric.subValueBadge}
-										deltas={metric.deltas}
-									/>
-								))}
-							</div>
-							{viewMode !== "default" && (
-								<MetricActionButtons
-									showAnalysis={viewMode === "preview"}
-									onAnalysisClick={handleAnalysis}
-									onCompareClick={handleCompare}
-								/>
+							{isHeatmapDataMissing ? (
+								<div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
+									<div className="flex size-12 items-center justify-center rounded-full bg-fill-alt">
+										<X className="size-5 text-label-assistive" />
+									</div>
+									<div className="flex flex-col items-center gap-1">
+										<p className="text-body-1 font-semibold text-label-normal">
+											데이터 미제공
+										</p>
+										<p className="text-body-2 text-label-alternative">
+											해당 지역의 {heatmap.heatmapLabel ?? "카테고리"} 데이터가 제공되지 않습니다.
+										</p>
+									</div>
+								</div>
+							) : (
+								<>
+									<div className="flex flex-col gap-1">
+										{currentMetrics.map((metric) => (
+											<MetricListRow
+												key={metric.label}
+												label={metric.label}
+												value={metric.value}
+												unit={metric.unit}
+												subValueBadge={metric.subValueBadge}
+												deltas={metric.deltas}
+											/>
+										))}
+									</div>
+									{viewMode !== "default" && (
+										<MetricActionButtons
+											showAnalysis={viewMode === "preview"}
+											onAnalysisClick={handleAnalysis}
+											onCompareClick={handleCompare}
+										/>
+									)}
+								</>
 							)}
 						</section>
 					)}
