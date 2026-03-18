@@ -19,4 +19,6 @@ export const mapColors = {
 	label: "oklch(var(--map-label))",
 	/** 검색 결과 하이라이트 */
 	fillSearchHighlight: "oklch(var(--map-fill-search-highlight))",
+	/** 데이터 미제공 폴리곤 채우기 (disabled) */
+	fillDisabled: "oklch(var(--map-fill-disabled))",
 } as const;

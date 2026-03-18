@@ -154,6 +154,7 @@
 	--color-map-stroke: var(--map-stroke);
 	--color-map-label: var(--map-label);
 	--color-map-fill-search-highlight: var(--map-fill-search-highlight);
+	--color-map-fill-disabled: var(--map-fill-disabled);
 
 	/* ── Primitive Color Palette (Figma Color 페이지 기반) ──
 	 * 사용법: bg-{palette}-{step}, text-{palette}-{step}, border-{palette}-{step}
@@ -371,6 +372,7 @@
 	--map-stroke-hover: 0.45 0.2 250;
 	--map-label: 0.3 0 0;
 	--map-fill-search-highlight: 0.8 0.15 140;
+	--map-fill-disabled: 0.92 0 0;
 }
 
 .dark {
@@ -413,6 +415,7 @@
 	--map-stroke-hover: 0.7 0.2 250;
 	--map-label: 0.85 0 0;
 	--map-fill-search-highlight: 0.5 0.15 140;
+	--map-fill-disabled: 0.3 0 0;
 }
 
 /* Sonner custom toast: 중앙 정렬 + 모바일 대응 */
