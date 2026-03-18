@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { ChevronUp, ChevronRight } from "lucide-react";
+import { ChevronUp, ChevronRight, X } from "lucide-react";
 
 import { CategoryNav } from "@/components/ui/category-nav";
 import { CardSectionHeader } from "@/components/ui/card-section-header";
@@ -10,6 +10,8 @@ import { BarChart } from "@/components/charts";
 import { WantedFillMessage } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { KoreaAdminMap } from "@/features/region/components/map";
+import { useHeatmapMode } from "@/features/region/hooks/useHeatmapMode";
+import type { MapTooltipData } from "@/features/region/components/map/MapTooltip";
 import { MetricListRow } from "@/features/region/components/MetricListRow";
 import { MetricActionButtons } from "@/features/region/components/MetricActionButtons";
 import { MetricComparisonCard } from "@/features/region/components/MetricComparisonCard";
@@ -36,7 +38,7 @@ import type {
 	CompareMetricSummary,
 } from "@/features/region/data/mock-comparison";
 import type { ChartConfig } from "@/types/chart";
-import type { MapRegion } from "@/types/map";
+import type { MapRegion, MapLevel } from "@/types/map";
 
 /* ═══════════════════════════════════════════════════════════
    Chart Configs
@@ -255,6 +257,27 @@ export function RegionResultPage() {
 	const [compareChartSplit, setCompareChartSplit] = useState(false);
 	const [activeViewTab, setActiveViewTab] = useState<CompareViewTab>("graph");
 
+	const [mapLevel, setMapLevel] = useState<MapLevel>("sido");
+	const [visibleCodes, setVisibleCodes] = useState<string[]>([]);
+
+	const heatmap = useHeatmapMode(selectedCategoryId, mapLevel, visibleCodes);
+
+	const tooltipDataProvider = useCallback(
+		(code: string): MapTooltipData | undefined => {
+			if (!heatmap.isHeatmapActive || !heatmap.choroplethData) return undefined;
+			const value = heatmap.choroplethData.values[code];
+			if (value === undefined) return undefined;
+			return {
+				heatmap: {
+					label: heatmap.heatmapLabel!,
+					value,
+					unit: heatmap.heatmapUnit!,
+				},
+			};
+		},
+		[heatmap.isHeatmapActive, heatmap.choroplethData, heatmap.heatmapLabel, heatmap.heatmapUnit],
+	);
+
 	const handleRegionSelect = useCallback((region: MapRegion) => {
 		if (region.fullName === MY_REGION.fullName) {
 			setViewMode("default");
@@ -412,10 +435,27 @@ export function RegionResultPage() {
 							title={MY_REGION.districtName}
 							description="선거구 단위"
 						/>
+						{heatmap.isHeatmapActive && (
+							<div className="flex justify-end">
+								<button
+									type="button"
+									onClick={heatmap.deactivateHeatmap}
+									className="flex items-center gap-1 rounded-full bg-surface-primary px-3 py-1.5 text-label-3 font-semibold text-label-alternative transition-colors hover:bg-surface-primary/80"
+								>
+									<X className="size-3.5" />
+									히트맵 끄기
+								</button>
+							</div>
+						)}
 						<div className="flex items-center justify-center">
 							<KoreaAdminMap
 								searchNavigation={MY_REGION_NAV}
 								onRegionSelect={handleRegionSelect}
+								choroplethData={heatmap.choroplethData}
+								choroplethConfig={heatmap.choroplethConfig}
+								tooltipDataProvider={heatmap.isHeatmapActive ? tooltipDataProvider : undefined}
+								onLevelChange={setMapLevel}
+								onVisibleCodesChange={setVisibleCodes}
 								className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full"
 							/>
 						</div>
