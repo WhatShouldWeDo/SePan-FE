@@ -265,13 +265,15 @@ export function RegionResultPage() {
 	const tooltipDataProvider = useCallback(
 		(code: string): MapTooltipData | undefined => {
 			if (!heatmap.isHeatmapActive || !heatmap.choroplethData) return undefined;
+			const { heatmapLabel, heatmapUnit } = heatmap;
+			if (!heatmapLabel || !heatmapUnit) return undefined;
 			const value = heatmap.choroplethData.values[code];
 			if (value === undefined) return undefined;
 			return {
 				heatmap: {
-					label: heatmap.heatmapLabel!,
+					label: heatmapLabel,
 					value,
-					unit: heatmap.heatmapUnit!,
+					unit: heatmapUnit,
 				},
 			};
 		},
@@ -440,7 +442,7 @@ export function RegionResultPage() {
 								<button
 									type="button"
 									onClick={heatmap.deactivateHeatmap}
-									className="flex items-center gap-1 rounded-full bg-surface-primary px-3 py-1.5 text-label-3 font-semibold text-label-alternative transition-colors hover:bg-surface-primary/80"
+									className="flex min-h-[44px] items-center gap-1 rounded-full bg-surface-primary px-3 py-2.5 text-label-3 font-semibold text-label-alternative transition-colors hover:bg-surface-primary/80"
 								>
 									<X className="size-3.5" />
 									히트맵 끄기
