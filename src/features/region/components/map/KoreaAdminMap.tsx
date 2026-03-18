@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { geoArea } from "d3-geo";
 import { useProjection } from "@/features/region/hooks/useProjection";
 import {
@@ -15,6 +15,7 @@ import { useLongPress } from "@/hooks/useLongPress";
 import { useContainerSize } from "@/hooks/useContainerSize";
 import { RegionPolygon } from "./RegionPolygon";
 import { MapTooltip } from "./MapTooltip";
+import type { MapTooltipData } from "./MapTooltip";
 import { MapSkeleton } from "./MapSkeleton";
 import { MapBreadcrumb } from "./MapBreadcrumb";
 import { MapZoomControls } from "./MapZoomControls";
@@ -29,6 +30,7 @@ import type {
 	SearchSelectedRegion,
 	ChoroplethData,
 	ChoroplethConfig,
+	MapLevel,
 } from "@/types/map";
 
 export interface KoreaAdminMapProps {
@@ -44,6 +46,12 @@ export interface KoreaAdminMapProps {
 	choroplethData?: ChoroplethData | null;
 	/** Choropleth 설정 (Phase 3-C) */
 	choroplethConfig?: ChoroplethConfig | null;
+	/** Tooltip 데이터 제공 함수 — 모드 비인지 방식 (Phase heatmap) */
+	tooltipDataProvider?: (code: string) => MapTooltipData | undefined;
+	/** 드릴다운 레벨 변경 콜백 (Phase heatmap) */
+	onLevelChange?: (level: MapLevel) => void;
+	/** 현재 보이는 지역 코드 변경 콜백 (Phase heatmap) */
+	onVisibleCodesChange?: (codes: string[]) => void;
 	/** 로딩 상태 (외부 데이터) */
 	isLoading?: boolean;
 	/** 추가 className */
@@ -80,6 +88,9 @@ export function KoreaAdminMap({
 	searchNavigation,
 	choroplethData = null,
 	choroplethConfig = null,
+	tooltipDataProvider,
+	onLevelChange,
+	onVisibleCodesChange,
 	isLoading = false,
 	className,
 }: KoreaAdminMapProps) {
@@ -184,6 +195,11 @@ export function KoreaAdminMap({
 	// 현재 레벨 (레거시 모드는 항상 sigun)
 	const currentLevel = enableDrillDown ? level : "sigun";
 
+	// currentLevel이 변경될 때 onLevelChange 콜백 호출
+	useEffect(() => {
+		onLevelChange?.(currentLevel);
+	}, [currentLevel, onLevelChange]);
+
 	// 레벨별 라벨 면적 임계값
 	const effectiveThreshold =
 		labelAreaThreshold ??
@@ -267,6 +283,17 @@ export function KoreaAdminMap({
 	// hover / tooltip 상태
 	const [hoveredCode, setHoveredCode] = useState<string | null>(null);
 	const [tooltip, setTooltip] = useState<HoveredRegion | null>(null);
+
+	// 보이는 지역 코드 목록 안정화 (참조 비교로 불필요한 리렌더 방지)
+	const prevCodesRef = useRef<string[]>([]);
+	useEffect(() => {
+		const codes = regionData.map((r) => r.region.code);
+		const prev = prevCodesRef.current;
+		if (codes.length !== prev.length || codes.some((c, i) => c !== prev[i])) {
+			prevCodesRef.current = codes;
+			onVisibleCodesChange?.(codes);
+		}
+	}, [regionData, onVisibleCodesChange]);
 
 	// 레벨 전환 시 hover 상태 초기화 (렌더 중 상태 조정 패턴)
 	const viewKey = `${currentLevel}-${selectedSido}-${selectedCity}-${selectedGu}`;
@@ -360,17 +387,19 @@ export function KoreaAdminMap({
 	// Choropleth 색상 맵 (Phase 3-C)
 	const choroplethColorMap = useMemo(() => {
 		if (!choroplethData || !choroplethConfig) return null;
+		// 데이터가 있는 지역: 계산된 색상, 없는 지역: disabled fill
 		const map: Record<string, string> = {};
+		// 먼저 보이는 모든 지역을 disabled로 설정
+		for (const { region } of regionData) {
+			map[region.code] = mapColors.fillDisabled;
+		}
+		// 데이터가 있는 지역만 계산된 색상으로 덮어쓰기
 		for (const code of Object.keys(choroplethData.values)) {
-			const color = getChoroplethColor(
-				code,
-				choroplethData,
-				choroplethConfig,
-			);
+			const color = getChoroplethColor(code, choroplethData, choroplethConfig);
 			if (color) map[code] = color;
 		}
 		return map;
-	}, [choroplethData, choroplethConfig]);
+	}, [choroplethData, choroplethConfig, regionData]);
 
 	// Choropleth 범례 항목
 	const legendItems = useMemo(() => {
@@ -566,7 +595,10 @@ export function KoreaAdminMap({
 					/>
 				</div>
 			)}
-			<MapTooltip hovered={tooltip} />
+			<MapTooltip
+				hovered={tooltip}
+				data={tooltip && tooltipDataProvider ? tooltipDataProvider(tooltip.region.code) : undefined}
+			/>
 		</div>
 	);
 }
