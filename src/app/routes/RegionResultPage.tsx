@@ -549,7 +549,7 @@ export function RegionResultPage() {
 										key={tab.id}
 										type="button"
 										className={cn(
-											"rounded-full px-3.5 py-2 text-[16px] font-semibold leading-[1.3] transition-colors",
+											"min-h-[44px] rounded-full px-3.5 py-2 text-[16px] font-semibold leading-[1.3] transition-colors",
 											activeViewTab === tab.id
 												? "bg-surface-inverse text-label-inverse"
 												: "bg-surface-primary text-label-alternative",
