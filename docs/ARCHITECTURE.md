@@ -1,6 +1,6 @@
 # Architecture Overview
 
-> 최종 업데이트: 2026-03-11
+> 최종 업데이트: 2026-03-18
 
 ## 기술 스택
 
@@ -42,24 +42,28 @@ src/
 │   │   └── data/               #   Mock 데이터
 │   ├── dashboard/              # 대시보드
 │   │   └── components/         #   CardSection, Greeting, SummaryCard, InsightListItem, ScheduleListItem, WeekStrip
+│   ├── pledges/                # 역대공약분석
+│   │   ├── components/         #   CandidateCard, CandidateGrid, 필터 컴포넌트
+│   │   └── data/               #   Mock 후보자 데이터, 지역 매핑
 │   ├── region/                 # 지역분석
 │   │   ├── components/map/     #   지도 컴포넌트 (폴리곤, 검색 등)
 │   │   ├── components/         #   MetricListRow, AiAnalysisBox (결과 페이지용)
-│   │   ├── hooks/              #   useMapDrillDown, useTopoJsonData 등
+│   │   ├── hooks/              #   useMapDrillDown, useTopoJsonData, useHeatmapMode 등
 │   │   ├── lib/                #   choropleth-utils, sido-utils, map-theme
-│   │   └── data/               #   TopoJSON, 카테고리 정의 + 아이콘 에셋
-│   ├── policy/                 # 정책개발
-│   │   ├── components/
-│   │   └── hooks/
+│   │   └── data/               #   TopoJSON, 카테고리 정의, 히트맵 설정
+│   ├── policy/                 # 정책개발 (비활성, 빈 디렉토리)
 │   └── test/                   # 테스트 페이지
 │
 ├── components/                 # 공유 UI 컴포넌트
 │   ├── ui/                     # shadcn 기반 (Button, Card, Input 등)
 │   ├── charts/                 # 차트 래퍼
+│   ├── tables/                 # 테이블 컴포넌트
 │   ├── icons/                  # SVGR 자동 생성 아이콘
 │   ├── Header.tsx
 │   ├── Sidebar.tsx              # Figma 기반 (접힘 80px / 펼침 280px, Duo 아이콘)
 │   └── ...                     # ConfirmDialog, DdayBadge 등
+│
+├── contexts/                   # 공유 컨텍스트 (NavigationContext, GnbPanelContext)
 │
 ├── hooks/                      # 공유 훅 (useContainerSize, useLongPress, useRecentSearches)
 │
@@ -69,7 +73,6 @@ src/
 │   │   ├── hooks.ts            #   useApiQuery, useApiMutation
 │   │   └── errors.ts           #   에러 처리 유틸
 │   ├── toast/                  # Sonner 래퍼 (toast.success/error/...)
-│   ├── utils/
 │   ├── utils.ts                # cn() (clsx + tailwind-merge)
 │   ├── chart-theme.ts
 │   └── hangul-utils.ts         # 한글 처리 유틸
@@ -189,7 +192,9 @@ Form (react-hook-form) → Zod 검증 → useApiMutation → API 호출
 | `/region` | RegionResultPage | 필요 |
 | `/pledges` | PledgesOverviewPage | 필요 |
 | `/pledges/presidential` | PresidentialPledgesPage | 필요 |
+| `/pledges/parliamentary` | ParliamentaryPledgesPage | 필요 |
 | `/pledges/:type` | PledgesPlaceholderPage | 필요 |
+| `/test` | TestPage | 필요 |
 
 ---
 
