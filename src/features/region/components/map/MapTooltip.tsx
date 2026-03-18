@@ -14,6 +14,12 @@ export interface MapTooltipData {
 	progressive?: number;
 	/** 보수 투표율 (%) */
 	conservative?: number;
+	/** 히트맵 모드 데이터 (존재 시 히트맵 표시, 기존 필드 무시) */
+	heatmap?: {
+		label: string;    // "교통 혼잡도"
+		value: number;    // 78.5
+		unit: string;     // "점"
+	};
 }
 
 interface MapTooltipProps {
@@ -24,6 +30,22 @@ interface MapTooltipProps {
 
 /** 지도 전용 ExtraContent — 유권자수 + 정당 투표율 */
 function MapTooltipContent({ data }: { data: MapTooltipData }) {
+	// 히트맵 모드 — 데이터값만 표시
+	if (data.heatmap) {
+		return (
+			<div className="flex items-center gap-1 py-1">
+				<span className="text-label-3 font-semibold leading-[1.3] text-white/72">
+					{data.heatmap.label}
+				</span>
+				<span className="text-label-3 font-semibold leading-[1.3] text-white">
+					{data.heatmap.value.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}
+					{data.heatmap.unit}
+				</span>
+			</div>
+		);
+	}
+
+	// 기존 유권자/정당 정보
 	const hasVoter = data.voterCount != null;
 	const hasParty = data.progressive != null && data.conservative != null;
 
