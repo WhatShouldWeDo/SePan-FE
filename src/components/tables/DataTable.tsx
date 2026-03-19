@@ -43,16 +43,16 @@ export function DataTable({
 
   return (
     <div className={className}>
-      <table className="w-full">
+      <table className="w-full border-b border-line-neutral">
         <thead>
-          <tr className="border-b border-line-neutral">
-            <th className="px-4 py-3 text-left text-[14px] font-semibold leading-[1.3] text-label-normal">
+          <tr className="border-y border-line-neutral bg-cool-neutral-5">
+            <th className="px-4 py-3 text-left text-[14px] font-semibold leading-[1.3] text-label-neutral">
               {xLabel}
             </th>
             {config.series.map((s) => (
               <th
                 key={s.key}
-                className="px-4 py-3 text-left text-[14px] font-semibold leading-[1.3] text-label-normal"
+                className="px-4 py-3 text-left text-[14px] font-semibold leading-[1.3] text-label-neutral"
               >
                 {s.label}
               </th>
@@ -65,13 +65,13 @@ export function DataTable({
               key={String(row[config.xKey])}
               className="border-b border-line-neutral last:border-b-0"
             >
-              <td className="px-4 py-3 text-[16px] font-medium leading-[1.5] text-label-normal">
+              <td className="px-4 py-3 text-[16px] font-medium leading-[1.5] text-label-neutral">
                 {row[config.xKey]}
               </td>
               {config.series.map((s) => (
                 <td
                   key={s.key}
-                  className="px-4 py-3 text-[16px] font-medium leading-[1.5] text-label-normal"
+                  className="px-4 py-3 text-[16px] font-medium leading-[1.5] text-label-neutral"
                 >
                   {typeof row[s.key] === "number"
                     ? valueFormatter(row[s.key] as number)
@@ -96,7 +96,9 @@ export function DataTable({
             className="min-h-[44px] min-w-[44px] rounded-lg border border-line-neutral px-2 py-1 text-[14px] font-semibold leading-[1.3] text-label-normal outline-none"
           >
             {[10, 20, 50].map((n) => (
-              <option key={n} value={n}>{n}</option>
+              <option key={n} value={n}>
+                {n}
+              </option>
             ))}
           </select>
           <span className="text-[12px] leading-[1.3] text-label-alternative">
@@ -141,7 +143,7 @@ export function DataTable({
           </div>
         )}
 
-        {/* 우측: 페이지 이동 (현재 페이지 표시) */}
+        {/* 우측: 페이지 이동 (엔터로 이동) */}
         <div className="flex items-center gap-2">
           <span className="text-[12px] leading-[1.3] text-label-alternative">
             페이지 이동
@@ -161,7 +163,7 @@ export function DataTable({
                 }
               }
             }}
-            className="min-h-[44px] w-[60px] rounded-lg border border-line-neutral px-2 py-1 text-center text-[14px] font-semibold text-label-normal outline-none"
+            className="min-h-[44px] w-[60px] appearance-none rounded-lg border border-line-neutral px-2 py-1 text-center text-[14px] font-semibold text-label-normal outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
         </div>
       </div>
