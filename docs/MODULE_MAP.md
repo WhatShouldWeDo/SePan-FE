@@ -1,6 +1,6 @@
 # Module Map
 
-> 최종 업데이트: 2026-03-17 (국회의원선거 역대공약분석 페이지 — 4단계 캐스케이딩 필터, 키워드 칩)
+> 최종 업데이트: 2026-03-19
 
 ---
 
@@ -183,6 +183,13 @@
 | `LineChart.tsx` | Recharts 라인 차트 래퍼 |
 | `index.ts` | re-export |
 
+#### Tables (`tables/`)
+
+| 파일 | 역할 |
+|------|------|
+| `DataTable.tsx` | 차트 데이터를 테이블로 표시 + 조건부 페이지네이션 |
+| `index.ts` | barrel export |
+
 #### Icons (`icons/`)
 
 | 파일 | 역할 |
@@ -197,6 +204,7 @@
 | `DuoBookOpen.tsx` | 책 아이콘 (Duo) — 사이드바 |
 | `DuoBinocular.tsx` | 쌍안경 아이콘 (Duo) — 사이드바 |
 | `DuoAddressBook.tsx` | 주소록 아이콘 (Duo) — 사이드바 |
+| `DuoWallet.tsx` | 지갑 아이콘 (Duo) |
 | `WantedSetting.tsx` | 설정 아이콘 — 사이드바 |
 | `WantedCrown.tsx` | 왕관 아이콘 — 사이드바 |
 | `WantedFillMessage.tsx` | 채팅 메시지 아이콘 (32×32) — 대시보드 인사이트 |
@@ -327,6 +335,7 @@ hooks/          ← app/routes, features (순수 훅, 의존성 없음)
 components/
   ├─ ui/        ← 모든 feature, app 모듈이 참조
   ├─ charts/    ← app/routes (대시보드, 지역분석)
+  ├─ tables/    ← app/routes (지역분석 표 보기)
   ├─ icons/     ← toast, 기타 UI
   ├─ Header     → auth/hooks/useAuth (역방향 의존)
   └─ Sidebar    → react-router-dom
@@ -335,7 +344,7 @@ features/
   ├─ auth/      → lib/api, types, components/ui
   ├─ region/    → types/map, lib/utils, components/ui, d3, topojson
   ├─ dashboard/ → components/ui (Badge, Banner, Button, CardSectionHeader), lib/utils
-  ├─ policy/    → (비어있음, PolicyPage에 직접 구현)
+  ├─ policy/    → (비활성, 빈 디렉토리)
   └─ test/      → components/ui
   │
 app/
