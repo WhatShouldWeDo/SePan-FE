@@ -25,6 +25,16 @@
 |------|----------|------|
 | `/pledges/local` | `LocalElectionPledgesPage` | 기존 PledgesPlaceholderPage 대체 |
 
+**주의:** `router.tsx`에서 `/pledges/local` 라우트는 반드시 `/pledges/:type` 와일드카드 라우트 **위에** 배치해야 한다. 기존 `/pledges/presidential`, `/pledges/parliamentary`와 동일한 위치.
+
+**Breadcrumb:**
+```typescript
+useBreadcrumb([
+  { label: "역대공약분석" },
+  { label: "지방선거" },
+])
+```
+
 ## 페이지 레이아웃
 
 ```
@@ -71,10 +81,10 @@ interface SegmentedControlProps<T extends string> {
 }
 ```
 
-**스타일:**
-- 컨테이너: `rgba(107,114,128,0.08)` 배경, 8px border-radius, 3px 내부 패딩
-- 활성 탭: white 배경 + shadow, font-weight 600, `#374151` 텍스트
-- 비활성 탭: transparent 배경, font-weight 500, `#9ca3af` 텍스트
+**스타일 (디자인 토큰 사용):**
+- 컨테이너: `bg-fill-normal` 배경, `rounded-lg`, `p-[3px]`
+- 활성 탭: `bg-white shadow-sm`, `font-semibold`, `text-label-normal`
+- 비활성 탭: `bg-transparent`, `font-medium`, `text-label-alternative`
 - 최소 높이: 44px (UX 가드레일)
 
 ### 2. CandidateTable (`src/features/pledges/components/CandidateTable.tsx`)
@@ -95,7 +105,7 @@ interface CandidateTableProps {
 | 이름 | 100px | font-weight 600 |
 | 정당 | 120px | PARTY_COLOR_MAP 뱃지 재사용 |
 | 지역 | 160px | 위치 아이콘 + 지역명 (선거종류별 상세도 차이) |
-| 주요 경력 | auto | 경력 요약 (1줄) |
+| 주요 경력 | auto | `careers[0]` 표시, 1줄 truncate with ellipsis |
 | 선거 정보 | 180px | "제 N회 {선거종류}" |
 | 액션 | 60px | `...` 더보기 (placeholder) |
 
@@ -123,9 +133,15 @@ const [viewMode, setViewMode] = useState<"card" | "list">("card")
 // 필터링
 const filteredCandidates = MOCK_LOCAL_CANDIDATES.filter(...)
 
+// 결과 헤더 — 페이지 레벨에서 렌더링 (CandidateGrid/CandidateTable 외부)
+// CandidateGrid의 기존 내장 헤더("검색결과 N건")를 대체하므로,
+// CandidateGrid에 hideHeader prop을 추가하거나,
+// 결과 헤더를 CandidateGrid 내장 헤더 위치에 통합한다.
+// → CandidateGrid에 hideHeader?: boolean prop 추가 (기존 페이지는 영향 없음, default false)
+
 // 뷰 전환
 {viewMode === "card"
-  ? <CandidateGrid candidates={filteredCandidates} />
+  ? <CandidateGrid candidates={filteredCandidates} hideHeader />
   : <CandidateTable candidates={filteredCandidates} />}
 ```
 
@@ -134,11 +150,14 @@ const filteredCandidates = MOCK_LOCAL_CANDIDATES.filter(...)
 ### 타입 확장
 
 ```typescript
-interface Candidate {
-  // 기존 필드 유지
-  regionDetail?: string  // 선거구/구·시·군 정보 (optional, 시·도지사는 없음)
-}
+// electionType 유니온 타입 확장
+electionType?: "national" | "proportional" | "governor" | "council" | "mayor"
+
+// regionDetail 필드 추가
+regionDetail?: string  // 선거구/구·시·군 정보 (optional, 시·도지사는 없음)
 ```
+
+두 변경 모두 optional이므로 기존 대통령/국회의원 mock 데이터에 영향 없음.
 
 ### Mock 데이터 파일
 
@@ -149,16 +168,16 @@ interface Candidate {
   - mayor 5명: `regionDetail` = 구·시·군 정보
 
 **`src/features/pledges/data/local-election-data.ts`:**
-- `LOCAL_ELECTION_TERMS`: 회차 목록 (제8회~제6회)
-- `LOCAL_ELECTION_TYPES`: 선거종류 3종 (governor, council, mayor)
-- `SIDO_LIST`: `region-data.ts`에서 재사용
+- `LOCAL_ELECTION_TERMS`: 회차 목록 (제8회~제6회, MVP 범위로 3회차만)
+- `LOCAL_ELECTION_TYPES`: 선거종류 3종 — `ElectionType` 인터페이스를 `region-data.ts`에서 import
+- `SIDO_LIST`: `region-data.ts`에서 재사용 (re-export)
 
 ## 재사용 컴포넌트
 
 | 컴포넌트 | 출처 | 변경 |
 |----------|------|------|
 | CandidateCard | `features/pledges/components/` | 변경 없음 |
-| CandidateGrid | `features/pledges/components/` | 변경 없음 |
+| CandidateGrid | `features/pledges/components/` | `hideHeader?: boolean` prop 추가 |
 | ElectionTermFilter | `features/pledges/components/` | 변경 없음, 데이터만 다름 |
 | ElectionTypeFilter | `features/pledges/components/` | 변경 없음, 데이터만 다름 |
 | RegionSidoFilter | `features/pledges/components/` | 변경 없음 |
@@ -177,7 +196,8 @@ interface Candidate {
   src/features/pledges/data/local-election-data.ts
 
 수정:
-  src/app/router.tsx                          (라우트 추가)
-  src/features/pledges/data/mock-candidates.ts (Candidate 타입에 regionDetail 추가)
+  src/app/router.tsx                          (라우트 추가, /pledges/:type 위에 배치)
+  src/features/pledges/data/mock-candidates.ts (Candidate 타입: electionType 유니온 확장 + regionDetail 추가)
+  src/features/pledges/components/CandidateGrid.tsx (hideHeader prop 추가)
   src/features/pledges/components/index.ts     (CandidateTable export 추가)
 ```
