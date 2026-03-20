@@ -3,16 +3,19 @@ import { CandidateCard } from "@/features/pledges/components/CandidateCard"
 
 interface CandidateGridProps {
 	candidates: Candidate[]
+	hideHeader?: boolean
 }
 
-export function CandidateGrid({ candidates }: CandidateGridProps) {
+export function CandidateGrid({ candidates, hideHeader = false }: CandidateGridProps) {
 	return (
 		<div className="flex flex-col gap-[13px]">
 			{/* 검색결과 헤더 */}
-			<div className="flex items-center gap-1 text-body-3 font-medium text-label-alternative">
-				<span>검색결과</span>
-				<span>{candidates.length}건</span>
-			</div>
+			{!hideHeader && (
+				<div className="flex items-center gap-1 text-body-3 font-medium text-label-alternative">
+					<span>검색결과</span>
+					<span>{candidates.length}건</span>
+				</div>
+			)}
 
 			{/* 카드 그리드 또는 빈 상태 */}
 			{candidates.length > 0 ? (
