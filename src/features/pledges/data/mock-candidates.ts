@@ -13,9 +13,10 @@ export interface Candidate {
 	photoUrl?: string
 	electionTerm: number
 	// 국회의원선거 전용 (optional)
-	electionType?: "national" | "proportional"
+	electionType?: "national" | "proportional" | "governor" | "council" | "mayor"
 	sido?: string
 	sigungu?: string
+	regionDetail?: string
 }
 
 export interface ElectionTerm {
