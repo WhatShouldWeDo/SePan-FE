@@ -27,9 +27,7 @@ features/region/
 │   │   └── index.ts              #   re-export
 │   ├── MetricListRow.tsx         # 지표 행 (라벨, 값, 단위, 델타 뱃지)
 │   ├── AiAnalysisBox.tsx         # AI 기본 분석 결과 박스
-│   ├── MetricActionButtons.tsx   # 분석/비교분석 액션 버튼 (preview/analysis 모드)
-│   ├── MetricComparisonCard.tsx  # 비교 모드 좌우 분할 메트릭 카드
-│   └── ComparisonSummaryBox.tsx  # 비교 해석 텍스트 박스
+│   └── MetricActionButtons.tsx   # 분석 결과 보기 액션 버튼 (preview 모드)
 ├── hooks/
 │   ├── useMapDrillDown.ts        # 4단계 드릴다운 상태 관리
 │   ├── useTopoJsonData.ts        # TopoJSON 동적 import + GeoJSON 변환
@@ -159,20 +157,17 @@ mask-position: 5.5px 5.5px;
 
 ## RegionResultPage 레이아웃
 
-Figma `R.2.0.지역분석-결과` 기반. 4가지 ViewMode로 조건부 렌더링.
+Figma `R.2.0.지역분석-결과` 기반. 3가지 ViewMode로 조건부 렌더링.
 
 ### ViewMode 상태 전환
 
 ```
 default ──(지도 타 지역 클릭)──→ preview
                                   │
-                    ┌─────────────┼─────────────┐
-                    ▼             │             ▼
-               analysis          │          compare
-          ("분석 결과 보기")       │    ("비교분석 하기")
-                    │             │             │
-                    └─("비교분석")─┘    ("초기화")─┘ → preview
-                                                │
+                                  ▼
+                              analysis
+                         ("분석 결과 보기")
+
 지도 새 지역 클릭 → preview (어느 모드에서든)
 지도 내 선거구 클릭 → default (어느 모드에서든)
 ```
@@ -180,40 +175,8 @@ default ──(지도 타 지역 클릭)──→ preview
 | 모드 | 메트릭 카드 | 하단 차트 | 버튼 |
 |------|------------|----------|------|
 | **default** | 내 선거구 데이터 + "내 선거구" 뱃지 | 내 선거구 추이 | 없음 |
-| **preview** | 선택 지역 데이터 | 내 선거구 추이 (유지) | "분석 결과 보기" + "비교분석 하기" |
-| **analysis** | 선택 지역 데이터 | 선택 지역 추이 | "비교분석 하기" |
-| **compare** | 좌우 분할 카드 + 비교 해석 박스 | 뷰탭 + 통합/분리 토글 | "초기화" 우상단 |
-
-### 비교 모드 추이 차트 카드 구조
-
-비교 모드(`compare`)의 하단 추이 차트 카드는 다음 구조로 구성:
-
-```
-CardSection (비교 추이 차트)
-├── CardSectionHeader ("강남구 갑 vs 강남구 병" / "행정안전부 2026년 1월")
-├── AiAnalysisBox (border-primary 1.5px)
-├── ControlSection
-│   ├── ViewTabs: "그래프 보기" | "표 보기" | "트리맵 보기" (rounded-full solid pills)
-│   └── "통합 보기" Switch (ON=통합, OFF=분리)
-├── [통합 보기]
-│   ├── MetricSummaryCard × 2 (중위연령 비교, 2열)
-│   ├── BarChart (Grouped Bar, primary + #2accd8)
-│   ├── InsightCard × 3 + InsightCard × 3 (2열, hover CTA)
-│   └── BottomMetricCell 2×2 그리드
-├── [분리 보기]
-│   ├── 좌측 컬럼 (내 선거구, primary 바)
-│   │   ├── MetricSummaryCard
-│   │   ├── BarChart (단색)
-│   │   ├── InsightCard × 3
-│   │   └── "인사이트" 카드 (bordered, "전체보기 >" 링크 + 2×2 메트릭)
-│   ├── 세로 구분선 (w-px bg-line-neutral, my-4)
-│   └── 우측 컬럼 (비교 선거구, #2accd8 바)
-│       ├── MetricSummaryCard
-│       ├── BarChart (단색)
-│       ├── InsightCard × 3
-│       └── 2×2 메트릭 (카드 없이)
-└── BottomCaption ("인구수[단위:천], 인구비율[단위:%]")
-```
+| **preview** | 선택 지역 데이터 | 내 선거구 추이 (유지) | "분석 결과 보기" |
+| **analysis** | 선택 지역 데이터 | 선택 지역 추이 | 없음 |
 
 ### 뷰 탭 (ViewTab)
 
@@ -225,32 +188,6 @@ CardSection (비교 추이 차트)
 | `"table"` | `DataTable` (`components/tables`) — `ChartData`/`ChartConfig` 타입 재사용 |
 | `"treemap"` | placeholder (Coming Soon) |
 
-### 통합 보기 토글
-
-- 라벨: "통합 보기" (18px semibold, label-alternative)
-- Switch: `checked={!compareChartSplit}`, `onCheckedChange={(val) => setCompareChartSplit(!val)}`
-- ON (기본) = 통합 (Grouped Bar), OFF = 분리 (좌우 독립 컬럼)
-
-### InsightCard (인라인 서브컴포넌트)
-
-```typescript
-interface InsightCardData {
-  label: string;    // "라벨 내용이 들어갑니다"
-  value: string;    // "인사이트 값 내용이 들어갑니다"
-  trailing: string; // "29%"
-}
-```
-
-- 아이콘: `WantedFillMessage` (32×32, white) in 48×48 colored circle (`bg-party-dpk` / `bg-party-ppp`)
-- 배경: `bg-fill-alt`, `rounded-2xl`, `p-6`
-- **Hover CTA**: `group-hover:block` — 호버 시 "이 정책 채택하기" 버튼 출현 (`bg-primary`, `rounded-[10px]`, white text)
-
-### BottomMetricCell (인라인 서브컴포넌트)
-
-하단 메트릭 요약. 두 가지 trailing 타입:
-- `type: "badge"` — "+10.1%" 뱃지 (`bg-party-dpk/8 text-party-dpk`)
-- `type: "delta"` — "전년대비 ▲ 8.4%" (`ChevronUp` 아이콘 + party 색상)
-
 ### 차트 설정
 
 | 속성 | 값 | 설명 |
@@ -259,8 +196,6 @@ interface InsightCardData {
 | `barGap` | `4` | 같은 카테고리 내 바 간격 4px |
 | `barRadius` | `6` | 바 상단 모서리 둥글기 6px |
 | `height` | `560` | 차트 높이 560px |
-| `darkTooltip` | `true` | 다크 배경 (#374151) 툴팁 |
-| 비교 선거구 색상 | `#2accd8` | 틸/시안 |
 
 ### 상태 관리 (useState)
 
@@ -269,9 +204,8 @@ interface InsightCardData {
 | `selectedCategoryId` | `string` | `"voter"` | 카테고리 선택 |
 | `selectedSubcategoryId` | `string \| null` | `"population"` | 서브카테고리 선택 |
 | `activeViewTab` | `ViewTab` | `"graph"` | 뷰 탭 (graph/table/treemap, 모든 모드 공통) |
-| `viewMode` | `ViewMode` | `"default"` | 4가지 뷰 모드 |
+| `viewMode` | `ViewMode` | `"default"` | 3가지 뷰 모드 |
 | `selectedRegion` | `{ code, name, fullName } \| null` | `null` | 지도에서 선택한 지역 |
-| `compareChartSplit` | `boolean` | `false` | 비교 차트 분리 보기 토글 |
 
 ### 지도 초기 드릴다운
 
@@ -284,9 +218,6 @@ interface InsightCardData {
 - `MY_REGION_METRICS` / `SELECTED_REGION_METRICS` — 각 지역 메트릭
 - `MY_REGION_MONTHLY` / `SELECTED_REGION_MONTHLY` — 월별 추이 데이터
 - `MY_REGION_NAV` — 내 선거구 지도 초기 네비게이션
-- `COMPARE_METRIC_SUMMARIES` — 비교 메트릭 요약 (중위연령 카드)
-- `MY_REGION_INSIGHTS` / `SELECTED_REGION_INSIGHTS` — 인사이트 카드 데이터
-- `COMPARE_BOTTOM_METRICS` — 하단 메트릭 요약 행
 
 ---
 
@@ -298,18 +229,11 @@ RegionResultPage
 ├── CardSectionHeader (components/ui)
 ├── DataTable (components/tables) — 표 보기 탭
 ├── Badge (components/ui)
-├── Switch (components/ui) — 통합 보기 토글
-├── BarChart (components/charts) — darkTooltip, barSize/barGap/barRadius
+├── BarChart (components/charts) — barSize/barGap/barRadius
 ├── KoreaAdminMap (region/components/map) — hover stroke 3px, auto-fit zoom
 ├── MetricListRow (region/components)
-├── AiAnalysisBox (region/components) — 비교 카드 내부에서 border 추가
+├── AiAnalysisBox (region/components)
 ├── MetricActionButtons (region/components)
-├── MetricComparisonCard (region/components)
-├── WantedFillMessage (components/icons) — InsightCard 아이콘
-├── ChevronUp, ChevronRight (lucide-react)
-├── InsightCard (인라인) — hover CTA "이 정책 채택하기"
-├── MetricSummaryCard (인라인) — 중위연령 비교 카드
-├── BottomMetricCell (인라인) — 하단 메트릭 요약
 ├── CATEGORIES, SUBCATEGORIES (region/data/categories)
 └── mock-comparison.ts (region/data)
 ```
