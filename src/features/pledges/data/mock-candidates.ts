@@ -12,6 +12,8 @@ export interface Candidate {
 	careers: string[]
 	photoUrl?: string
 	electionTerm: number
+	job?: string
+	education?: string
 	// 국회의원선거 전용 (optional)
 	electionType?: "national" | "proportional" | "governor" | "council" | "mayor"
 	sido?: string
@@ -52,6 +54,8 @@ export const MOCK_CANDIDATES: Candidate[] = [
 		partyName: "더불어민주당",
 		region: "서울특별시",
 		electionInfo: "제 20대 대통령선거",
+		job: "정당인",
+		education: "서울대학교 법학과 졸업",
 		careers: [
 			"서울대학교 법학과 졸업",
 			"(전)국무총리",
@@ -66,6 +70,8 @@ export const MOCK_CANDIDATES: Candidate[] = [
 		partyName: "국민의힘",
 		region: "부산광역시",
 		electionInfo: "제 20대 대통령선거",
+		job: "정당인",
+		education: "고려대학교 정치외교학과 졸업",
 		careers: [
 			"고려대학교 정치외교학과 졸업",
 			"(전)부산광역시장",
@@ -80,6 +86,8 @@ export const MOCK_CANDIDATES: Candidate[] = [
 		partyName: "정의당",
 		region: "경기도",
 		electionInfo: "제 20대 대통령선거",
+		job: "정당인",
+		education: "이화여자대학교 사회학과 졸업",
 		careers: [
 			"이화여자대학교 사회학과 졸업",
 			"(전)정의당 대표",
@@ -93,6 +101,8 @@ export const MOCK_CANDIDATES: Candidate[] = [
 		partyName: "개혁신당",
 		region: "대전광역시",
 		electionInfo: "제 20대 대통령선거",
+		job: "정당인",
+		education: "KAIST 경영대학원 졸업",
 		careers: [
 			"KAIST 경영대학원 졸업",
 			"(전)중소벤처기업부 장관",
@@ -107,6 +117,8 @@ export const MOCK_CANDIDATES: Candidate[] = [
 		partyName: "더불어민주당",
 		region: "광주광역시",
 		electionInfo: "제 19대 대통령선거",
+		job: "정당인",
+		education: "연세대학교 행정학과 졸업",
 		careers: [
 			"연세대학교 행정학과 졸업",
 			"(전)광주광역시장",
@@ -121,6 +133,8 @@ export const MOCK_CANDIDATES: Candidate[] = [
 		partyName: "국민의힘",
 		region: "대구광역시",
 		electionInfo: "제 19대 대통령선거",
+		job: "정당인",
+		education: "서울대학교 경제학과 졸업",
 		careers: [
 			"서울대학교 경제학과 졸업",
 			"(전)기획재정부 장관",
@@ -134,6 +148,8 @@ export const MOCK_CANDIDATES: Candidate[] = [
 		partyName: "무소속",
 		region: "제주특별자치도",
 		electionInfo: "제 19대 대통령선거",
+		job: "정당인",
+		education: "한국외국어대학교 법학과 졸업",
 		careers: [
 			"한국외국어대학교 법학과 졸업",
 			"(전)헌법재판관",
@@ -148,6 +164,8 @@ export const MOCK_CANDIDATES: Candidate[] = [
 		partyName: "더불어민주당",
 		region: "인천광역시",
 		electionInfo: "제 18대 대통령선거",
+		job: "정당인",
+		education: "성균관대학교 정치학과 졸업",
 		careers: [
 			"성균관대학교 정치학과 졸업",
 			"(전)인천광역시장",
@@ -161,6 +179,8 @@ export const MOCK_CANDIDATES: Candidate[] = [
 		partyName: "국민의힘",
 		region: "울산광역시",
 		electionInfo: "제 18대 대통령선거",
+		job: "정당인",
+		education: "서울대학교 공과대학 졸업",
 		careers: [
 			"서울대학교 공과대학 졸업",
 			"(전)산업통상자원부 장관",
@@ -175,6 +195,8 @@ export const MOCK_CANDIDATES: Candidate[] = [
 		partyName: "정의당",
 		region: "세종특별자치시",
 		electionInfo: "제 18대 대통령선거",
+		job: "정당인",
+		education: "중앙대학교 사회복지학과 졸업",
 		careers: [
 			"중앙대학교 사회복지학과 졸업",
 			"(전)정의당 원내대표",
