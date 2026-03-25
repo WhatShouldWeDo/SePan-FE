@@ -21,8 +21,19 @@
 | `/pledges/:electionType/:candidateId` | `CandidateDetailPage` | `electionType`: presidential / parliamentary / local |
 
 - 기존 `/pledges/presidential`, `/pledges/parliamentary`, `/pledges/local` 패턴과 일관
+- **라우트 순서**: `router.tsx`에서 반드시 `/pledges/:type` catch-all 라우트 **위에** 삽입해야 함
 - 브레드크럼: `역대공약분석 > {선거유형} > {후보자명}`
 - 뒤로가기: `< 공약목록` → `navigate(-1)`
+
+### 선거 유형 라벨 매핑
+
+```typescript
+const ELECTION_TYPE_LABEL_MAP: Record<string, string> = {
+  presidential: '대통령선거',
+  parliamentary: '국회의원선거',
+  local: '지방선거',
+}
+```
 
 ---
 
@@ -77,10 +88,12 @@ interface PledgeKeywordStat {
 }
 ```
 
-### 3-2. 기존 타입 재사용
+### 3-2. 기존 타입과의 관계
 
 - `Candidate`, `Party`, `PARTY_COLOR_MAP` — `mock-candidates.ts`에서 import
 - `ElectionTerm` — 필터용
+- **`careers` vs `careerHistory` 구분**: 기존 `Candidate.careers: string[]`은 ProfileHeader의 경력 요약 3줄 표시용. `CandidateDetail.careerHistory: HistoryItem[]`은 ProfileSection의 기간별 구조화 경력 목록용. 동일 데이터의 다른 뷰.
+- **`education` vs `educationHistory`**: 동일 패턴. `education`은 카드용 한 줄 요약, `educationHistory`는 상세 타임라인.
 
 ---
 
@@ -161,16 +174,16 @@ CandidateDetailPage
 
 ### 5-2. SectionAnchorNav
 
-- `sticky top-0 z-10 bg-background-normal`
+- `sticky top-0 z-10 bg-background` (CSS 변수 `--background`가 Background/Normal에 해당)
 - 3개 버튼: 프로필 | 공약 | 관련뉴스
 - 활성 탭: `text-label-normal font-bold` + 하단 2px border
 - 비활성 탭: `text-label-assistive font-bold`
 - 클릭: `scrollIntoView({ behavior: 'smooth' })`
-- `IntersectionObserver`로 현재 보이는 섹션 → 활성 탭 자동 업데이트
+- `IntersectionObserver` (rootMargin: `'-50% 0px'`)로 뷰포트 중앙 기준 활성 섹션 감지 → 탭 자동 업데이트
 
 ### 5-3. ProfileSection
 
-CardSection 래퍼 (`rounded-[20px] bg-white p-8 shadow-deepshadow`) 안에 3개 서브섹션 `gap-8`:
+CardSection 래퍼 (`rounded-[20px] bg-white p-8 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.06)]`) 안에 3개 서브섹션 `gap-8`:
 
 **기본정보**:
 - 서브 헤더: "기본정보" (Title 4/Bold, 16px)
@@ -190,24 +203,25 @@ CardSection 래퍼 (`rounded-[20px] bg-white p-8 shadow-deepshadow`) 안에 3개
 
 CardSection 래퍼 안에:
 
-**Chip 필터**: 기존 `Chip` 컴포넌트 (`size="small"`, `state="active"`, `variant="outlined"`)
+**Chip 필터**: 기존 `Chip` 컴포넌트를 드롭다운 트리거로 사용 (`size="medium"`, `variant="outlined"`). 기존 `ElectionTermFilter` 컴포넌트 패턴을 참고하여 선거 회차 선택 드롭다운 구현. 선택된 상태에서 `state="active"`, 미선택 시 `state="default"`.
 
 **PledgeDonutChart**:
 - Recharts `PieChart` + `Pie` (innerRadius=55, outerRadius=120, 240×240px)
-- 중앙: 카테고리 아이콘(32px) + 키워드 텍스트(Heading 3) + 퍼센트(Label 4)
-- 하단 범례: 색상 dot(10px) + 카테고리명(Caption, 12px)
-- hover 시 Tooltip 표시 (피그마 Tooltip 컴포넌트)
+- 중앙 라벨: `absolute`로 차트 위에 오버레이 (`inset-0 flex items-center justify-center`). 아이콘(32px) + 키워드(Heading 3) + 퍼센트(Label 4)
+- 하단 범례: 색상 dot(10px) + 카테고리명(Caption, 12px). 커스텀 렌더링 (Recharts Legend 사용하지 않음)
+- hover: Recharts `<Tooltip>` 컴포넌트 사용 (Radix Tooltip 아님). 커스텀 content로 피그마 스타일 적용
+- `dataKey="percentage"`, `nameKey="keyword"`, animationDuration=300
 
 **PledgeRow**:
 - 행 구조: 제목(16px Semibold) + 카테고리 배지(색상별) + 설명 1줄(14px Medium, `text-label-alternative`) + chevron
-- 아코디언: 다중 열림 가능, `useState<Set<string>>` 관리
+- 아코디언: 다중 열림 가능, `useState<Set<string>>` 관리. 토글 시 항상 새 Set 생성: `new Set(prev).add(id)` / `new Set([...prev].filter(x => x !== id))`
 - 펼침 영역: placeholder ("상세 공약 내용은 추후 디자인이 제공됩니다")
 
 ### 5-5. NewsSection
 
 CardSection 래퍼 안에:
 
-- `CardSectionHeader` title="관련 뉴스 이슈", `trailingContent`에 CircleInfo 아이콘(24px)
+- `CardSectionHeader` title="관련 뉴스 이슈", `trailingContent`에 `CircleInfoFill` 아이콘(24px, 기존 `components/icons/CircleInfoFill.tsx`)
 
 **NewsRow**:
 - 썸네일: 80×60px, `rounded-[10px]`, `object-cover`, 테두리(`border border-line-neutral`)
@@ -215,6 +229,22 @@ CardSection 래퍼 안에:
 - 메타: Caption 2/Medium(12px), `text-label-neutral`, "1시간 전 · 조선일보"
 
 **더보기**: 초기 4개 표시, "더보기" 클릭 시 추가 4개씩 표시 (mock에서는 전체 데이터 슬라이스)
+
+### 5-6. CardSection 래퍼
+
+각 섹션(프로필/공약/뉴스)을 감싸는 카드 컨테이너. 대시보드 `CardSection`과 유사하지만 shadow 값이 다르므로, 인라인 Tailwind 클래스로 직접 적용:
+
+```
+rounded-[20px] bg-white p-8 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.06)]
+```
+
+별도 컴포넌트로 추출하지 않고, 각 섹션 컴포넌트의 최외곽 div에 적용.
+
+### 5-7. 에러/빈 상태
+
+- **잘못된 candidateId**: mock 데이터에서 찾지 못하면 `<Navigate to="/pledges" replace />` 로 리다이렉트
+- **빈 공약/뉴스**: 해당 섹션에 "등록된 데이터가 없습니다" 텍스트 표시 (14px Medium, `text-label-alternative`, 중앙 정렬)
+- **로딩 상태**: mock 단계에서는 불필요. API 전환 시 스켈레톤 추가 예정
 
 ---
 
@@ -258,9 +288,17 @@ src/features/pledges/components/NewsRow.tsx
 src/features/pledges/data/mock-candidate-detail.ts
 ```
 
-### 수정 파일 (2개)
+### 수정 파일 (4개)
 
 ```
-src/app/router.tsx              — 라우트 추가
-docs/MODULE_MAP.md              — 모듈 맵 업데이트
+src/app/router.tsx                                    — 라우트 추가 (/:type catch-all 위에 삽입)
+src/features/pledges/components/CandidateCard.tsx      — Link 래핑 추가 (상세 페이지 네비게이션)
+src/features/pledges/components/CandidateTable.tsx     — 행 클릭 네비게이션 추가
+docs/MODULE_MAP.md                                    — 모듈 맵 업데이트
 ```
+
+### CandidateCard/CandidateTable 네비게이션
+
+기존 `CandidateCard`와 `CandidateTable`에 클릭 시 상세 페이지 이동 기능 추가:
+- `CandidateCard`: react-router-dom `<Link to={/pledges/${electionCategory}/${candidate.id}}>` 로 래핑. `electionCategory`(presidential/parliamentary/local)는 새로운 prop으로 전달. **주의**: 기존 `Candidate.electionType`(national/proportional 등)과 혼동하지 않도록 prop 이름을 `electionCategory`로 구분.
+- `CandidateTable`: 행 클릭 시 `useNavigate`로 동일 URL 이동.
