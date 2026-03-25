@@ -30,12 +30,15 @@ export function PledgesSection({ candidate }: PledgesSectionProps) {
 		<div className="flex flex-col gap-8 rounded-[20px] bg-white p-8 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.06)]">
 			<CardSectionHeader title="공약" />
 
-			<Chip
-				label={candidate.electionInfo}
-				size="medium"
-				state="active"
-				variant="outlined"
-			/>
+			{/* 선거 종류 필터 칩 */}
+			<div className="flex">
+				<Chip
+					label={candidate.electionInfo}
+					size="small"
+					state="default"
+					variant="solid"
+				/>
+			</div>
 
 			{stats.length > 0 && <PledgeDonutChart stats={stats} />}
 
