@@ -4,9 +4,10 @@ import { CandidateCard } from "@/features/pledges/components/CandidateCard"
 interface CandidateGridProps {
 	candidates: Candidate[]
 	hideHeader?: boolean
+	electionCategory?: string
 }
 
-export function CandidateGrid({ candidates, hideHeader = false }: CandidateGridProps) {
+export function CandidateGrid({ candidates, hideHeader = false, electionCategory }: CandidateGridProps) {
 	return (
 		<div className="flex flex-col gap-[13px]">
 			{/* 검색결과 헤더 */}
@@ -24,6 +25,7 @@ export function CandidateGrid({ candidates, hideHeader = false }: CandidateGridP
 						<CandidateCard
 							key={candidate.id}
 							candidate={candidate}
+							electionCategory={electionCategory}
 						/>
 					))}
 				</div>

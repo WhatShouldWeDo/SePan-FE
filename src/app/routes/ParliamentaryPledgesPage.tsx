@@ -123,7 +123,7 @@ export function ParliamentaryPledgesPage() {
 				</TabsList>
 
 				<TabsContent value="candidates" className="pt-4">
-					<CandidateGrid candidates={filteredCandidates} />
+					<CandidateGrid candidates={filteredCandidates} electionCategory="parliamentary" />
 				</TabsContent>
 
 				<TabsContent value="statistics" className="pt-4">
