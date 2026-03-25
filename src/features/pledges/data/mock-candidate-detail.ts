@@ -17,6 +17,8 @@ export interface CandidatePledge {
 	title: string
 	description: string
 	category: string
+	/** CATEGORIES의 id와 매핑 (아이콘 표시용) */
+	categoryId?: string
 	categoryVariant: "red" | "orange" | "blue" | "green" | "purple"
 }
 
@@ -131,7 +133,8 @@ export const MOCK_CANDIDATE_DETAILS: CandidateDetail[] = [
 				title: "청년 주거 안정 프로젝트",
 				description:
 					"공공임대주택 50만 호 공급 및 청년 월세 지원 확대를 통한 주거 안정 실현",
-				category: "부동산",
+				category: "주거·부동산",
+				categoryId: "housing",
 				categoryVariant: "blue",
 			},
 			{
@@ -140,6 +143,7 @@ export const MOCK_CANDIDATE_DETAILS: CandidateDetail[] = [
 				description:
 					"중소기업 디지털 전환 바우처 지급 및 AI 도입 컨설팅 지원 프로그램 운영",
 				category: "경제",
+				categoryId: "economy",
 				categoryVariant: "purple",
 			},
 			{
@@ -147,7 +151,8 @@ export const MOCK_CANDIDATE_DETAILS: CandidateDetail[] = [
 				title: "기초연금 40만원 인상",
 				description:
 					"기초연금을 현행 대비 인상하여 노인 빈곤율 해소 및 노후 소득 보장 강화",
-				category: "복지",
+				category: "복지·분배",
+				categoryId: "welfare",
 				categoryVariant: "red",
 			},
 			{
@@ -156,6 +161,7 @@ export const MOCK_CANDIDATE_DETAILS: CandidateDetail[] = [
 				description:
 					"방과후 프로그램 확대 및 AI 기반 맞춤형 학습 시스템 도입으로 사교육 의존도 축소",
 				category: "교육",
+				categoryId: "education",
 				categoryVariant: "green",
 			},
 			{
@@ -163,7 +169,8 @@ export const MOCK_CANDIDATE_DETAILS: CandidateDetail[] = [
 				title: "탄소중립 2040 로드맵",
 				description:
 					"재생에너지 비중 60% 달성 및 탄소세 도입을 통한 2040년 탄소중립 실현",
-				category: "환경",
+				category: "교통",
+				categoryId: "transport",
 				categoryVariant: "orange",
 			},
 		],

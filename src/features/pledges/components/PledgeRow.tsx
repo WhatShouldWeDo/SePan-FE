@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react"
 import type { CandidatePledge } from "../data/mock-candidate-detail"
+import { CATEGORIES } from "@/features/region/data/categories"
 
 const CATEGORY_VARIANT_STYLES: Record<
 	CandidatePledge["categoryVariant"],
@@ -19,6 +20,10 @@ interface PledgeRowProps {
 }
 
 export function PledgeRow({ pledge, isOpen, onToggle }: PledgeRowProps) {
+	const categoryData = pledge.categoryId
+		? CATEGORIES.find((c) => c.id === pledge.categoryId)
+		: undefined
+
 	return (
 		<div className="border-b border-line-neutral">
 			<button
@@ -32,8 +37,24 @@ export function PledgeRow({ pledge, isOpen, onToggle }: PledgeRowProps) {
 							{pledge.title}
 						</span>
 						<span
-							className={`rounded-[6px] px-1.5 py-0.5 text-caption-1 font-semibold ${CATEGORY_VARIANT_STYLES[pledge.categoryVariant]}`}
+							className={`inline-flex items-center gap-1 rounded-[6px] px-1.5 py-0.5 text-caption-1 font-semibold ${CATEGORY_VARIANT_STYLES[pledge.categoryVariant]}`}
 						>
+							{categoryData?.iconAsset && (
+								<span
+									className="inline-block size-3 shrink-0"
+									style={{
+										backgroundColor: "currentColor",
+										maskImage: `url('${categoryData.iconAsset}')`,
+										maskSize: "contain",
+										maskRepeat: "no-repeat",
+										maskPosition: "center",
+										WebkitMaskImage: `url('${categoryData.iconAsset}')`,
+										WebkitMaskSize: "contain",
+										WebkitMaskRepeat: "no-repeat",
+										WebkitMaskPosition: "center",
+									}}
+								/>
+							)}
 							{pledge.category}
 						</span>
 					</div>
