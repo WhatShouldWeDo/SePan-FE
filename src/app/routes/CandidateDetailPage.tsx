@@ -50,7 +50,7 @@ export function CandidateDetailPage() {
 	]
 
 	return (
-		<div className="min-w-[1040px]">
+		<div className="-m-4 min-w-[1040px] md:-m-6">
 			{/* 상단 영역: 흰색 배경 (뒤로가기 + 프로필 헤더 + 앵커 탭) */}
 			<div className="bg-white">
 				<div className="space-y-4 px-20 py-4">
