@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom"
 import { useBreadcrumb } from "@/contexts/useNavigation"
+import agingIcon from "@/assets/category-icons/aging.png"
+import locationFillIcon from "@/assets/pledges/location-fill.svg"
 
 /* ─── Types ─── */
 
