@@ -51,7 +51,7 @@ export function SectionAnchorNav({ sections }: SectionAnchorNavProps) {
 
   return (
     <nav className="sticky top-0 z-10 bg-white">
-      <div className="flex">
+      <div className="flex gap-6">
         {sections.map((section) => {
           const isActive = activeId === section.id
 
@@ -61,7 +61,7 @@ export function SectionAnchorNav({ sections }: SectionAnchorNavProps) {
               type="button"
               onClick={() => handleClick(section)}
               className={cn(
-                "relative flex h-11 flex-1 items-center justify-center text-title-4 font-bold transition-colors",
+                "relative flex h-11 items-center justify-center text-title-4 font-bold transition-colors",
                 isActive
                   ? "text-label-normal"
                   : "text-label-assistive hover:text-label-neutral",

@@ -181,6 +181,7 @@ export function Sidebar({
       <aside
         className={cn(
           "hidden overflow-hidden bg-primary-heavy transition-[width] duration-300 ease-in-out md:block",
+          "sticky top-0 h-screen",
           isCollapsed ? "w-20" : "w-[280px]",
         )}
       >

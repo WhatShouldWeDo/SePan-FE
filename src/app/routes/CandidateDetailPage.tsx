@@ -73,15 +73,15 @@ export function CandidateDetailPage() {
 			{/* 하단 영역: cool-neutral-5 배경 (섹션 콘텐츠) */}
 			<div className="bg-cool-neutral-5">
 				<div className="space-y-4 px-20 py-4">
-					<div id="profile" ref={profileRef}>
+					<div id="profile" ref={profileRef} className="scroll-mt-[96px]">
 						<ProfileSection candidate={candidate} />
 					</div>
 
-					<div id="pledges" ref={pledgesRef}>
+					<div id="pledges" ref={pledgesRef} className="scroll-mt-[96px]">
 						<PledgesSection candidate={candidate} />
 					</div>
 
-					<div id="news" ref={newsRef}>
+					<div id="news" ref={newsRef} className="scroll-mt-[96px]">
 						<NewsSection news={candidate.news ?? []} />
 					</div>
 				</div>
