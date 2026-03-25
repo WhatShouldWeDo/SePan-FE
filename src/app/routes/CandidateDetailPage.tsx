@@ -50,29 +50,41 @@ export function CandidateDetailPage() {
 	]
 
 	return (
-		<div className="min-w-[1040px] space-y-4 px-20 py-4">
-			<button
-				type="button"
-				onClick={() => navigate(-1)}
-				className="inline-flex items-center gap-1 text-title-4 font-bold text-label-alternative"
-			>
-				<ChevronLeft className="size-5" />
-				공약목록
-			</button>
+		<div className="min-w-[1040px]">
+			{/* 상단 영역: 흰색 배경 (뒤로가기 + 프로필 헤더 + 앵커 탭) */}
+			<div className="bg-white">
+				<div className="space-y-4 px-20 py-4">
+					<button
+						type="button"
+						onClick={() => navigate(-1)}
+						className="inline-flex items-center gap-1 text-title-4 font-bold text-label-alternative"
+					>
+						<ChevronLeft className="size-5" />
+						공약목록
+					</button>
 
-			<CandidateProfileHeader candidate={candidate} />
-			<SectionAnchorNav sections={sections} />
-
-			<div id="profile" ref={profileRef}>
-				<ProfileSection candidate={candidate} />
+					<CandidateProfileHeader candidate={candidate} />
+				</div>
+				<div className="px-20">
+					<SectionAnchorNav sections={sections} />
+				</div>
 			</div>
 
-			<div id="pledges" ref={pledgesRef}>
-				<PledgesSection candidate={candidate} />
-			</div>
+			{/* 하단 영역: cool-neutral-5 배경 (섹션 콘텐츠) */}
+			<div className="bg-cool-neutral-5">
+				<div className="space-y-4 px-20 py-4">
+					<div id="profile" ref={profileRef}>
+						<ProfileSection candidate={candidate} />
+					</div>
 
-			<div id="news" ref={newsRef}>
-				<NewsSection news={candidate.news ?? []} />
+					<div id="pledges" ref={pledgesRef}>
+						<PledgesSection candidate={candidate} />
+					</div>
+
+					<div id="news" ref={newsRef}>
+						<NewsSection news={candidate.news ?? []} />
+					</div>
+				</div>
 			</div>
 		</div>
 	)

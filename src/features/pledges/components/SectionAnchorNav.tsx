@@ -50,7 +50,7 @@ export function SectionAnchorNav({ sections }: SectionAnchorNavProps) {
   }
 
   return (
-    <nav className="sticky top-0 z-10 bg-background">
+    <nav className="sticky top-0 z-10 bg-white">
       <div className="flex">
         {sections.map((section) => {
           const isActive = activeId === section.id
