@@ -15,7 +15,10 @@ interface SectionAnchorNavProps {
 export function SectionAnchorNav({ sections }: SectionAnchorNavProps) {
   const [activeId, setActiveId] = useState<string>(sections[0]?.id ?? "")
   const sectionsRef = useRef(sections)
-  sectionsRef.current = sections
+
+  useEffect(() => {
+    sectionsRef.current = sections
+  })
 
   useEffect(() => {
     const elements = sectionsRef.current

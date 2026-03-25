@@ -87,8 +87,8 @@
 
 ### Pledges (역대공약분석)
 
-- **경로**: `src/features/pledges/`, `src/app/routes/PledgesOverviewPage.tsx`, `PresidentialPledgesPage.tsx`, `ParliamentaryPledgesPage.tsx`, `LocalElectionPledgesPage.tsx`, `PledgesPlaceholderPage.tsx`
-- **역할**: 역대공약분석 개요 + 대통령선거/국회의원선거/지방선거 후보자 목록 페이지
+- **경로**: `src/features/pledges/`, `src/app/routes/PledgesOverviewPage.tsx`, `PresidentialPledgesPage.tsx`, `ParliamentaryPledgesPage.tsx`, `LocalElectionPledgesPage.tsx`, `CandidateDetailPage.tsx`, `PledgesPlaceholderPage.tsx`
+- **역할**: 역대공약분석 개요 + 대통령선거/국회의원선거/지방선거 후보자 목록 + 후보자 상세 페이지
 - **핵심 파일**:
   - `PledgesOverviewPage.tsx` — 개요 랜딩 페이지 (선거 유형 카드 3개 + 빠른시작 카드 3개)
   - `PresidentialPledgesPage.tsx` — 대통령선거 후보자 목록 (2열 그리드, 선거회차 필터, 탭)
@@ -103,14 +103,23 @@
   - `features/pledges/components/RegionSidoFilter.tsx` — 시/도 버튼 그리드 팝오버 필터
   - `features/pledges/components/RegionSigunguFilter.tsx` — 시/군/구 버튼 그리드 팝오버 필터 (멀티셀렉트 최대 3개)
   - `features/pledges/components/KeywordChips.tsx` — 상위 키워드 칩 (정보 표시용)
+  - `features/pledges/components/CandidateProfileHeader.tsx` — 후보자 상세 프로필 헤더 (사진+이름+정당+SNS+배지+경력요약)
+  - `features/pledges/components/SectionAnchorNav.tsx` — sticky 앵커 탭 네비게이션 (IntersectionObserver 기반)
+  - `features/pledges/components/ProfileSection.tsx` — 프로필 카드 섹션 (기본정보/학력/경력+더보기)
+  - `features/pledges/components/PledgesSection.tsx` — 공약 카드 섹션 (Chip 필터+도넛차트+아코디언 리스트)
+  - `features/pledges/components/PledgeDonutChart.tsx` — Recharts 도넛 차트 (키워드 분포)
+  - `features/pledges/components/PledgeRow.tsx` — 공약 행 (아코디언 토글, 다중 열림)
+  - `features/pledges/components/NewsSection.tsx` — 관련 뉴스 카드 섹션 (리스트+더보기)
+  - `features/pledges/components/NewsRow.tsx` — 뉴스 행 (썸네일+제목+메타)
   - `features/pledges/data/mock-candidates.ts` — Mock 후보자 데이터 + 타입 + 정당 색상 매핑
+  - `features/pledges/data/mock-candidate-detail.ts` — 후보자 상세 Mock 데이터 + CandidateDetail 타입 + 선거유형 라벨 매핑
   - `features/pledges/data/mock-parliamentary.ts` — 국회의원선거 Mock 후보자 데이터 (12명)
   - `features/pledges/data/mock-local.ts` — 지방선거 Mock 후보자 데이터 (15명)
   - `features/pledges/data/region-data.ts` — 시/도 목록, 시/군/구 매핑, 키워드 매핑, 선거종류/회차 상수
   - `features/pledges/data/local-election-data.ts` — 지방선거 필터 옵션 데이터
 - **에셋**: `src/assets/pledges/location-fill.svg`, `src/assets/category-icons/aging.png` (재사용)
 - **의존하는 모듈**: `contexts/useNavigation`, `components/ui` (Chip, Tabs, SegmentedControl), react-router-dom
-- **상태**: 대통령선거 + 국회의원선거 + 지방선거 후보자 목록 페이지 완료 (mock 데이터), 통계분석 탭 placeholder
+- **상태**: 대통령선거 + 국회의원선거 + 지방선거 후보자 목록 + 후보자 상세 페이지 완료 (mock 데이터), 통계분석 탭 placeholder
 
 ### Policy
 
@@ -298,6 +307,7 @@
 | `/pledges/presidential` | PresidentialPledgesPage | 필요 |
 | `/pledges/parliamentary` | ParliamentaryPledgesPage | 필요 |
 | `/pledges/local` | LocalElectionPledgesPage | 필요 |
+| `/pledges/:electionType/:candidateId` | CandidateDetailPage | 필요 |
 | `/pledges/:type` | PledgesPlaceholderPage | 필요 |
 | `/test` | TestPage | 필요 |
 
