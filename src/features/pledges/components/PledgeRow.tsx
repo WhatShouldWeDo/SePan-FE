@@ -41,19 +41,24 @@ export function PledgeRow({ pledge, isOpen, onToggle }: PledgeRowProps) {
 						>
 							{categoryData?.iconAsset && (
 								<span
-									className="inline-block size-3 shrink-0"
-									style={{
-										backgroundColor: "currentColor",
-										maskImage: `url('${categoryData.iconAsset}')`,
-										maskSize: "contain",
-										maskRepeat: "no-repeat",
-										maskPosition: "center",
-										WebkitMaskImage: `url('${categoryData.iconAsset}')`,
-										WebkitMaskSize: "contain",
-										WebkitMaskRepeat: "no-repeat",
-										WebkitMaskPosition: "center",
-									}}
-								/>
+									className="relative inline-block size-3.5 shrink-0 overflow-hidden rounded-[3px]"
+								>
+									<span
+										className="absolute inset-0"
+										style={{
+											backgroundColor: categoryData.iconColor,
+											maskImage: `url('${categoryData.iconAsset}')`,
+											maskMode: "luminance",
+											maskSize: "11px 11px",
+											maskPosition: "1.5px 1.5px",
+											maskRepeat: "no-repeat",
+											WebkitMaskImage: `url('${categoryData.iconAsset}')`,
+											WebkitMaskSize: "11px 11px",
+											WebkitMaskPosition: "1.5px 1.5px",
+											WebkitMaskRepeat: "no-repeat",
+										}}
+									/>
+								</span>
 							)}
 							{pledge.category}
 						</span>
