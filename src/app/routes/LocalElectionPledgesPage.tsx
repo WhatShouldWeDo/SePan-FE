@@ -167,9 +167,10 @@ export function LocalElectionPledgesPage() {
 						<CandidateGrid
 							candidates={filteredCandidates}
 							hideHeader
+							electionCategory="local"
 						/>
 					) : (
-						<CandidateTable candidates={filteredCandidates} />
+						<CandidateTable candidates={filteredCandidates} electionCategory="local" />
 					)}
 				</TabsContent>
 

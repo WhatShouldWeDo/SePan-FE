@@ -1,15 +1,17 @@
+import { Link } from "react-router-dom"
 import locationFillIcon from "@/assets/pledges/location-fill.svg"
 import type { Candidate } from "@/features/pledges/data/mock-candidates"
 import { PARTY_COLOR_MAP } from "@/features/pledges/data/mock-candidates"
 
 interface CandidateCardProps {
 	candidate: Candidate
+	electionCategory?: string
 }
 
-export function CandidateCard({ candidate }: CandidateCardProps) {
+export function CandidateCard({ candidate, electionCategory }: CandidateCardProps) {
 	const partyColor = PARTY_COLOR_MAP[candidate.party]
 
-	return (
+	const card = (
 		<div className="flex items-center gap-4 rounded-3xl bg-white p-6 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.06)]">
 			{/* 프로필 사진 */}
 			{candidate.photoUrl ? (
@@ -65,4 +67,13 @@ export function CandidateCard({ candidate }: CandidateCardProps) {
 			</div>
 		</div>
 	)
+
+	if (electionCategory) {
+		return (
+			<Link to={`/pledges/${electionCategory}/${candidate.id}`} className="block">
+				{card}
+			</Link>
+		)
+	}
+	return card
 }

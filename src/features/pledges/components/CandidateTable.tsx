@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import type { Candidate } from "@/features/pledges/data/mock-candidates";
 import { PARTY_COLOR_MAP } from "@/features/pledges/data/mock-candidates";
@@ -24,9 +25,11 @@ function LocationIcon({ className }: { className?: string }) {
 
 interface CandidateTableProps {
   candidates: Candidate[];
+  electionCategory?: string;
 }
 
-export function CandidateTable({ candidates }: CandidateTableProps) {
+export function CandidateTable({ candidates, electionCategory }: CandidateTableProps) {
+  const navigate = useNavigate();
   if (candidates.length === 0) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -60,7 +63,8 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
           return (
             <tr
               key={candidate.id}
-              className="h-16 border-b border-line-neutral text-body-3 font-medium hover:bg-label-alternative"
+              className="h-16 border-b border-line-neutral text-body-3 font-medium cursor-pointer hover:bg-fill-normal"
+              onClick={() => electionCategory && navigate(`/pledges/${electionCategory}/${candidate.id}`)}
             >
               {/* 후보자 (아바타 + 이름) */}
               <td className="px-4">

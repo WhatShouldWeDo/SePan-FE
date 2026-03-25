@@ -81,7 +81,16 @@ function getContainerStyle(
 		};
 	}
 
-	// default (outlined & solid 동일)
+	// default + solid: border 없이 Background/Alternative 배경
+	if (variant === "solid") {
+		return {
+			...base,
+			borderWidth: 0,
+			backgroundColor: "var(--background-alt)",
+		};
+	}
+
+	// default + outlined
 	return {
 		...base,
 		borderWidth: 1,

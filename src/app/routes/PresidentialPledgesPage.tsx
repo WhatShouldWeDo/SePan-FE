@@ -48,7 +48,7 @@ export function PresidentialPledgesPage() {
 				</TabsList>
 
 				<TabsContent value="candidates" className="pt-4">
-					<CandidateGrid candidates={filteredCandidates} />
+					<CandidateGrid candidates={filteredCandidates} electionCategory="presidential" />
 				</TabsContent>
 
 				<TabsContent value="statistics" className="pt-4">
