@@ -27,7 +27,7 @@ export function PledgesSection({ candidate }: PledgesSectionProps) {
 	}
 
 	return (
-		<div className="flex flex-col gap-8 rounded-[20px] bg-white p-8 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.06)]">
+		<div className="flex flex-col gap-4 rounded-[20px] bg-white p-8 shadow-[0px_2px_32px_0px_rgba(8,31,116,0.06)]">
 			<CardSectionHeader title="공약" />
 
 			{/* 선거 종류 필터 칩 */}
