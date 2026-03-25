@@ -2,17 +2,6 @@ import { ChevronDown } from "lucide-react"
 import type { CandidatePledge } from "../data/mock-candidate-detail"
 import { CATEGORIES } from "@/features/region/data/categories"
 
-const CATEGORY_VARIANT_STYLES: Record<
-	CandidatePledge["categoryVariant"],
-	string
-> = {
-	red: "bg-red-100 text-red-700",
-	orange: "bg-orange-100 text-orange-700",
-	blue: "bg-blue-100 text-blue-700",
-	green: "bg-green-100 text-green-700",
-	purple: "bg-violet-100 text-violet-700",
-}
-
 interface PledgeRowProps {
 	pledge: CandidatePledge
 	isOpen: boolean
@@ -23,6 +12,13 @@ export function PledgeRow({ pledge, isOpen, onToggle }: PledgeRowProps) {
 	const categoryData = pledge.categoryId
 		? CATEGORIES.find((c) => c.id === pledge.categoryId)
 		: undefined
+
+	// 아이콘 색상 기반으로 배지 스타일 생성
+	const badgeColor = categoryData?.iconColor ?? "#6B7280"
+	const badgeStyle = {
+		color: badgeColor,
+		backgroundColor: `${badgeColor}1A`, // 10% opacity (hex alpha)
+	}
 
 	return (
 		<div className="border-b border-line-neutral">
@@ -37,7 +33,8 @@ export function PledgeRow({ pledge, isOpen, onToggle }: PledgeRowProps) {
 							{pledge.title}
 						</span>
 						<span
-							className={`inline-flex items-center gap-1 rounded-[6px] px-1.5 py-0.5 text-caption-1 font-semibold ${CATEGORY_VARIANT_STYLES[pledge.categoryVariant]}`}
+							className="inline-flex shrink-0 items-center gap-1 rounded-[6px] px-1.5 py-0.5 text-caption-1 font-semibold"
+							style={badgeStyle}
 						>
 							{categoryData?.iconAsset && (
 								<span
@@ -46,7 +43,7 @@ export function PledgeRow({ pledge, isOpen, onToggle }: PledgeRowProps) {
 									<span
 										className="absolute inset-0"
 										style={{
-											backgroundColor: categoryData.iconColor,
+											backgroundColor: badgeColor,
 											maskImage: `url('${categoryData.iconAsset}')`,
 											maskMode: "luminance",
 											maskSize: "11px 11px",
