@@ -51,6 +51,8 @@
 	--color-primary-strong: var(--primary-strong);
 	--color-primary-heavy: var(--primary-heavy);
 	--color-primary-alpha-5: var(--primary-alpha-5);
+	--color-primary-alpha-10: var(--primary-alpha-10);
+	--color-primary-alpha-20: var(--primary-alpha-20);
 	--color-primary-alpha-50: var(--primary-alpha-50);
 	--color-label-strong: var(--label-strong);
 	--color-label-normal: var(--label-normal);
@@ -59,7 +61,10 @@
 	--color-label-assistive: var(--label-assistive);
 	--color-label-disabled: var(--label-disabled);
 	--color-label-inverse: var(--label-inverse);
+	--color-label-inverse-16: var(--label-inverse-16);
+	--color-label-inverse-32: var(--label-inverse-32);
 	--color-label-inverse-48: var(--label-inverse-48);
+	--color-label-inverse-72: var(--label-inverse-72);
 	--color-background-alt: var(--background-alt);
 	--color-line-normal: var(--line-normal);
 	--color-line-neutral: var(--line-neutral);
@@ -305,8 +310,10 @@
 	/* Primary 변형 */
 	--primary-strong: var(--violet-600);
 	--primary-heavy: var(--violet-700);
-	--primary-alpha-5: rgba(107, 92, 255, 0.05); /* Violet/500 @ 5% — Chip active outlined bg */
-	--primary-alpha-50: rgba(107, 92, 255, 0.5); /* Violet/500 @ 50% — Chip active outlined border */
+	--primary-alpha-5: rgba(107, 92, 255, 0.05); /* Violet/500 @ 5% */
+	--primary-alpha-10: rgba(107, 92, 255, 0.1); /* Violet/500 @ 10% */
+	--primary-alpha-20: rgba(107, 92, 255, 0.2); /* Violet/500 @ 20% */
+	--primary-alpha-50: rgba(107, 92, 255, 0.5); /* Violet/500 @ 50% */
 
 	/* Label (텍스트 색상 계층) */
 	--label-strong: var(--cool-neutral-100);
@@ -316,7 +323,10 @@
 	--label-assistive: var(--cool-neutral-40);
 	--label-disabled: var(--cool-neutral-30);
 	--label-inverse: var(--cool-neutral-0);
+	--label-inverse-16: rgba(255, 255, 255, 0.16);
+	--label-inverse-32: rgba(255, 255, 255, 0.32);
 	--label-inverse-48: rgba(255, 255, 255, 0.48);
+	--label-inverse-72: rgba(255, 255, 255, 0.72);
 
 	/* Background */
 	--background-alt: var(--cool-neutral-10);

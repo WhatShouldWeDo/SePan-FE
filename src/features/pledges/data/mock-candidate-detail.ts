@@ -121,9 +121,9 @@ export const MOCK_CANDIDATE_DETAILS: CandidateDetail[] = [
 			},
 		],
 		pledgeKeywordStats: [
-			{ keyword: "경제", percentage: 45, color: "#7C3AED" },
-			{ keyword: "복지", percentage: 30, color: "#3B82F6" },
-			{ keyword: "교육", percentage: 25, color: "#10B981" },
+			{ keyword: "경제", percentage: 45, color: "#6B5CFF" },
+			{ keyword: "복지", percentage: 30, color: "rgba(107, 92, 255, 0.5)" },
+			{ keyword: "교육", percentage: 25, color: "rgba(107, 92, 255, 0.2)" },
 		],
 		pledges: [
 			{
