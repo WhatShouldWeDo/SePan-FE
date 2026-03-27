@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { PressOverlay } from "@/components/ui/press-overlay";
 
 interface SelectCellProps extends Omit<React.ComponentProps<"div">, "children"> {
 	/** 셀 라벨 텍스트 */
@@ -61,9 +62,7 @@ function SelectCell({
 			<div className={cn("relative flex flex-1 flex-col items-start min-w-0", interaction && !disabled && "group cursor-pointer")}>
 				{/* Interaction overlay */}
 				{interaction && !disabled && (
-					<div className="absolute inset-y-0 -inset-x-5 px-2 flex flex-col pointer-events-none">
-						<div className="flex-1 bg-label-alternative opacity-0 group-hover:opacity-[0.08] group-active:opacity-[0.12] rounded-xl transition-opacity" />
-					</div>
+					<PressOverlay className="inset-y-0 -inset-x-3 rounded-xl" />
 				)}
 
 				{/* Divider */}
