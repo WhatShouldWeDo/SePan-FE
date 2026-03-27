@@ -13,7 +13,7 @@ export interface BenchmarkCategory {
 export interface MyPledge {
 	id: string;
 	category: string;
-	categoryColor: string;
+	categoryId: string;
 	title: string;
 	description: string;
 	region: string;
@@ -61,7 +61,7 @@ export const mockMyPledges: MyPledge[] = [
 	{
 		id: "1",
 		category: "경제",
-		categoryColor: "text-red-500",
+		categoryId: "economy",
 		title: "소상공인 임대료 부담 경감 지원 확대",
 		description: "공공임대상가 공급 확대 및 임대료 상한제 도입 추진",
 		region: "청담동",
@@ -70,7 +70,7 @@ export const mockMyPledges: MyPledge[] = [
 	{
 		id: "2",
 		category: "주거·부동산",
-		categoryColor: "text-blue-500",
+		categoryId: "housing",
 		title: "강남구 도시숲 조성 및 미세먼지 저감 대책",
 		description: "학교 주변 생활환경 개선 및 전기차 충전 인프라 확대",
 		region: "논현1동",
@@ -79,7 +79,7 @@ export const mockMyPledges: MyPledge[] = [
 	{
 		id: "3",
 		category: "복지·분배",
-		categoryColor: "text-pink-500",
+		categoryId: "welfare",
 		title: "노인 요양시설 접근성 개선 및 운영비 지원",
 		description: "치매안심센터 확충 및 재가요양 서비스 품질 향상 추진",
 		region: "신사동",
@@ -88,7 +88,7 @@ export const mockMyPledges: MyPledge[] = [
 	{
 		id: "4",
 		category: "교육",
-		categoryColor: "text-green-500",
+		categoryId: "education",
 		title: "공립 유치원 확충 및 보육교사 처우 개선",
 		description: "국공립 어린이집 비율 50% 달성 및 보육료 단계적 인하",
 		region: "논현2동",
