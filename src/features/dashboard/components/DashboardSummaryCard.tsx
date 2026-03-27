@@ -18,7 +18,7 @@ const variantStyles: Record<SummaryVariant, string> = {
 	"dday-purple": "bg-primary-strong",
 };
 
-export function SummaryCard({
+export function DashboardSummaryCard({
 	variant,
 	title,
 	value,
