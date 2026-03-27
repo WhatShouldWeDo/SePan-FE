@@ -33,7 +33,7 @@ export function BenchmarkSection({ data }: BenchmarkSectionProps) {
 			/>
 
 			{/* 바 차트 */}
-			<div className="flex-1 pb-4">
+			<div className="pb-4">
 				<ResponsiveContainer width="100%" height={136}>
 					<BarChart data={chartData} barCategoryGap="12%">
 						<XAxis
@@ -51,7 +51,7 @@ export function BenchmarkSection({ data }: BenchmarkSectionProps) {
 						>
 							{chartData.map((entry, index) => (
 								<Cell
-									key={`cell-${index}`}
+									key={entry.name}
 									fill={
 										entry.isHighlighted
 											? "url(#highlightGradient)"
