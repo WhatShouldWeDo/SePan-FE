@@ -63,7 +63,8 @@ function PledgeRow({
 				<button
 					type="button"
 					onClick={onEdit}
-					className="inline-flex size-10 items-center justify-center rounded-lg text-label-alternative transition-colors hover:bg-fill-normal"
+					disabled={!onEdit}
+					className="inline-flex size-10 items-center justify-center rounded-lg text-label-alternative transition-colors hover:bg-fill-normal disabled:cursor-not-allowed disabled:opacity-50"
 					aria-label="편집"
 				>
 					<Pencil className="size-5" />
