@@ -18,11 +18,11 @@ interface MyPledgesSectionProps {
 }
 
 const TABLE_COLUMNS = [
-	{ label: "분야", width: "w-[140px]" },
-	{ label: "공약", width: "flex-1" },
-	{ label: "지역", width: "w-[180px] text-center" },
-	{ label: "생성일", width: "w-[180px] text-center" },
-	{ label: "편집", width: "w-[84px] text-center" },
+	{ label: "분야", width: "w-[140px] shrink-0" },
+	{ label: "공약", width: "min-w-0 flex-1" },
+	{ label: "지역", width: "w-[180px] shrink-0" },
+	{ label: "생성일", width: "w-[180px] shrink-0" },
+	{ label: "편집", width: "w-[84px] shrink-0" },
 ];
 
 export function MyPledgesSection({ summary, pledges }: MyPledgesSectionProps) {
@@ -61,11 +61,11 @@ export function MyPledgesSection({ summary, pledges }: MyPledgesSectionProps) {
 			{/* 테이블 */}
 			<div className="mt-6">
 				{/* 테이블 헤더 */}
-				<div className="flex items-center rounded-t-lg bg-cool-neutral-5 backdrop-blur-[32px]">
+				<div className="flex items-center rounded-t-lg bg-cool-neutral-5 px-5 py-3 backdrop-blur-[32px]">
 					{TABLE_COLUMNS.map((col) => (
 						<div
 							key={col.label}
-							className={`px-5 py-3 text-label-4 font-semibold text-label-neutral ${col.width}`}
+							className={`text-label-4 font-semibold text-label-neutral ${col.width}`}
 						>
 							{col.label}
 						</div>
@@ -78,7 +78,7 @@ export function MyPledgesSection({ summary, pledges }: MyPledgesSectionProps) {
 						<PledgeRow
 							key={pledge.id}
 							category={pledge.category}
-							categoryColor={pledge.categoryColor}
+							categoryId={pledge.categoryId}
 							title={pledge.title}
 							description={pledge.description}
 							region={pledge.region}
@@ -100,7 +100,7 @@ export function MyPledgesSection({ summary, pledges }: MyPledgesSectionProps) {
 							나의 공약 더보기
 						</span>
 						<ChevronRight className="size-5 text-primary" />
-						<PressOverlay className="-inset-x-[7px] inset-y-0 rounded-lg" />
+						<PressOverlay className="-inset-x-[4px] inset-y-0 rounded-lg" />
 					</button>
 				</div>
 			</div>

@@ -23,7 +23,7 @@ export function AiRecommendationSection({
 				description={`강남구의 '소상공인' 및 '교통' 이슈 데이터를 분석하여\n승리 가능성이 높은 공약 ${updateCount}건을 도출했습니다.`}
 				trailingContent={
 					<Badge
-						className="border-0 bg-status-cautionary/8 text-status-cautionary"
+						className="rounded-[6px] border-0 bg-status-cautionary/8 text-status-cautionary"
 						size="lg"
 					>
 						업데이트 {updateCount}건
@@ -43,7 +43,7 @@ export function AiRecommendationSection({
 							{item.title}
 						</span>
 						<Badge
-							className="border-0 bg-primary/8 text-primary"
+							className="rounded-[6px] border-0 bg-primary/8 text-primary"
 							size="lg"
 						>
 							{item.matchRate}% Match
