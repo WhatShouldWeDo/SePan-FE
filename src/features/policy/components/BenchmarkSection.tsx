@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
 	BarChart,
 	Bar,
@@ -106,8 +107,8 @@ export function BenchmarkSection({ data }: BenchmarkSectionProps) {
 			{/* 하단 링크 */}
 			<div className="flex flex-col gap-5">
 				<div className="h-px bg-line-neutral" />
-				<button
-					type="button"
+				<Link
+					to="/pledges"
 					className="group relative inline-flex items-center gap-1 self-start rounded-3xl py-1"
 				>
 					<span className="text-label-2 font-semibold text-primary">
@@ -115,7 +116,7 @@ export function BenchmarkSection({ data }: BenchmarkSectionProps) {
 					</span>
 					<ChevronRight className="size-5 text-primary" />
 					<PressOverlay className="-inset-x-[7px] inset-y-0 rounded-lg" />
-				</button>
+				</Link>
 			</div>
 		</div>
 	);
