@@ -123,9 +123,18 @@
 
 ### Policy
 
-- **경로**: `src/features/policy/` (빈 디렉토리)
-- **역할**: 정책/공약 관리 (라우트에서 제거됨, 파일 보존)
-- **상태**: 라우트 비활성 (`/pledges`로 대체)
+- **경로**: `src/features/policy/`
+- **역할**: 정책개발 메인 페이지 — AI 공약 추천, 역대 공약 벤치마킹, 나의 공약 관리
+- **핵심 파일**:
+  - `components/AiRecommendationSection.tsx` — AI 공약 추천 카드 섹션
+  - `components/BenchmarkSection.tsx` — 역대 공약 벤치마킹 카드 (Recharts 바 차트)
+  - `components/MyPledgesSection.tsx` — 나의 공약 관리 섹션 (SummaryCard + 테이블)
+  - `components/PledgeRow.tsx` — 공약 테이블 행 컴포넌트
+  - `components/index.ts` — barrel export
+  - `data/mock-policy.ts` — mock 데이터 및 타입 정의
+- **의존하는 모듈**: `components/ui` (CardSectionHeader, Badge, PressOverlay, SummaryCard), `components/icons` (WantedMagicWand), recharts, lucide-react
+- **라우트**: `/policy` → `PolicyPage`
+- **상태**: 피그마 기반 퍼블리싱 완료 (mock 데이터)
 
 ### Test
 
