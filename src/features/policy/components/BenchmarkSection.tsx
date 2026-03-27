@@ -49,7 +49,7 @@ export function BenchmarkSection({ data }: BenchmarkSectionProps) {
 							stackId="stack"
 							isAnimationActive={false}
 						>
-							{chartData.map((entry, index) => (
+							{chartData.map((entry) => (
 								<Cell
 									key={entry.name}
 									fill={
