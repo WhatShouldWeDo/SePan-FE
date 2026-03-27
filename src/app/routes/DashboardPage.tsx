@@ -19,7 +19,7 @@ import {
 import {
 	CardSection,
 	DashboardGreeting,
-	SummaryCard,
+	DashboardSummaryCard,
 	InsightListItem,
 	InsightDelta,
 	ScheduleListItem,
@@ -78,21 +78,21 @@ export function DashboardPage() {
 
 			{/* 요약 카드 3종 */}
 			<div className="flex gap-4">
-				<SummaryCard
+				<DashboardSummaryCard
 					variant="schedule"
 					title="오늘의 일정"
 					value="3건"
 					subtitle="이번 주 총 일정"
 					subValue="12건"
 				/>
-				<SummaryCard
+				<DashboardSummaryCard
 					variant="dday-blue"
 					title="선거일까지"
 					value="D-104"
 					subtitle="예비후보 등록까지"
 					subValue="D-60"
 				/>
-				<SummaryCard
+				<DashboardSummaryCard
 					variant="dday-purple"
 					title="공약 달성률"
 					value="68%"

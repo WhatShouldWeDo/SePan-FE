@@ -36,7 +36,7 @@ function CardSectionHeader({
 		<div className={cn("flex flex-col gap-1", className)}>
 			{/* Description Top */}
 			{hasDescription && isTop && (
-				<p className="text-body-2 font-medium leading-[1.5] text-label-alternative">
+				<p className="whitespace-pre-line text-body-2 font-medium leading-[1.5] text-label-alternative">
 					{description}
 				</p>
 			)}
@@ -65,7 +65,7 @@ function CardSectionHeader({
 
 					{/* Description Bottom */}
 					{hasDescription && !isTop && (
-						<p className="text-body-2 font-medium leading-[1.5] text-label-alternative">
+						<p className="whitespace-pre-line text-body-2 font-medium leading-[1.5] text-label-alternative">
 							{description}
 						</p>
 					)}
