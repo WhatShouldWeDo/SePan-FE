@@ -1,3 +1,5 @@
+import * as React from "react";
+
 import { cn } from "@/lib/utils";
 import { PressOverlay } from "@/components/ui/press-overlay";
 
@@ -19,7 +21,7 @@ function SummaryCard({
 	return (
 		<div
 			className={cn(
-				"group relative flex h-[90px] flex-1 flex-col justify-between overflow-hidden rounded-[16px] border border-line-neutral bg-white px-6 py-4",
+				"group relative flex h-[90px] flex-1 cursor-pointer flex-col justify-between overflow-hidden rounded-[16px] border border-line-neutral bg-white px-6 py-4",
 				className,
 			)}
 		>
