@@ -38,7 +38,7 @@ export function RegionInfoBar({
           return (
             <div
               key={char.categoryId}
-              className="flex items-center gap-2 rounded-xl px-3 py-2"
+              className="flex items-center gap-2 rounded-[8px] px-3 py-2"
               style={{ backgroundColor: `${category?.iconColor ?? "#888"}1A` }}
             >
               {category?.iconAsset && (

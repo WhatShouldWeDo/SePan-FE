@@ -40,7 +40,7 @@ export function RecommendationDetailModal({
         <DialogContent className="flex max-h-[85vh] flex-col gap-6 overflow-y-auto p-8 sm:max-w-2xl">
           <DialogHeader className="flex-row items-start gap-5">
             <div
-              className="flex size-16 shrink-0 items-center justify-center rounded-2xl"
+              className="flex size-16 shrink-0 items-center justify-center rounded-[12px]"
               style={{ backgroundColor: `${category?.iconColor ?? "#888"}1A` }}
             >
               {category?.iconAsset && (
@@ -108,13 +108,13 @@ export function RecommendationDetailModal({
           </p>
 
           <div className="flex flex-col gap-3">
-            <div className="flex items-start gap-3 rounded-2xl bg-primary/8 px-4 py-3">
+            <div className="flex items-start gap-3 rounded-[12px] bg-primary/8 px-4 py-3">
               <WantedMagicWand className="mt-0.5 size-4 shrink-0 text-primary" />
               <p className="text-body-2 text-primary">
                 {recommendation.aiInsight}
               </p>
             </div>
-            <div className="flex items-start gap-3 rounded-2xl bg-fill-normal px-4 py-3">
+            <div className="flex items-start gap-3 rounded-[12px] bg-fill-normal px-4 py-3">
               <CircleCheckFill className="mt-0.5 size-4 shrink-0 text-label-alternative" />
               <p className="text-body-2 text-label-normal">
                 {recommendation.expectedEffect}
