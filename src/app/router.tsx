@@ -13,6 +13,7 @@ import { LocalElectionPledgesPage } from "@/app/routes/LocalElectionPledgesPage"
 import { CandidateDetailPage } from "@/app/routes/CandidateDetailPage";
 import { PledgesPlaceholderPage } from "@/app/routes/PledgesPlaceholderPage";
 import { PolicyPage } from "@/app/routes/PolicyPage";
+import { AiRecommendationsPage } from "@/app/routes/AiRecommendationsPage";
 import { NotFoundPage } from "@/app/routes/NotFoundPage";
 import TestPage from "./routes/TestPage";
 
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
 					{ path: "/", element: <DashboardPage /> },
 					{ path: "/region", element: <RegionResultPage /> },
 					{ path: "/policy", element: <PolicyPage /> },
+					{ path: "/policy/recommendations", element: <AiRecommendationsPage /> },
 					{ path: "/pledges", element: <PledgesOverviewPage /> },
 					{ path: "/pledges/presidential", element: <PresidentialPledgesPage /> },
 					{ path: "/pledges/parliamentary", element: <ParliamentaryPledgesPage /> },
