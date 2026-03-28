@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ export function AiRecommendationSection({
 	recommendations,
 	updateCount = 3,
 }: AiRecommendationSectionProps) {
+	const navigate = useNavigate();
 	return (
 		<div className="flex flex-1 flex-col gap-4 rounded-[24px] border border-line-neutral bg-white px-8 pb-6 pt-8">
 			{/* 헤더 */}
@@ -59,6 +61,7 @@ export function AiRecommendationSection({
 				<button
 					type="button"
 					className="group relative inline-flex items-center gap-1 self-start rounded-3xl py-1"
+					onClick={() => navigate("/policy/recommendations")}
 				>
 					<span className="text-label-2 font-semibold text-primary">
 						추천 공약 전체보기

@@ -51,7 +51,7 @@ src/
 │   │   ├── hooks/              #   useMapDrillDown, useTopoJsonData, useHeatmapMode 등
 │   │   ├── lib/                #   choropleth-utils, sido-utils, map-theme
 │   │   └── data/               #   TopoJSON, 카테고리 정의, 히트맵 설정
-│   ├── policy/                 # 정책개발 (비활성, 빈 디렉토리)
+│   ├── policy/                 # 정책개발 (AI 추천, 벤치마킹, 나의 공약)
 │   └── test/                   # 테스트 페이지
 │
 ├── components/                 # 공유 UI 컴포넌트
@@ -194,6 +194,8 @@ Form (react-hook-form) → Zod 검증 → useApiMutation → API 호출
 | `/pledges/presidential` | PresidentialPledgesPage | 필요 |
 | `/pledges/parliamentary` | ParliamentaryPledgesPage | 필요 |
 | `/pledges/:type` | PledgesPlaceholderPage | 필요 |
+| `/policy` | PolicyPage | 필요 |
+| `/policy/recommendations` | AiRecommendationsPage | 필요 |
 | `/test` | TestPage | 필요 |
 
 ---

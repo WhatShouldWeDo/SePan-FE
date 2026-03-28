@@ -130,11 +130,15 @@
   - `components/BenchmarkSection.tsx` — 역대 공약 벤치마킹 카드 (Recharts 바 차트)
   - `components/MyPledgesSection.tsx` — 나의 공약 관리 섹션 (SummaryCard + 테이블)
   - `components/PledgeRow.tsx` — 공약 테이블 행 컴포넌트
+  - `components/RegionInfoBar.tsx` — 지역 정보 + 특성 뱃지 바
+  - `components/RecommendationCard.tsx` — AI 추천 공약 카드
+  - `components/RecommendationDetailModal.tsx` — 추천 공약 상세보기 모달
   - `components/index.ts` — barrel export
+  - `routes/AiRecommendationsPage.tsx` — AI 추천 공약 전체 목록 페이지
   - `data/mock-policy.ts` — mock 데이터 및 타입 정의
 - **의존하는 모듈**: `components/ui` (CardSectionHeader, Badge, PressOverlay, SummaryCard), `components/icons` (WantedMagicWand), recharts, lucide-react
-- **라우트**: `/policy` → `PolicyPage`
-- **상태**: 피그마 기반 퍼블리싱 완료 (mock 데이터)
+- **라우트**: `/policy` → `PolicyPage`, `/policy/recommendations` → `AiRecommendationsPage`
+- **상태**: 피그마 기반 퍼블리싱 완료 (mock 데이터), AI 추천 공약 페이지 추가
 
 ### Test
 
