@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 import { useBreadcrumb } from "@/contexts/useNavigation";
 import { Chip } from "@/components/ui/chip";
@@ -13,10 +13,10 @@ import {
 
 type SortOption = "matchRate" | "updatedAt";
 
-const SORT_LABELS: Record<SortOption, string> = {
-  matchRate: "매칭률순",
-  updatedAt: "최근수정된순",
-};
+const SORT_OPTIONS: { key: SortOption; label: string }[] = [
+  { key: "matchRate", label: "매칭률순" },
+  { key: "updatedAt", label: "최근수정된순" },
+];
 
 export function AiRecommendationsPage() {
   useBreadcrumb([{ label: "정책개발" }, { label: "AI 추천 공약" }]);
@@ -32,7 +32,9 @@ export function AiRecommendationsPage() {
   );
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // 정렬 드롭다운 외부 클릭 + Escape 닫기
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+
+  // 정렬 드롭다운 외부 클릭 닫기
   const sortRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!sortOpen) return;
@@ -41,16 +43,41 @@ export function AiRecommendationsPage() {
         setSortOpen(false);
       }
     }
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") setSortOpen(false);
-    }
     document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [sortOpen]);
+
+  // 드롭다운 키보드 네비게이션
+  const handleMenuKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          setFocusedIndex((prev) =>
+            prev < SORT_OPTIONS.length - 1 ? prev + 1 : 0
+          );
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setFocusedIndex((prev) =>
+            prev > 0 ? prev - 1 : SORT_OPTIONS.length - 1
+          );
+          break;
+        case "Enter":
+        case " ":
+          e.preventDefault();
+          if (focusedIndex >= 0) {
+            setSortBy(SORT_OPTIONS[focusedIndex].key);
+            setSortOpen(false);
+          }
+          break;
+        case "Escape":
+          setSortOpen(false);
+          break;
+      }
+    },
+    [focusedIndex]
+  );
 
   // 정렬된 데이터
   const sorted = [...mockRecommendationDetails].sort((a, b) => {
@@ -97,38 +124,42 @@ export function AiRecommendationsPage() {
       <div className="flex gap-3">
         <div ref={sortRef} className="relative">
           <Chip
-            label={SORT_LABELS[sortBy]}
+            label={SORT_OPTIONS.find((o) => o.key === sortBy)?.label ?? ""}
             state={sortOpen ? "active" : "default"}
             isOpen={sortOpen}
-            onClick={() => setSortOpen((prev) => !prev)}
+            onClick={() => {
+              setSortOpen((prev) => !prev);
+              setFocusedIndex(-1);
+            }}
           />
           {sortOpen && (
             <div
-              role="listbox"
+              role="menu"
               aria-label="정렬 옵션"
-              className="absolute top-full left-0 z-10 mt-1 rounded-[10px] border border-line-neutral bg-white py-1 shadow-lg"
+              className="absolute top-full left-0 z-10 mt-1 min-w-[140px] rounded-[10px] border border-line-neutral bg-white py-1 shadow-lg"
+              onKeyDown={handleMenuKeyDown}
             >
-              {(Object.entries(SORT_LABELS) as [SortOption, string][]).map(
-                ([key, label]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    role="option"
-                    aria-selected={sortBy === key}
-                    className={`w-full px-4 py-2.5 text-left text-label-3 font-medium transition-colors hover:bg-fill-normal ${
-                      sortBy === key
-                        ? "font-semibold text-primary"
-                        : "text-label-normal"
-                    }`}
-                    onClick={() => {
-                      setSortBy(key);
-                      setSortOpen(false);
-                    }}
-                  >
-                    {label}
-                  </button>
-                )
-              )}
+              {SORT_OPTIONS.map((option, index) => (
+                <div
+                  key={option.key}
+                  role="menuitem"
+                  tabIndex={index === focusedIndex ? 0 : -1}
+                  ref={(el) => {
+                    if (index === focusedIndex) el?.focus();
+                  }}
+                  className={`w-full cursor-pointer px-4 py-2.5 text-left text-label-3 font-medium transition-colors hover:bg-fill-normal focus:bg-fill-normal focus:outline-none ${
+                    sortBy === option.key
+                      ? "font-semibold text-primary"
+                      : "text-label-normal"
+                  }`}
+                  onClick={() => {
+                    setSortBy(option.key);
+                    setSortOpen(false);
+                  }}
+                >
+                  {option.label}
+                </div>
+              ))}
             </div>
           )}
         </div>

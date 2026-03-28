@@ -195,7 +195,7 @@ Form (react-hook-form) → Zod 검증 → useApiMutation → API 호출
 | `/pledges/parliamentary` | ParliamentaryPledgesPage | 필요 |
 | `/pledges/:type` | PledgesPlaceholderPage | 필요 |
 | `/policy` | PolicyPage | 필요 |
-| `/policy/recommendations` | AiRecommendationsPage | AI 추천 공약 전체 목록 |
+| `/policy/recommendations` | AiRecommendationsPage | 필요 |
 | `/test` | TestPage | 필요 |
 
 ---
