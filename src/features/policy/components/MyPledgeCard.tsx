@@ -3,6 +3,7 @@ import { MapPin, Pencil } from "lucide-react";
 import { PressOverlay } from "@/components/ui/press-overlay";
 import { CATEGORIES } from "@/features/region/data/categories";
 import type { MyPledge, PledgeStatus } from "@/features/policy/data/mock-policy";
+import { getCategoryLabel } from "@/features/policy/data/mock-policy";
 
 interface MyPledgeCardProps {
 	pledge: MyPledge;
@@ -12,6 +13,7 @@ interface MyPledgeCardProps {
 const STATUS_LABEL: Record<PledgeStatus, string> = {
 	drafting: "작성중",
 	reviewing: "검토중",
+	approved: "승인완료",
 	confirmed: "확정됨",
 };
 
@@ -24,6 +26,10 @@ const STATUS_STYLE: Record<PledgeStatus, { text: string; bg: string }> = {
 		text: "text-status-positive",
 		bg: "bg-status-positive/8",
 	},
+	approved: {
+		text: "text-status-positive",
+		bg: "bg-status-positive/8",
+	},
 	confirmed: {
 		text: "text-primary",
 		bg: "bg-primary/8",
@@ -31,7 +37,9 @@ const STATUS_STYLE: Record<PledgeStatus, { text: string; bg: string }> = {
 };
 
 function MyPledgeCard({ pledge, onEdit }: MyPledgeCardProps) {
-	const categoryData = CATEGORIES.find((c) => c.id === pledge.categoryId);
+	const primaryCategoryId = pledge.categoryIds[0];
+	const categoryLabel = getCategoryLabel(primaryCategoryId);
+	const categoryData = CATEGORIES.find((c) => c.id === primaryCategoryId);
 	const badgeColor = categoryData?.iconColor ?? "#6B7280";
 	const badgeStyle = {
 		color: badgeColor,
@@ -47,7 +55,7 @@ function MyPledgeCard({ pledge, onEdit }: MyPledgeCardProps) {
 					<div className="w-[80px]">
 						<span className="inline-flex items-center gap-1 rounded-[6px] bg-primary/8 px-1.5 py-1 text-label-4 font-semibold text-primary">
 							<MapPin className="size-3.5 fill-current" />
-							{pledge.region}
+							{pledge.regions[0]}
 						</span>
 					</div>
 				</div>
@@ -81,11 +89,11 @@ function MyPledgeCard({ pledge, onEdit }: MyPledgeCardProps) {
 									/>
 								</span>
 							)}
-							{pledge.category}
+							{categoryLabel}
 						</span>
 					</div>
 					<p className="text-body-2 font-medium text-label-neutral">
-						{pledge.description}
+						{pledge.summary}
 					</p>
 				</div>
 

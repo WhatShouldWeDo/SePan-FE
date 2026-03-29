@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, useEffect } from "react";
-import { Plus, Pencil, Clock, CircleCheck } from "lucide-react";
+import { Plus, Pencil, Clock, CircleCheck, ShieldCheck } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useBreadcrumb } from "@/contexts/useNavigation";
@@ -23,6 +23,11 @@ const STATUS_FILTERS: {
   { value: "all", label: "전체" },
   { value: "drafting", label: "작성중", icon: <Pencil className="size-4" /> },
   { value: "reviewing", label: "검토중", icon: <Clock className="size-4" /> },
+  {
+    value: "approved",
+    label: "승인완료",
+    icon: <ShieldCheck className="size-4" />,
+  },
   {
     value: "confirmed",
     label: "확정됨",

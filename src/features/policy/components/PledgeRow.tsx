@@ -2,27 +2,28 @@ import { MapPin, Pencil } from "lucide-react";
 
 import { PressOverlay } from "@/components/ui/press-overlay";
 import { CATEGORIES } from "@/features/region/data/categories";
+import { getCategoryLabel } from "@/features/policy/data/mock-policy";
 
 interface PledgeRowProps {
-	category: string;
-	categoryId: string;
+	categoryIds: string[];
 	title: string;
-	description: string;
-	region: string;
+	summary: string;
+	regions: string[];
 	createdAt: string;
 	onEdit?: () => void;
 }
 
 function PledgeRow({
-	category,
-	categoryId,
+	categoryIds,
 	title,
-	description,
-	region,
+	summary,
+	regions,
 	createdAt,
 	onEdit,
 }: PledgeRowProps) {
-	const categoryData = CATEGORIES.find((c) => c.id === categoryId);
+	const primaryCategoryId = categoryIds[0];
+	const categoryLabel = getCategoryLabel(primaryCategoryId);
+	const categoryData = CATEGORIES.find((c) => c.id === primaryCategoryId);
 	const badgeColor = categoryData?.iconColor ?? "#6B7280";
 	const badgeStyle = {
 		color: badgeColor,
@@ -56,7 +57,7 @@ function PledgeRow({
 							/>
 						</span>
 					)}
-					{category}
+					{categoryLabel}
 				</span>
 			</div>
 
@@ -66,7 +67,7 @@ function PledgeRow({
 					{title}
 				</span>
 				<span className="truncate text-body-3 font-medium text-label-alternative">
-					{description}
+					{summary}
 				</span>
 			</div>
 
@@ -74,7 +75,7 @@ function PledgeRow({
 			<div className="w-[180px] shrink-0">
 				<span className="inline-flex items-center gap-1 rounded-[6px] bg-primary/8 px-2.5 py-1 text-body-3 font-medium text-primary">
 					<MapPin className="size-3.5 fill-current" />
-					{region}
+					{regions[0]}
 				</span>
 			</div>
 

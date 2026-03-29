@@ -4,6 +4,7 @@ import {
 	Pencil,
 	Clock,
 	CircleCheck,
+	ShieldCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -52,6 +53,12 @@ export function MyPledgesSection({ summary, pledges }: MyPledgesSectionProps) {
 					valueClassName="text-status-positive"
 				/>
 				<SummaryCard
+					label="승인완료"
+					value={`${summary.approved}건`}
+					icon={<ShieldCheck className="size-6" />}
+					valueClassName="text-status-positive"
+				/>
+				<SummaryCard
 					label="확정됨"
 					value={`${summary.confirmed}건`}
 					icon={<CircleCheck className="size-6" />}
@@ -78,11 +85,10 @@ export function MyPledgesSection({ summary, pledges }: MyPledgesSectionProps) {
 					{pledges.map((pledge) => (
 						<PledgeRow
 							key={pledge.id}
-							category={pledge.category}
-							categoryId={pledge.categoryId}
+							categoryIds={pledge.categoryIds}
 							title={pledge.title}
-							description={pledge.description}
-							region={pledge.region}
+							summary={pledge.summary}
+							regions={pledge.regions}
 							createdAt={pledge.createdAt}
 						/>
 					))}
