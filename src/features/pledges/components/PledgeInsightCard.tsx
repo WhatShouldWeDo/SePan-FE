@@ -92,7 +92,7 @@ function InsightGridItem({ item }: { item: PledgeInsightItem }) {
         {item.trailing.type === "badge" ? (
           <Badge className={item.trailing.className}>{item.trailing.text}</Badge>
         ) : (
-          <span className="inline-flex items-center gap-0.5 text-label-4 font-semibold text-status-negative">
+          <span className={cn("inline-flex items-center gap-0.5 text-label-4 font-semibold", item.trailing.isPositive ? "text-status-positive" : "text-status-negative")}>
             {item.trailing.label}
             <WantedCaretUp
               className={cn("size-4", !item.trailing.isPositive && "rotate-180")}

@@ -75,7 +75,7 @@ function MetricCell({ metric }: { metric: MetricItem }) {
             {metric.trailing.text}
           </Badge>
         ) : (
-          <span className="inline-flex items-center gap-1 pt-1 text-label-4 font-semibold text-status-negative">
+          <span className={cn("inline-flex items-center gap-1 pt-1 text-label-4 font-semibold", metric.trailing.isPositive ? "text-status-positive" : "text-status-negative")}>
             {metric.trailing.label}
             <WantedCaretUp
               className={cn("size-5", !metric.trailing.isPositive && "rotate-180")}
