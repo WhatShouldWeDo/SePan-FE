@@ -33,7 +33,7 @@ export function MyPledgesSection({ summary, pledges }: MyPledgesSectionProps) {
 			{/* 섹션 헤더 */}
 			<CardSectionHeader title="나의 공약 관리" />
 
-			{/* 요약 카드 4개 */}
+			{/* 요약 카드 5개 */}
 			<div className="mt-6 flex gap-3">
 				<SummaryCard
 					label="전체공약"
