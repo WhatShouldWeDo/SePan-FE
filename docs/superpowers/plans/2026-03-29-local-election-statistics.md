@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 기존 `/pledges/local` 페이지의 "통계분석" 탭 플레이스홀더를 4개 섹션 카드(카테고리 분포, 민원 인사이트, 주요 지표, 정당별 비교)로 구현한다.
+**Goal:** 기존 `/pledges/local` 페이지의 "통계분석" 탭 플레이스홀더를 3개 시각적 섹션(4개 카드 컴포넌트: 카테고리 분포 + 민원 인사이트 | 주요 지표 | 정당별 비교)으로 구현한다.
 
-**Architecture:** `LocalElectionStatistics` 오케스트레이터가 4개 카드 컴포넌트를 조합. Mock 데이터 기반, 기존 `CardSection`/`CardSectionHeader`/`PledgeDonutChart`/`Banner`/`Badge` 재사용. 정당별 바 차트만 Recharts 직접 사용.
+**Architecture:** `LocalElectionStatistics` 오케스트레이터가 4개 카드 컴포넌트를 3개 섹션 행으로 조합. Mock 데이터 기반, 기존 `CardSection`/`CardSectionHeader`/`PledgeDonutChart`/`Banner`/`Badge` 재사용. 정당별 바 차트만 Recharts 직접 사용.
 
 **Tech Stack:** React 19, TypeScript 5.9, Tailwind CSS 4, Recharts 3.7, Vitest + Testing Library
 
