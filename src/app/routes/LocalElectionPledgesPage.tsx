@@ -8,6 +8,7 @@ import {
 	ElectionTermFilter,
 	ElectionTypeFilter,
 	RegionSidoFilter,
+	LocalElectionStatistics,
 } from "@/features/pledges/components"
 import {
 	LOCAL_ELECTION_TERMS,
@@ -175,11 +176,11 @@ export function LocalElectionPledgesPage() {
 				</TabsContent>
 
 				<TabsContent value="statistics" className="pt-4">
-					<div className="flex items-center justify-center py-20">
-						<p className="text-body-2 font-medium text-label-alternative">
-							통계분석 기능은 준비 중입니다
-						</p>
-					</div>
+					<LocalElectionStatistics
+						term={selectedTerm}
+						electionType={selectedElectionType}
+						sido={selectedSido}
+					/>
 				</TabsContent>
 			</Tabs>
 		</div>
