@@ -5,7 +5,7 @@ import { MyPledgesSection } from "@/features/policy/components/MyPledgesSection"
 import {
 	mockAiRecommendations,
 	mockBenchmarkData,
-	mockPledgeSummary,
+	computePledgeSummary,
 	mockMyPledges,
 } from "@/features/policy/data/mock-policy";
 
@@ -37,7 +37,7 @@ export function PolicyPage() {
 			{/* 나의 공약 관리 */}
 			<div className="mt-8">
 				<MyPledgesSection
-					summary={mockPledgeSummary}
+					summary={computePledgeSummary(mockMyPledges)}
 					pledges={mockMyPledges}
 				/>
 			</div>
