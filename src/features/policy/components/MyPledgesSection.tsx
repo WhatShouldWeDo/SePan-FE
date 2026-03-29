@@ -5,6 +5,7 @@ import {
 	Clock,
 	CircleCheck,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { CardSectionHeader } from "@/components/ui/card-section-header";
 import { SummaryCard } from "@/components/ui/summary-card";
@@ -92,8 +93,8 @@ export function MyPledgesSection({ summary, pledges }: MyPledgesSectionProps) {
 			<div className="flex flex-col gap-5">
 				<div className="h-px bg-line-neutral" />
 				<div className="flex justify-center">
-					<button
-						type="button"
+					<Link
+						to="/policy/my-pledges"
 						className="group relative inline-flex items-center gap-1 rounded-3xl py-1"
 					>
 						<span className="text-label-2 font-semibold text-primary">
@@ -101,7 +102,7 @@ export function MyPledgesSection({ summary, pledges }: MyPledgesSectionProps) {
 						</span>
 						<ChevronRight className="size-5 text-primary" />
 						<PressOverlay className="-inset-x-[4px] inset-y-0 rounded-lg" />
-					</button>
+					</Link>
 				</div>
 			</div>
 		</div>
