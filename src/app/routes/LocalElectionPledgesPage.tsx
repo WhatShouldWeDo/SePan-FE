@@ -177,10 +177,10 @@ export function LocalElectionPledgesPage() {
 
 				<TabsContent value="statistics" className="pt-4">
 					<LocalElectionStatistics
-					term={selectedTerm}
-					electionType={selectedElectionType}
-					sido={selectedSido}
-				/>
+						term={selectedTerm}
+						electionType={selectedElectionType}
+						sido={selectedSido}
+					/>
 				</TabsContent>
 			</Tabs>
 		</div>
