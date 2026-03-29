@@ -78,10 +78,11 @@ function Pagination({
 
   const handleJump = () => {
     const page = Number(jumpValue);
-    if (page >= 1 && page <= totalPages) {
-      onPageChange(page);
-      setJumpValue("");
+    if (!Number.isNaN(page) && page >= 1) {
+      const clamped = Math.min(Math.max(page, 1), totalPages);
+      onPageChange(clamped);
     }
+    setJumpValue("");
   };
 
   if (totalPages <= 0) return null;
@@ -144,7 +145,7 @@ function Pagination({
           type="button"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="flex size-4 items-center justify-center disabled:opacity-30"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center disabled:opacity-30"
           aria-label="이전 페이지"
         >
           <ChevronLeft className="size-4 text-label-alternative" />
@@ -181,7 +182,7 @@ function Pagination({
           type="button"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="flex size-4 items-center justify-center disabled:opacity-30"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center disabled:opacity-30"
           aria-label="다음 페이지"
         >
           <ChevronRight className="size-4 text-label-alternative" />
