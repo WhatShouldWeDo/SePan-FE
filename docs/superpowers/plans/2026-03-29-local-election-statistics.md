@@ -27,7 +27,9 @@
 
 ---
 
-### Task 1: 타입 정의 및 Mock 데이터
+### Task 1: 타입 정의 및 Mock 데이터 ✅ COMPLETED
+
+> **이미 구현 및 커밋 완료** (commit `18247e2`). 이후 Task의 에이전트는 이 계획의 draft 코드가 아닌 실제 커밋된 파일 `src/features/pledges/data/mock-local-statistics.ts`을 참조해야 합니다.
 
 **Files:**
 - Create: `src/features/pledges/data/mock-local-statistics.ts`
@@ -337,19 +339,20 @@ import { CardSection } from "@/features/dashboard/components/CardSection"
 import { CardSectionHeader } from "@/components/ui/card-section-header"
 import { Banner } from "@/components/ui/banner"
 import { Badge } from "@/components/ui/badge"
-import { WantedCaretUp } from "@/components/icons"
 import {
+  WantedCaretUp,
   WantedFillMessage,
+  WantedFillMegaphone,
   WantedFillTriangleExclamation,
+  CircleInfoFill,
 } from "@/components/icons"
-import { CircleInfoFill } from "@/components/icons"
 import { cn } from "@/lib/utils"
 import type { PledgeInsightData, PledgeInsightItem } from "../data/mock-local-statistics"
 
 const ICON_MAP: Record<string, React.FC<React.SVGProps<SVGSVGElement>>> = {
   message: WantedFillMessage,
   warning: WantedFillTriangleExclamation,
-  megaphone: WantedFillMessage, // 대체 아이콘
+  megaphone: WantedFillMegaphone,
   info: CircleInfoFill,
 }
 
@@ -724,8 +727,12 @@ export function PartyPledgeComparisonCard({ data }: PartyPledgeComparisonCardPro
                 content={<CustomTooltip />}
                 cursor={false}
               />
-              <Bar dataKey="fulfillmentTime" radius={[50, 50, 50, 50]}>
-                {chartData.map((entry, index) => (
+              <Bar
+                dataKey="fulfillmentTime"
+                radius={[50, 50, 50, 50]}
+                activeBar={{ fill: "#2388ff" }}
+              >
+                {chartData.map((_, index) => (
                   <Cell key={index} fill="#e3efff" />
                 ))}
               </Bar>
@@ -838,23 +845,23 @@ export { LocalElectionStatistics } from "./LocalElectionStatistics"
 
 - [ ] **Step 2: LocalElectionPledgesPage.tsx에 import 추가**
 
-`src/app/routes/LocalElectionPledgesPage.tsx` 기존 import 블록에 추가:
+`src/app/routes/LocalElectionPledgesPage.tsx`에서 `RegionSidoFilter` import 뒤에 `LocalElectionStatistics`를 추가한다.
+기존 import에서 `RegionSidoFilter,` 다음 줄에 `LocalElectionStatistics,`를 삽입:
 
 ```tsx
-// 기존 import (Line 5-11):
-import {
-  CandidateGrid,
-  CandidateTable,
-  ElectionTermFilter,
-  ElectionTypeFilter,
+// old_string:
   RegionSidoFilter,
-  LocalElectionStatistics,  // ← 추가
+} from "@/features/pledges/components"
+
+// new_string:
+  RegionSidoFilter,
+  LocalElectionStatistics,
 } from "@/features/pledges/components"
 ```
 
 - [ ] **Step 3: 플레이스홀더 교체**
 
-`src/app/routes/LocalElectionPledgesPage.tsx` Lines 177-183의 플레이스홀더를 교체:
+`src/app/routes/LocalElectionPledgesPage.tsx`에서 "통계분석 기능은 준비 중입니다" 텍스트를 포함하는 플레이스홀더 블록을 검색하여 교체한다 (줄 번호는 import 추가로 인해 이동 가능하므로 텍스트 기반 검색):
 
 ```tsx
 // Before (Line 177-183):
