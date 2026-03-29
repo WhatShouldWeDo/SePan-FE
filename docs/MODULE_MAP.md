@@ -111,12 +111,18 @@
   - `features/pledges/components/PledgeRow.tsx` — 공약 행 (아코디언 토글, 다중 열림)
   - `features/pledges/components/NewsSection.tsx` — 관련 뉴스 카드 섹션 (리스트+더보기)
   - `features/pledges/components/NewsRow.tsx` — 뉴스 행 (썸네일+제목+메타)
+  - `features/pledges/components/LocalElectionStatistics.tsx` — 지방선거 통계분석 탭 오케스트레이터
+  - `features/pledges/components/CategoryDistributionCard.tsx` — 카테고리 분포 도넛 차트 카드
+  - `features/pledges/components/PledgeInsightCard.tsx` — 민원 인사이트 카드 (배너 + 2x2 그리드)
+  - `features/pledges/components/PledgeMetricsCard.tsx` — 주요 지표 + 비교 인사이트 카드
+  - `features/pledges/components/PartyPledgeComparisonCard.tsx` — 정당별 공약 비교 바 차트 카드
   - `features/pledges/data/mock-candidates.ts` — Mock 후보자 데이터 + 타입 + 정당 색상 매핑
   - `features/pledges/data/mock-candidate-detail.ts` — 후보자 상세 Mock 데이터 + CandidateDetail 타입 + 선거유형 라벨 매핑
   - `features/pledges/data/mock-parliamentary.ts` — 국회의원선거 Mock 후보자 데이터 (12명)
   - `features/pledges/data/mock-local.ts` — 지방선거 Mock 후보자 데이터 (15명)
   - `features/pledges/data/region-data.ts` — 시/도 목록, 시/군/구 매핑, 키워드 매핑, 선거종류/회차 상수
   - `features/pledges/data/local-election-data.ts` — 지방선거 필터 옵션 데이터
+  - `features/pledges/data/mock-local-statistics.ts` — 통계분석 Mock 데이터 + 타입 정의
 - **에셋**: `src/assets/pledges/location-fill.svg`, `src/assets/category-icons/aging.png` (재사용)
 - **의존하는 모듈**: `contexts/useNavigation`, `components/ui` (Chip, Tabs, SegmentedControl), react-router-dom
 - **상태**: 대통령선거 + 국회의원선거 + 지방선거 후보자 목록 + 후보자 상세 페이지 완료 (mock 데이터), 통계분석 탭 placeholder
