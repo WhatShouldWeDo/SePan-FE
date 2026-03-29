@@ -10,6 +10,8 @@ export interface BenchmarkCategory {
 	isHighlighted?: boolean;
 }
 
+export type PledgeStatus = "drafting" | "reviewing" | "confirmed";
+
 export interface MyPledge {
 	id: string;
 	category: string;
@@ -18,6 +20,7 @@ export interface MyPledge {
 	description: string;
 	region: string;
 	createdAt: string;
+	status: PledgeStatus;
 }
 
 export interface PledgeSummary {
@@ -25,6 +28,15 @@ export interface PledgeSummary {
 	drafting: number;
 	reviewing: number;
 	confirmed: number;
+}
+
+export function computePledgeSummary(pledges: MyPledge[]): PledgeSummary {
+	return {
+		total: pledges.length,
+		drafting: pledges.filter((p) => p.status === "drafting").length,
+		reviewing: pledges.filter((p) => p.status === "reviewing").length,
+		confirmed: pledges.filter((p) => p.status === "confirmed").length,
+	};
 }
 
 export interface AiRecommendationDetail extends AiRecommendation {
@@ -67,51 +79,31 @@ export const mockBenchmarkData: BenchmarkCategory[] = [
 	{ name: "문화", value: 50 },
 ];
 
-export const mockPledgeSummary: PledgeSummary = {
-	total: 24,
-	drafting: 12,
-	reviewing: 9,
-	confirmed: 3,
-};
-
 export const mockMyPledges: MyPledge[] = [
-	{
-		id: "1",
-		category: "경제",
-		categoryId: "economy",
-		title: "소상공인 임대료 부담 경감 지원 확대",
-		description: "공공임대상가 공급 확대 및 임대료 상한제 도입 추진",
-		region: "청담동",
-		createdAt: "3시간 전",
-	},
-	{
-		id: "2",
-		category: "주거·부동산",
-		categoryId: "housing",
-		title: "강남구 도시숲 조성 및 미세먼지 저감 대책",
-		description: "학교 주변 생활환경 개선 및 전기차 충전 인프라 확대",
-		region: "논현1동",
-		createdAt: "20분 전",
-	},
-	{
-		id: "3",
-		category: "복지·분배",
-		categoryId: "welfare",
-		title: "노인 요양시설 접근성 개선 및 운영비 지원",
-		description: "치매안심센터 확충 및 재가요양 서비스 품질 향상 추진",
-		region: "신사동",
-		createdAt: "2일 전",
-	},
-	{
-		id: "4",
-		category: "교육",
-		categoryId: "education",
-		title: "공립 유치원 확충 및 보육교사 처우 개선",
-		description: "국공립 어린이집 비율 50% 달성 및 보육료 단계적 인하",
-		region: "논현2동",
-		createdAt: "2026.03.05",
-	},
+	{ id: "20", category: "저출산·고령화", categoryId: "aging", title: "어린이집 확충 및 보육 인프라 강화", description: "국공립 어린이집 신설 및 기존 시설 리모델링 추진", region: "청담동", createdAt: "10분 전", status: "drafting" },
+	{ id: "19", category: "교육", categoryId: "education", title: "AI 디지털 교육 센터 설립", description: "초중고 디지털 리터러시 교육 강화 및 AI 체험관 운영", region: "논현1동", createdAt: "30분 전", status: "confirmed" },
+	{ id: "18", category: "문화여가", categoryId: "culture", title: "공공 도서관 확대 및 야간 운영", description: "주민 접근성 향상을 위한 소규모 도서관 3개소 신설", region: "대치동", createdAt: "1시간 전", status: "reviewing" },
+	{ id: "17", category: "교통", categoryId: "transport", title: "자전거 도로 확충 및 공유 자전거 확대", description: "주요 도로 자전거 전용 도로 신설 및 공유 자전거 스테이션 추가", region: "신사동", createdAt: "2시간 전", status: "drafting" },
+	{ id: "16", category: "복지·분배", categoryId: "welfare", title: "다문화 가정 한국어 교육 지원", description: "다문화 가정 맞춤형 한국어 교육 및 문화 적응 프로그램 운영", region: "역삼동", createdAt: "3시간 전", status: "drafting" },
+	{ id: "15", category: "경제", categoryId: "economy", title: "청년 창업 지원센터 운영", description: "창업 초기 사무 공간 및 멘토링 프로그램 제공", region: "삼성동", createdAt: "5시간 전", status: "reviewing" },
+	{ id: "14", category: "사회안전", categoryId: "safety", title: "CCTV 사각지대 해소 프로젝트", description: "주택가 골목 및 공원 주변 스마트 CCTV 200대 추가 설치", region: "논현2동", createdAt: "8시간 전", status: "drafting" },
+	{ id: "13", category: "주거·부동산", categoryId: "housing", title: "노후 아파트 리모델링 지원", description: "20년 이상 노후 공동주택 리모델링 비용 일부 지원", region: "청담동", createdAt: "12시간 전", status: "confirmed" },
+	{ id: "12", category: "교육", categoryId: "education", title: "방과후 프로그램 다양화", description: "코딩·예체능 등 방과후 프로그램 확대 및 강사 수당 인상", region: "대치동", createdAt: "1일 전", status: "drafting" },
+	{ id: "11", category: "교통", categoryId: "transport", title: "불법 주정차 단속 강화", description: "주요 이면도로 이동식 단속 카메라 설치 및 주민 신고 앱 도입", region: "신사동", createdAt: "1일 전", status: "reviewing" },
+	{ id: "10", category: "복지·분배", categoryId: "welfare", title: "장애인 이동권 보장 확대", description: "저상 버스 도입 확대 및 장애인 콜택시 대기 시간 단축", region: "역삼동", createdAt: "1일 전", status: "drafting" },
+	{ id: "9", category: "경제", categoryId: "economy", title: "전통시장 현대화 사업", description: "전통시장 아케이드 설치 및 온라인 판매 플랫폼 구축 지원", region: "대치동", createdAt: "2일 전", status: "reviewing" },
+	{ id: "8", category: "저출산·고령화", categoryId: "aging", title: "스마트 경로당 전환 사업", description: "기존 경로당 디지털 설비 설치 및 건강 모니터링 시스템 도입", region: "삼성동", createdAt: "2일 전", status: "confirmed" },
+	{ id: "7", category: "문화여가", categoryId: "culture", title: "청소년 문화시설 신설", description: "청소년 전용 공연장 및 창작 공간 조성", region: "청담동", createdAt: "3일 전", status: "drafting" },
+	{ id: "6", category: "사회안전", categoryId: "safety", title: "학교 주변 안심 귀가 인프라 강화", description: "스마트 가로등 및 비상벨 설치, 야간 순찰 강화", region: "논현1동", createdAt: "3일 전", status: "reviewing" },
+	{ id: "5", category: "교통", categoryId: "transport", title: "강남구 대중교통 환승 체계 개선 및 버스 노선 확대", description: "심야버스 노선 신설 및 버스정류장 스마트셸터 설치 확대", region: "역삼동", createdAt: "4일 전", status: "drafting" },
+	{ id: "4", category: "교육", categoryId: "education", title: "공립 유치원 확충 및 보육교사 처우 개선", description: "국공립 어린이집 비율 50% 달성 및 보육료 단계적 인하", region: "논현2동", createdAt: "2026.03.05", status: "drafting" },
+	{ id: "3", category: "복지·분배", categoryId: "welfare", title: "노인 요양시설 접근성 개선 및 운영비 지원", description: "치매안심센터 확충 및 재가요양 서비스 품질 향상 추진", region: "신사동", createdAt: "2026.03.03", status: "confirmed" },
+	{ id: "2", category: "주거·부동산", categoryId: "housing", title: "강남구 도시숲 조성 및 미세먼지 저감 대책", description: "학교 주변 생활환경 개선 및 전기차 충전 인프라 확대", region: "논현1동", createdAt: "2026.03.01", status: "reviewing" },
+	{ id: "1", category: "경제", categoryId: "economy", title: "소상공인 임대료 부담 경감 지원 확대", description: "공공임대상가 공급 확대 및 임대료 상한제 도입 추진", region: "청담동", createdAt: "2026.02.28", status: "drafting" },
 ];
+
+/** @deprecated Use computePledgeSummary(mockMyPledges) instead */
+export const mockPledgeSummary = computePledgeSummary(mockMyPledges);
 
 export const mockRegionInfo: RegionInfo = {
 	name: "서울특별시 강남구 갑",
