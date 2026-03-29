@@ -132,10 +132,9 @@ export const MOCK_LOCAL_STATISTICS: LocalElectionStatisticsData = {
 				label: "총 공약 수",
 				value: "735",
 				trailing: {
-					type: "delta",
-					label: "",
-					value: "+10.1%",
-					isPositive: true,
+					type: "badge",
+					text: "+10.1%",
+					className: "bg-party-dpk/10 text-party-dpk",
 				},
 			},
 			{
@@ -152,10 +151,9 @@ export const MOCK_LOCAL_STATISTICS: LocalElectionStatisticsData = {
 				label: "진행 중 공약",
 				value: "735",
 				trailing: {
-					type: "delta",
-					label: "",
-					value: "+10.1%",
-					isPositive: true,
+					type: "badge",
+					text: "+10.1%",
+					className: "bg-party-dpk/10 text-party-dpk",
 				},
 			},
 			{

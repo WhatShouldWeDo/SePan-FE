@@ -125,7 +125,7 @@
   - `features/pledges/data/mock-local-statistics.ts` — 통계분석 Mock 데이터 + 타입 정의
 - **에셋**: `src/assets/pledges/location-fill.svg`, `src/assets/category-icons/aging.png` (재사용)
 - **의존하는 모듈**: `contexts/useNavigation`, `components/ui` (Chip, Tabs, SegmentedControl), react-router-dom
-- **상태**: 대통령선거 + 국회의원선거 + 지방선거 후보자 목록 + 후보자 상세 페이지 완료 (mock 데이터), 통계분석 탭 placeholder
+- **상태**: 대통령선거 + 국회의원선거 + 지방선거 후보자 목록 + 후보자 상세 페이지 완료 (mock 데이터), 지방선거 통계분석 탭 구현 완료 (mock 데이터)
 
 ### Policy
 
