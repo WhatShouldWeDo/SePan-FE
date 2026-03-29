@@ -167,7 +167,7 @@ function Pagination({
               aria-current={page === currentPage ? "page" : undefined}
               aria-label={`${page}페이지`}
               className={cn(
-                "relative flex size-[30px] items-center justify-center rounded-[6px] text-[15px] tracking-[0.14px]",
+                "relative flex min-h-[44px] min-w-[30px] items-center justify-center rounded-[6px] text-[15px] tracking-[0.14px]",
                 page === currentPage
                   ? "bg-label-normal/[0.09] font-medium text-label-strong"
                   : "font-normal text-label-neutral",
@@ -200,6 +200,7 @@ function Pagination({
           value={jumpValue}
           onChange={(e) => setJumpValue(e.target.value.replace(/\D/g, ""))}
           onKeyDown={(e) => e.key === "Enter" && handleJump()}
+          aria-label="이동할 페이지 번호"
           className="w-[53px] rounded-[8px] border border-line-neutral px-1.5 py-1 text-center text-[14px] font-medium tracking-[0.2px] text-label-normal shadow-[0px_1px_2px_0px_rgba(0,0,0,0.03)] outline-none focus:border-primary"
         />
       </div>
