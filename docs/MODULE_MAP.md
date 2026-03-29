@@ -139,12 +139,14 @@
   - `components/RegionInfoBar.tsx` — 지역 정보 + 특성 뱃지 바
   - `components/RecommendationCard.tsx` — AI 추천 공약 카드
   - `components/RecommendationDetailModal.tsx` — 추천 공약 상세보기 모달
+  - `components/MyPledgeCard.tsx` — 내 공약 카드 (Row/Pledge 레이아웃)
   - `components/index.ts` — barrel export
   - `routes/AiRecommendationsPage.tsx` — AI 추천 공약 전체 목록 페이지
+  - `routes/MyPledgesPage.tsx` — 내 공약관리 페이지 (`/policy/my-pledges`)
   - `data/mock-policy.ts` — mock 데이터 및 타입 정의
-- **의존하는 모듈**: `components/ui` (CardSectionHeader, Badge, PressOverlay, SummaryCard), `components/icons` (WantedMagicWand), recharts, lucide-react
-- **라우트**: `/policy` → `PolicyPage`, `/policy/recommendations` → `AiRecommendationsPage`
-- **상태**: 피그마 기반 퍼블리싱 완료 (mock 데이터), AI 추천 공약 페이지 추가
+- **의존하는 모듈**: `components/ui` (CardSectionHeader, Badge, PressOverlay, SummaryCard, ChipTag, Chip, Pagination), `components/icons` (WantedMagicWand), recharts, lucide-react
+- **라우트**: `/policy` → `PolicyPage`, `/policy/recommendations` → `AiRecommendationsPage`, `/policy/my-pledges` → `MyPledgesPage`
+- **상태**: 피그마 기반 퍼블리싱 완료 (mock 데이터), AI 추천 공약 페이지 추가, 내 공약관리 페이지 추가
 
 ### Test
 
@@ -197,6 +199,7 @@
 | `dialog.tsx` | 모달 다이얼로그 |
 | `input.tsx`, `text-field.tsx`, `text-area.tsx` | 텍스트 입력 |
 | `label.tsx` | 폼 라벨 |
+| `pagination.tsx` | 공용 페이지네이션 (페이지 번호 + N씩 보기 + 페이지 이동) |
 | `radio.tsx`, `radio-group.tsx` | 라디오 버튼 |
 | `select.tsx` | 드롭다운 셀렉트 |
 | `select-cell.tsx` | 셀렉트 셀 (드롭다운/리스트 항목 기반 컴포넌트, Composition 슬롯) |

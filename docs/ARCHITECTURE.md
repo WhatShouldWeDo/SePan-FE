@@ -196,6 +196,7 @@ Form (react-hook-form) → Zod 검증 → useApiMutation → API 호출
 | `/pledges/:type` | PledgesPlaceholderPage | 필요 |
 | `/policy` | PolicyPage | 필요 |
 | `/policy/recommendations` | AiRecommendationsPage | 필요 |
+| `/policy/my-pledges` | `MyPledgesPage` | 필요 |
 | `/test` | TestPage | 필요 |
 
 ---
