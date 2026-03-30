@@ -17,8 +17,7 @@ export const pledgeFormSchema = z.object({
 		.min(1, "카테고리를 1개 이상 선택해주세요"),
 	content: z
 		.string()
-		.max(2000, "2000자 이내로 입력해주세요")
-		.default(""),
+		.max(2000, "2000자 이내로 입력해주세요"),
 	status: z.enum(["drafting", "reviewing", "approved", "confirmed"]),
 });
 
