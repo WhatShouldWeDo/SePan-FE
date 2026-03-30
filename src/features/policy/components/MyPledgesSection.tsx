@@ -4,6 +4,7 @@ import {
 	Pencil,
 	Clock,
 	CircleCheck,
+	ShieldCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -32,7 +33,7 @@ export function MyPledgesSection({ summary, pledges }: MyPledgesSectionProps) {
 			{/* 섹션 헤더 */}
 			<CardSectionHeader title="나의 공약 관리" />
 
-			{/* 요약 카드 4개 */}
+			{/* 요약 카드 5개 */}
 			<div className="mt-6 flex gap-3">
 				<SummaryCard
 					label="전체공약"
@@ -49,6 +50,12 @@ export function MyPledgesSection({ summary, pledges }: MyPledgesSectionProps) {
 					label="검토중"
 					value={`${summary.reviewing}건`}
 					icon={<Clock className="size-6" />}
+					valueClassName="text-status-positive"
+				/>
+				<SummaryCard
+					label="승인완료"
+					value={`${summary.approved}건`}
+					icon={<ShieldCheck className="size-6" />}
 					valueClassName="text-status-positive"
 				/>
 				<SummaryCard
@@ -78,11 +85,10 @@ export function MyPledgesSection({ summary, pledges }: MyPledgesSectionProps) {
 					{pledges.map((pledge) => (
 						<PledgeRow
 							key={pledge.id}
-							category={pledge.category}
-							categoryId={pledge.categoryId}
+							categoryIds={pledge.categoryIds}
 							title={pledge.title}
-							description={pledge.description}
-							region={pledge.region}
+							summary={pledge.summary}
+							regions={pledge.regions}
 							createdAt={pledge.createdAt}
 						/>
 					))}
