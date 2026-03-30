@@ -140,13 +140,15 @@
   - `components/RecommendationCard.tsx` — AI 추천 공약 카드
   - `components/RecommendationDetailModal.tsx` — 추천 공약 상세보기 모달
   - `components/MyPledgeCard.tsx` — 내 공약 카드 (Row/Pledge 레이아웃)
+  - `components/PledgeFormModal.tsx` — 공약 추가/수정 모달 (React Hook Form + Zod, 지역/카테고리 다중선택, 상태 선택, 임시저장)
   - `components/index.ts` — barrel export
+  - `schemas/pledgeFormSchema.ts` — 공약 폼 Zod 스키마 (title, summary, regions, categoryIds, content, status)
   - `routes/AiRecommendationsPage.tsx` — AI 추천 공약 전체 목록 페이지
   - `routes/MyPledgesPage.tsx` — 내 공약관리 페이지 (`/policy/my-pledges`)
   - `data/mock-policy.ts` — mock 데이터 및 타입 정의
-- **의존하는 모듈**: `components/ui` (CardSectionHeader, Badge, PressOverlay, SummaryCard, ChipTag, Chip, Pagination), `components/icons` (WantedMagicWand), recharts, lucide-react
+- **의존하는 모듈**: `components/ui` (CardSectionHeader, Badge, PressOverlay, SummaryCard, ChipTag, Chip, Pagination, Dialog, TextField, TextArea, Button), `components/icons` (WantedMagicWand), `lib/toast`, `region/data/categories`, recharts, lucide-react, react-hook-form, zod
 - **라우트**: `/policy` → `PolicyPage`, `/policy/recommendations` → `AiRecommendationsPage`, `/policy/my-pledges` → `MyPledgesPage`
-- **상태**: 피그마 기반 퍼블리싱 완료 (mock 데이터), AI 추천 공약 페이지 추가, 내 공약관리 페이지 추가
+- **상태**: 피그마 기반 퍼블리싱 완료 (mock 데이터), AI 추천 공약 페이지 추가, 내 공약관리 페이지 + 공약 추가/수정 모달 구현 완료
 
 ### Test
 
@@ -383,7 +385,7 @@ features/
   ├─ auth/      → lib/api, types, components/ui
   ├─ region/    → types/map, lib/utils, components/ui, d3, topojson
   ├─ dashboard/ → components/ui (Badge, Banner, Button, CardSectionHeader), lib/utils
-  ├─ policy/    → (비활성, 빈 디렉토리)
+  ├─ policy/    → components/ui, lib/toast, region/data, react-hook-form, zod
   └─ test/      → components/ui
   │
 app/
