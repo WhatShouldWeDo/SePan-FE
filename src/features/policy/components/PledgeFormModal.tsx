@@ -6,7 +6,12 @@ import { Check, MapPin, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { TextArea } from "@/components/ui/text-area";
 import { TextField } from "@/components/ui/text-field";
 import { CATEGORIES } from "@/features/region/data/categories";
@@ -200,6 +205,14 @@ function PledgeFormModal({
 	} = useForm<PledgeFormData>({
 		resolver: zodResolver(pledgeFormSchema),
 		mode: "onChange",
+		defaultValues: {
+			title: "",
+			summary: "",
+			regions: [],
+			categoryIds: [],
+			content: "",
+			status: "drafting",
+		},
 	});
 
 	// open 변경 시 폼 초기화
@@ -251,9 +264,9 @@ function PledgeFormModal({
 		setValue("categoryIds", next, { shouldValidate: true });
 	}
 
-	/* Draft handler */
+	/* Draft handler — 유효성 검사 없이 현재 폼 값 전달 */
 	const handleDraft = () => {
-		onSaveDraft(getValues() as PledgeFormData);
+		onSaveDraft(getValues());
 	};
 
 	return (
@@ -263,6 +276,13 @@ function PledgeFormModal({
 				showCloseButton={false}
 				onInteractOutside={(e) => e.preventDefault()}
 			>
+				<DialogTitle className="sr-only">
+					{pledge ? "공약 수정" : "새 공약 추가"}
+				</DialogTitle>
+				<DialogDescription className="sr-only">
+					공약의 제목, 요약, 지역, 카테고리, 상세내용을 입력하세요.
+				</DialogDescription>
+
 				{/* ── Header (fixed top) ── */}
 				<div className="px-8 pt-8 pb-2">
 					<div className="flex items-start justify-between">
@@ -300,7 +320,7 @@ function PledgeFormModal({
 						{/* 닫기 버튼 */}
 						<button
 							type="button"
-							className="shrink-0 p-1"
+							className="flex shrink-0 items-center justify-center rounded-lg p-2"
 							onClick={onClose}
 							aria-label="닫기"
 						>
