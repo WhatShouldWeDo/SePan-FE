@@ -51,7 +51,7 @@ src/
 │   │   ├── hooks/              #   useMapDrillDown, useTopoJsonData, useHeatmapMode 등
 │   │   ├── lib/                #   choropleth-utils, sido-utils, map-theme
 │   │   └── data/               #   TopoJSON, 카테고리 정의, 히트맵 설정
-│   ├── policy/                 # 정책개발 (AI 추천, 벤치마킹, 나의 공약)
+│   ├── policy/                 # 정책개발 (AI 추천, 벤치마킹, 나의 공약, 공약 추가/수정 모달)
 │   └── test/                   # 테스트 페이지
 │
 ├── components/                 # 공유 UI 컴포넌트

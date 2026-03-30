@@ -1,14 +1,18 @@
 import { useMemo, useRef, useState, useEffect } from "react";
-import { Plus, Pencil, Clock, CircleCheck } from "lucide-react";
+import { Plus, Pencil, Clock, CircleCheck, ShieldCheck } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { toast } from "@/lib/toast/toast";
 import { useBreadcrumb } from "@/contexts/useNavigation";
 import { ChipTag } from "@/components/ui/chip-tag";
 import { Chip } from "@/components/ui/chip";
 import { Pagination } from "@/components/ui/pagination";
 import { MyPledgeCard } from "@/features/policy/components/MyPledgeCard";
+import { PledgeFormModal } from "@/features/policy/components/PledgeFormModal";
+import type { PledgeFormData } from "@/features/policy/schemas/pledgeFormSchema";
 import {
   mockMyPledges,
+  type MyPledge,
   type PledgeStatus,
 } from "@/features/policy/data/mock-policy";
 
@@ -23,6 +27,11 @@ const STATUS_FILTERS: {
   { value: "all", label: "전체" },
   { value: "drafting", label: "작성중", icon: <Pencil className="size-4" /> },
   { value: "reviewing", label: "검토중", icon: <Clock className="size-4" /> },
+  {
+    value: "approved",
+    label: "승인완료",
+    icon: <ShieldCheck className="size-4" />,
+  },
   {
     value: "confirmed",
     label: "확정됨",
@@ -43,6 +52,8 @@ export function MyPledgesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [isSortOpen, setIsSortOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPledge, setEditingPledge] = useState<MyPledge | null>(null);
 
   const sortRef = useRef<HTMLDivElement>(null);
 
@@ -93,6 +104,33 @@ export function MyPledgesPage() {
     setCurrentPage(1);
   };
 
+  const handleOpenCreate = () => {
+    setEditingPledge(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (id: string) => {
+    const target = mockMyPledges.find((p) => p.id === id) ?? null;
+    setEditingPledge(target);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingPledge(null);
+  };
+
+  const handleFormSubmit = (_data: PledgeFormData) => {
+    toast.success(
+      editingPledge ? "공약이 수정되었습니다." : "공약이 등록되었습니다.",
+    );
+    handleCloseModal();
+  };
+
+  const handleSaveDraft = (_data: PledgeFormData) => {
+    toast.success("임시저장되었습니다.");
+  };
+
   const sortLabel =
     SORT_OPTIONS.find((o) => o.value === sortOrder)?.label ?? "최근수정된순";
 
@@ -110,6 +148,7 @@ export function MyPledgesPage() {
         </div>
         <button
           type="button"
+          onClick={handleOpenCreate}
           className="inline-flex items-center gap-1.5 rounded-[12px] bg-primary px-7 py-[15px] text-label-2 font-semibold text-white"
         >
           <Plus className="size-5" />
@@ -178,7 +217,7 @@ export function MyPledgesPage() {
       <div className="mt-6 flex flex-col gap-4">
         {paginated.length > 0 ? (
           paginated.map((pledge) => (
-            <MyPledgeCard key={pledge.id} pledge={pledge} />
+            <MyPledgeCard key={pledge.id} pledge={pledge} onEdit={handleOpenEdit} />
           ))
         ) : (
           <div className="flex items-center justify-center py-20">
@@ -201,6 +240,15 @@ export function MyPledgesPage() {
           />
         </div>
       )}
+
+      {/* 공약 추가/수정 모달 */}
+      <PledgeFormModal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        pledge={editingPledge}
+        onSubmit={handleFormSubmit}
+        onSaveDraft={handleSaveDraft}
+      />
     </div>
   );
 }
