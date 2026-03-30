@@ -287,34 +287,45 @@ function PledgeFormModal({
 				<div className="px-8 pt-8 pb-2">
 					<div className="flex items-start justify-between">
 						<div className="flex flex-col gap-2">
-							{/* 제목 */}
-							<h2 className="text-heading-3 font-bold text-label-strong">
-								{watchedTitle ||
-									(pledge ? "공약 제목" : "새 공약 추가하기")}
-							</h2>
-
-							{/* 지역 뱃지 + 카테고리 서브칩 */}
-							<div className="flex flex-wrap items-center gap-2">
+							{/* 제목 + 지역 뱃지 (같은 줄) */}
+							<div className="flex items-center gap-2">
+								<h2
+									className={cn(
+										"text-heading-3 font-bold",
+										watchedTitle
+											? "text-label-strong"
+											: "text-label-assistive",
+									)}
+								>
+									{watchedTitle || "공약 제목"}
+								</h2>
 								{selectedRegions?.length > 0 && (
-									<span className="inline-flex items-center gap-1 rounded-[8px] bg-primary/8 px-2 py-[5px] text-label-4 font-semibold text-primary">
+									<span className="inline-flex shrink-0 items-center gap-1 rounded-[8px] bg-primary/8 px-2 py-[5px] text-label-4 font-semibold text-primary">
 										<MapPin className="size-3.5" />
-										{selectedRegions[0]}
+										{selectedRegions.length === 1
+											? selectedRegions[0]
+											: `${selectedRegions[0]} 외 ${selectedRegions.length - 1}곳`}
 									</span>
 								)}
-
-								{selectedCategoryIds?.map((catId) => (
-									<span
-										key={catId}
-										className="inline-flex items-center gap-1 text-[14px] font-semibold text-label-alternative"
-									>
-										<CategoryIcon
-											categoryId={catId}
-											size={16}
-										/>
-										{CATEGORY_DISPLAY_LABELS[catId] ?? catId}
-									</span>
-								))}
 							</div>
+
+							{/* 카테고리 서브칩 */}
+							{selectedCategoryIds?.length > 0 && (
+								<div className="flex flex-wrap items-center gap-2">
+									{selectedCategoryIds.map((catId) => (
+										<span
+											key={catId}
+											className="inline-flex items-center gap-1 text-[14px] font-semibold text-label-alternative"
+										>
+											<CategoryIcon
+												categoryId={catId}
+												size={16}
+											/>
+											{CATEGORY_DISPLAY_LABELS[catId] ?? catId}
+										</span>
+									))}
+								</div>
+							)}
 						</div>
 
 						{/* 닫기 버튼 */}
