@@ -331,7 +331,7 @@ function PledgeFormModal({
 						{/* 닫기 버튼 */}
 						<button
 							type="button"
-							className="flex shrink-0 items-center justify-center rounded-lg p-2"
+							className="flex shrink-0 items-center justify-center rounded-lg p-2.5"
 							onClick={onClose}
 							aria-label="닫기"
 						>

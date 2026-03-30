@@ -1,0 +1,60 @@
+<h2>파일 구조 & 아키텍처</h2>
+<p class="subtitle">features/pledges/ 모듈 구조 — 접근방식 C</p>
+
+<div class="section">
+  <h3>디렉토리 구조</h3>
+  <div class="mockup">
+    <div class="mockup-header">src/features/pledges/</div>
+    <div class="mockup-body" style="font-family: monospace; font-size: 14px; line-height: 1.8; background: #1a1a2e; color: #e0e0e0; padding: 24px;">
+      <div>📁 <span style="color:#82aaff">components/</span></div>
+      <div style="padding-left:24px">📄 <span style="color:#c3e88d">CandidateCard.tsx</span> <span style="color:#666">— 후보자 프로필 카드 (사진+이름+정당+지역+경력)</span></div>
+      <div style="padding-left:24px">📄 <span style="color:#c3e88d">CandidateGrid.tsx</span> <span style="color:#666">— 2열 그리드 + 검색결과 헤더</span></div>
+      <div style="padding-left:24px">📄 <span style="color:#c3e88d">ElectionTermFilter.tsx</span> <span style="color:#666">— 선거회차 Chip/Filter 드롭다운</span></div>
+      <div style="padding-left:24px">📄 <span style="color:#c3e88d">index.ts</span> <span style="color:#666">— re-export</span></div>
+      <div>📁 <span style="color:#82aaff">data/</span></div>
+      <div style="padding-left:24px">📄 <span style="color:#c3e88d">mock-candidates.ts</span> <span style="color:#666">— 하드코딩 mock 후보자 데이터</span></div>
+      <div>📁 <span style="color:#82aaff">types/</span></div>
+      <div style="padding-left:24px">📄 <span style="color:#c3e88d">index.ts</span> <span style="color:#666">— Candidate, ElectionTerm, Party 타입</span></div>
+      <div style="margin-top:16px; border-top: 1px solid #333; padding-top:16px;">
+        <div>📁 <span style="color:#82aaff">src/app/routes/</span></div>
+        <div style="padding-left:24px">📄 <span style="color:#f78c6c">PresidentialPledgesPage.tsx</span> <span style="color:#666">— 새 페이지 (라우트 엔트리)</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>컴포넌트 계층</h3>
+  <div class="mockup">
+    <div class="mockup-header">Page → Section → Pure UI</div>
+    <div class="mockup-body" style="font-family: monospace; font-size: 13px; line-height: 2; padding: 24px;">
+      <div style="color:#ff9800; font-weight:bold">PresidentialPledgesPage (Page)</div>
+      <div style="padding-left:20px; color:#666">├─ useBreadcrumb (역대공약분석 > 대통령선거)</div>
+      <div style="padding-left:20px; color:#666">├─ Heading (text-heading-2)</div>
+      <div style="padding-left:20px; color:#4caf50; font-weight:bold">├─ ElectionTermFilter (Section)</div>
+      <div style="padding-left:40px; color:#666">└─ Chip (기존 ui/chip.tsx 재사용)</div>
+      <div style="padding-left:20px; color:#4caf50; font-weight:bold">├─ Tabs (기존 ui/tabs.tsx 재사용)</div>
+      <div style="padding-left:40px; color:#666">├─ "후보자 목록" → CandidateGrid</div>
+      <div style="padding-left:40px; color:#666">└─ "통계분석" → placeholder</div>
+      <div style="padding-left:20px; color:#2196f3; font-weight:bold">└─ CandidateGrid (Section)</div>
+      <div style="padding-left:40px; color:#666">├─ ResultHeader ("검색결과 N건")</div>
+      <div style="padding-left:40px; color:#2196f3; font-weight:bold">└─ CandidateCard[] (Pure UI) × 2열</div>
+      <div style="padding-left:60px; color:#666">├─ 프로필 사진 (placeholder)</div>
+      <div style="padding-left:60px; color:#666">├─ 이름 + BadgeParty</div>
+      <div style="padding-left:60px; color:#666">├─ 지역구 Badge + 선거정보 Badge</div>
+      <div style="padding-left:60px; color:#666">└─ 경력 3줄</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>상태 관리</h3>
+  <div style="background:#f8f9fa; border-radius:12px; padding:20px; line-height:1.8;">
+    <p><strong>useState만 사용</strong> (API 연동 전이므로 React Query 불필요)</p>
+    <ul style="margin:8px 0; padding-left:20px;">
+      <li><code>selectedTerm</code> — 선택된 선거회차 (ElectionTermFilter)</li>
+      <li><code>activeTab</code> — 현재 탭 ("candidates" | "statistics")</li>
+    </ul>
+    <p>mock 데이터를 selectedTerm으로 필터링하여 CandidateGrid에 전달</p>
+  </div>
+</div>
