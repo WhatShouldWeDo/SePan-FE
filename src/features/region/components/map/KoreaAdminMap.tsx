@@ -52,6 +52,10 @@ export interface KoreaAdminMapProps {
 	onLevelChange?: (level: MapLevel) => void;
 	/** 현재 보이는 지역 코드 변경 콜백 (Phase heatmap) */
 	onVisibleCodesChange?: (codes: string[]) => void;
+	/** 지도가 내 선거구 초기 위치에 있는지 여부 콜백 */
+	onHomeStateChange?: (isAtHome: boolean) => void;
+	/** 지도 전환 애니메이션 진행 여부 콜백 */
+	onTransitionStateChange?: (isTransitioning: boolean) => void;
 	/** 로딩 상태 (외부 데이터) */
 	isLoading?: boolean;
 	/** 추가 className */
@@ -91,6 +95,8 @@ export function KoreaAdminMap({
 	tooltipDataProvider,
 	onLevelChange,
 	onVisibleCodesChange,
+	onHomeStateChange,
+	onTransitionStateChange,
 	isLoading = false,
 	className,
 }: KoreaAdminMapProps) {
@@ -146,6 +152,10 @@ export function KoreaAdminMap({
 	// --- 전환 애니메이션 (Phase 4-D) ---
 	const { isTransitioning, triggerTransition } = useMapTransition();
 
+	useEffect(() => {
+		onTransitionStateChange?.(isTransitioning);
+	}, [isTransitioning, onTransitionStateChange]);
+
 	// 브레드크럼 뒤로가기 (애니메이션 포함)
 	const handleAnimatedBackToNational = useCallback(() => {
 		if (isTransitioning) return;
@@ -169,11 +179,22 @@ export function KoreaAdminMap({
 	}, [isTransitioning, triggerTransition, gRef, handleBackToSigun]);
 
 	// 검색 네비게이션 처리
+	const hasNavigated = useRef(false);
+
 	useEffect(() => {
 		if (searchNavigation && enableDrillDown) {
-			navigateToSearchResult(searchNavigation);
+			if (hasNavigated.current && gRef.current) {
+				// 후속 네비게이션 (복귀, 검색 등) — 전환 애니메이션 적용
+				triggerTransition(gRef.current, () => {
+					navigateToSearchResult(searchNavigation);
+				});
+			} else {
+				// 초기 마운트 네비게이션 — 애니메이션 없이 즉시
+				navigateToSearchResult(searchNavigation);
+			}
+			hasNavigated.current = true;
 		}
-	}, [searchNavigation, enableDrillDown, navigateToSearchResult]);
+	}, [searchNavigation, enableDrillDown, navigateToSearchResult, triggerTransition, gRef]);
 
 	// 레벨 전환 시 줌 리셋 (부드러운 전환)
 	useEffect(() => {
@@ -199,6 +220,28 @@ export function KoreaAdminMap({
 	useEffect(() => {
 		onLevelChange?.(currentLevel);
 	}, [currentLevel, onLevelChange]);
+
+	// 내 선거구 위치 판별
+	const isAtHome = useMemo(() => {
+		if (!searchNavigation) return false;
+		return (
+			currentLevel === "eupMyeonDong" &&
+			selectedSido === searchNavigation.sido &&
+			selectedCity === (searchNavigation.cityCode ?? null) &&
+			selectedGu === (searchNavigation.guCode ?? null)
+		);
+	}, [currentLevel, selectedSido, selectedCity, selectedGu, searchNavigation]);
+
+	// 내 선거구 위치 변경을 부모에 전파 (mount 시 첫 호출만 skip)
+	const isMountedForHome = useRef(false);
+
+	useEffect(() => {
+		if (!isMountedForHome.current) {
+			isMountedForHome.current = true;
+			return;
+		}
+		onHomeStateChange?.(isAtHome);
+	}, [isAtHome, onHomeStateChange]);
 
 	// 레벨별 라벨 면적 임계값
 	const effectiveThreshold =

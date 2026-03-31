@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { MapPin, X } from "lucide-react";
 
 import { CategoryNav } from "@/components/ui/category-nav";
 import { CardSectionHeader } from "@/components/ui/card-section-header";
@@ -25,7 +25,7 @@ import {
 } from "@/features/region/data/mock-comparison";
 import type { MetricRowData } from "@/features/region/data/mock-comparison";
 import type { ChartConfig } from "@/types/chart";
-import type { MapRegion, MapLevel } from "@/types/map";
+import type { MapRegion, MapLevel, SearchSelectedRegion } from "@/types/map";
 
 /* ═══════════════════════════════════════════════════════════
    Chart Configs
@@ -75,6 +75,10 @@ export function RegionResultPage() {
 	const [mapLevel, setMapLevel] = useState<MapLevel>("sido");
 	const [visibleCodes, setVisibleCodes] = useState<string[]>([]);
 
+	const [searchNav, setSearchNav] = useState<SearchSelectedRegion | null>(MY_REGION_NAV);
+	const [isAtHome, setIsAtHome] = useState(true);
+	const isMapTransitioningRef = useRef(false);
+
 	const heatmap = useHeatmapMode(selectedCategoryId, mapLevel, visibleCodes);
 
 	const tooltipDataProvider = useCallback(
@@ -111,6 +115,17 @@ export function RegionResultPage() {
 
 	const handleAnalysis = useCallback(() => {
 		setViewMode("analysis");
+	}, []);
+
+	const handleReturnHome = useCallback(() => {
+		if (isMapTransitioningRef.current) return;
+		setViewMode("default");
+		setSelectedRegion(null);
+		setSearchNav({ ...MY_REGION_NAV });
+	}, []);
+
+	const handleTransitionStateChange = useCallback((v: boolean) => {
+		isMapTransitioningRef.current = v;
 	}, []);
 
 	const handleCategorySelect = useCallback((categoryId: string) => {
@@ -164,6 +179,8 @@ export function RegionResultPage() {
 	const selectedCategoryLabel =
 		CATEGORIES.find((c) => c.id === selectedCategoryId)?.label ??
 		selectedCategoryId;
+
+	const showReturnButton = !(viewMode === "default" && isAtHome);
 
 	useBreadcrumb([
 		{ label: "지역분석" },
@@ -222,7 +239,7 @@ export function RegionResultPage() {
 				{/* ── 2열 카드 섹션: 지도 + 지표 ── */}
 				<div className="grid grid-cols-2 gap-4 2xl:gap-6">
 					{/* 좌측: 폴리곤 지도 */}
-					<section className="flex flex-col rounded-3xl border border-line-neutral p-8">
+					<section className="relative flex flex-col rounded-3xl border border-line-neutral p-8">
 						<CardSectionHeader
 							title={MY_REGION.districtName}
 							description="선거구 단위"
@@ -241,16 +258,28 @@ export function RegionResultPage() {
 						)}
 						<div className="flex items-center justify-center">
 							<KoreaAdminMap
-								searchNavigation={MY_REGION_NAV}
+								searchNavigation={searchNav}
 								onRegionSelect={handleRegionSelect}
 								choroplethData={heatmap.choroplethData}
 								choroplethConfig={heatmap.choroplethConfig}
 								tooltipDataProvider={heatmap.isHeatmapActive ? tooltipDataProvider : undefined}
 								onLevelChange={setMapLevel}
 								onVisibleCodesChange={setVisibleCodes}
+								onHomeStateChange={setIsAtHome}
+								onTransitionStateChange={handleTransitionStateChange}
 								className="h-[460px] w-full [&>svg]:h-full [&>svg]:w-full"
 							/>
 						</div>
+						{showReturnButton && (
+							<button
+								type="button"
+								onClick={handleReturnHome}
+								className="absolute bottom-4 left-1/2 z-10 flex min-h-[44px] -translate-x-1/2 items-center gap-1 rounded-full border-2 border-primary bg-background px-3.5 py-3 text-label-3 font-semibold text-primary shadow-[0px_2px_8px_0px_rgba(20,40,113,0.06)] hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+							>
+								<MapPin className="size-4 fill-current" />
+								내 선거구로 돌아가기
+							</button>
+						)}
 					</section>
 
 					{/* 우측: 지표 메트릭 리스트 */}
