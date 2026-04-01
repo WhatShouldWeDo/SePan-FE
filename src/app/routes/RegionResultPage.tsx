@@ -26,6 +26,7 @@ import {
 import type { MetricRowData } from "@/features/region/data/mock-comparison";
 import type { ChartConfig } from "@/types/chart";
 import type { MapRegion, MapLevel, SearchSelectedRegion } from "@/types/map";
+import { CONSTITUENCY_TOOLTIP_MOCK } from "@/features/region/data/mock-constituency-tooltip";
 
 /* ═══════════════════════════════════════════════════════════
    Chart Configs
@@ -126,6 +127,11 @@ export function RegionResultPage() {
 
 	const handleTransitionStateChange = useCallback((v: boolean) => {
 		isMapTransitioningRef.current = v;
+	}, []);
+
+	const handleConstituencyModeChange = useCallback((_isOn: boolean) => {
+		setViewMode("default");
+		setSelectedRegion(null);
 	}, []);
 
 	const handleCategorySelect = useCallback((categoryId: string) => {
@@ -258,8 +264,11 @@ export function RegionResultPage() {
 						)}
 						<div className="flex items-center justify-center">
 							<KoreaAdminMap
+								selectedCode={selectedRegion?.code ?? null}
 								searchNavigation={searchNav}
 								onRegionSelect={handleRegionSelect}
+								onConstituencyModeChange={handleConstituencyModeChange}
+								constituencyTooltipData={CONSTITUENCY_TOOLTIP_MOCK}
 								choroplethData={heatmap.choroplethData}
 								choroplethConfig={heatmap.choroplethConfig}
 								tooltipDataProvider={heatmap.isHeatmapActive ? tooltipDataProvider : undefined}
