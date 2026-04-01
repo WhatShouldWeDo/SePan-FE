@@ -28,8 +28,6 @@ interface TopoJsonDataState {
 	emdFeatures: GeoJSON.FeatureCollection | null;
 	/** 선거구 SGG_Code → ConstituencyInfo 매핑 */
 	constituencyInfoMap: Map<string, ConstituencyInfo> | null;
-	/** 선거구 GeoJSON FeatureCollection (경계 오버레이 렌더링용) */
-	constituencyFeatures: GeoJSON.FeatureCollection | null;
 	/** 로딩 중 여부 */
 	isLoading: boolean;
 	/** 에러 메시지 */
@@ -53,7 +51,6 @@ export function useTopoJsonData(): TopoJsonDataState {
 		sigunguFeatures: null,
 		emdFeatures: null,
 		constituencyInfoMap: null,
-		constituencyFeatures: null,
 		isLoading: true,
 		error: null,
 	});
@@ -122,19 +119,12 @@ export function useTopoJsonData(): TopoJsonDataState {
 					});
 				}
 
-				// 선거구 경계 오버레이용 GeoJSON FeatureCollection
-				const constituencyFeatures = topojson.feature(
-					constituencyTopo,
-					constituencyTopo.objects[CONSTITUENCY_TOPOJSON_OBJECT_KEY],
-				) as unknown as GeoJSON.FeatureCollection;
-
 				setState({
 					sidoFeatures,
 					sigunFeatures,
 					sigunguFeatures,
 					emdFeatures,
 					constituencyInfoMap,
-					constituencyFeatures,
 					isLoading: false,
 					error: null,
 				});
@@ -146,7 +136,6 @@ export function useTopoJsonData(): TopoJsonDataState {
 					sigunguFeatures: null,
 					emdFeatures: null,
 					constituencyInfoMap: null,
-					constituencyFeatures: null,
 					isLoading: false,
 					error:
 						err instanceof Error

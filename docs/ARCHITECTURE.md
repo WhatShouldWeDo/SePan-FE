@@ -1,6 +1,6 @@
 # Architecture Overview
 
-> 최종 업데이트: 2026-03-18
+> 최종 업데이트: 2026-04-01
 
 ## 기술 스택
 
@@ -84,7 +84,7 @@ src/
 │   ├── api.ts                  # ApiResponse<T>, Login/Signup 타입
 │   ├── common.ts               # User, Region, Pagination
 │   ├── chart.ts
-│   └── map.ts                  # MapRegion, projection 타입
+│   └── map.ts                  # MapRegion, ConstituencyInfo, projection 타입
 │
 ├── test/                       # 테스트 설정
 │   └── setup.ts
@@ -130,6 +130,7 @@ Context는 테마/인증 등 제한적 사용만 허용. Redux, MobX 등 금지.
 - 레벨 변경 시 `fitExtent`가 최적 확대 비율·중앙 좌표를 자동 계산, d3-zoom identity(1x) 리셋
 - 동적 import로 TopoJSON 지연 로딩 (`useTopoJsonData`)
 - `React.memo` + 커스텀 `arePropsEqual`로 폴리곤 렌더링 최적화
+- 선거구 뷰 모드: 읍면동 레벨에서 22대 국회의원 선거구 단위 색상/인터랙션 오버레이 (SGG_Code 기반 EMD→선거구 매핑, OKLCH 팔레트, SVG clip-path 외곽선)
 
 ### 폼 검증
 

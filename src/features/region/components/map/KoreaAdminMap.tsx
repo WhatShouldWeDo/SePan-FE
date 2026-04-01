@@ -128,7 +128,6 @@ export function KoreaAdminMap({
 		sigunguFeatures,
 		emdFeatures,
 		constituencyInfoMap,
-		constituencyFeatures,
 		isLoading: isDataLoading,
 		error: dataError,
 	} = useTopoJsonData();
@@ -249,7 +248,7 @@ export function KoreaAdminMap({
 	}, [isAtHome, onHomeStateChange]);
 
 	// --- 선거구 뷰 모드 ---
-	const [isConstituencyMode, setIsConstituencyMode] = useState(false);
+	const [isConstituencyMode, setIsConstituencyMode] = useState(true);
 
 	// --- 선거구 드릴다운 ---
 	const [selectedConstituency, setSelectedConstituency] = useState<string | null>(null);
@@ -260,7 +259,7 @@ export function KoreaAdminMap({
 	// 레벨 변경 시 자동 리셋
 	useEffect(() => {
 		if (currentLevel !== "eupMyeonDong") {
-			setIsConstituencyMode(false);
+			setIsConstituencyMode(true);
 			setSelectedConstituency(null);
 			setSelectedConstituencyName(null);
 		}
@@ -268,7 +267,7 @@ export function KoreaAdminMap({
 
 	// searchNavigation 변경 시 자동 리셋
 	useEffect(() => {
-		setIsConstituencyMode(false);
+		setIsConstituencyMode(true);
 		setSelectedConstituency(null);
 		setSelectedConstituencyName(null);
 	}, [searchNavigation]);
@@ -424,24 +423,25 @@ export function KoreaAdminMap({
 	}, [isConstituencyMode, hoveredCode, constituencyColorMap]);
 
 	// --- 선거구 경계 오버레이 (선거구 개요 모드에서만) ---
-	const visibleConstituencyFeatures = useMemo(() => {
-		if (!isConstituencyMode || selectedConstituency || !constituencyFeatures) return [];
-		const visibleSggCodes = new Set<string>();
-		for (const f of effectiveFeatureCollection.features) {
-			const code = f.properties?.SGG_Code as string;
-			if (code) visibleSggCodes.add(code);
+	// 렌더된 EMD SVG path를 SGG_Code별로 합쳐 compound path 생성 → 경계 정확 일치 보장
+	const constituencyOverlayPaths = useMemo(() => {
+		if (!isConstituencyMode || selectedConstituency || !constituencyColorMap) return [];
+		const pathsBySgg = new Map<string, string[]>();
+		for (const { region, pathD } of regionData) {
+			const entry = constituencyColorMap.get(region.code);
+			if (!entry) continue;
+			const arr = pathsBySgg.get(entry.sggCode);
+			if (arr) {
+				arr.push(pathD);
+			} else {
+				pathsBySgg.set(entry.sggCode, [pathD]);
+			}
 		}
-		return constituencyFeatures.features.filter(
-			(f) => visibleSggCodes.has(f.properties?.SGG_Code as string),
-		);
-	}, [isConstituencyMode, selectedConstituency, constituencyFeatures, effectiveFeatureCollection]);
-
-	const constituencyBoundaryPaths = useMemo(() => {
-		return visibleConstituencyFeatures.map((f) => ({
-			pathD: pathGenerator(f) ?? "",
-			sggCode: f.properties?.SGG_Code as string,
+		return Array.from(pathsBySgg.entries()).map(([sggCode, pathDs]) => ({
+			sggCode,
+			combinedPathD: pathDs.join(" "),
 		}));
-	}, [visibleConstituencyFeatures, pathGenerator]);
+	}, [isConstituencyMode, selectedConstituency, constituencyColorMap, regionData]);
 
 	// 보이는 지역 코드 목록 안정화 (참조 비교로 불필요한 리렌더 방지)
 	const prevCodesRef = useRef<string[]>([]);
@@ -474,13 +474,14 @@ export function KoreaAdminMap({
 			}
 			setHoveredCode(region.code);
 
-			// 선거구 모드: tooltip region을 선거구 정보로 교체
+			// 선거구 개요 모드: tooltip region을 선거구 정보로 교체
+			// 선거구 드릴다운 모드: 개별 EMD 정보 그대로 표시
 			const cMode = isConstituencyModeRef.current;
 			const cMap = constituencyColorMapRef.current;
 			const cInfo = constituencyInfoMapRef.current;
 
 			let tooltipRegion = region;
-			if (cMode && cMap && cInfo) {
+			if (cMode && !selectedConstituencyRef.current && cMap && cInfo) {
 				const sggCode = cMap.get(region.code)?.sggCode;
 				const info = sggCode ? cInfo.get(sggCode) : null;
 				if (info) {
@@ -709,15 +710,11 @@ export function KoreaAdminMap({
 
 							const isHovered = isConstituencyOverview
 								? false
-								: isConstituencyMode
-									? emdSggCode != null && emdSggCode === hoveredConstituencyCode
-									: hoveredCode === region.code;
+								: hoveredCode === region.code;
 
 							const isSelected = isConstituencyOverview
 								? false
-								: isConstituencyMode
-									? emdSggCode != null && emdSggCode === selectedCode
-									: (selectedCode === region.code || searchHighlightCode === region.code);
+								: (selectedCode === region.code || searchHighlightCode === region.code);
 
 							const isActive = isHovered || isSelected;
 							if (isActive) return null;
@@ -752,20 +749,15 @@ export function KoreaAdminMap({
 					{/* Layer 2: 비활성 폴리곤 label — 모든 path 위에 렌더링 */}
 					{regionData.map(
 						({ region, centroid, showLabel, area }) => {
-							const emdSggCode = constituencyColorMap?.get(region.code)?.sggCode;
 							const isConstituencyOverview = isConstituencyMode && !selectedConstituency;
 
 							const isHovered = isConstituencyOverview
 								? false
-								: isConstituencyMode
-									? emdSggCode != null && emdSggCode === hoveredConstituencyCode
-									: hoveredCode === region.code;
+								: hoveredCode === region.code;
 
 							const isSelected = isConstituencyOverview
 								? false
-								: isConstituencyMode
-									? emdSggCode != null && emdSggCode === selectedCode
-									: (selectedCode === region.code || searchHighlightCode === region.code);
+								: (selectedCode === region.code || searchHighlightCode === region.code);
 
 							const isActive = isHovered || isSelected;
 							if (isActive) return null;
@@ -799,20 +791,15 @@ export function KoreaAdminMap({
 					{/* Layer 3: hover/selected 폴리곤 — path + label 최상위 렌더링 */}
 					{regionData.map(
 						({ region, pathD, centroid, showLabel, area }) => {
-							const emdSggCode = constituencyColorMap?.get(region.code)?.sggCode;
 							const isConstituencyOverview = isConstituencyMode && !selectedConstituency;
 
 							const isHovered = isConstituencyOverview
 								? false
-								: isConstituencyMode
-									? emdSggCode != null && emdSggCode === hoveredConstituencyCode
-									: hoveredCode === region.code;
+								: hoveredCode === region.code;
 
 							const isSelected = isConstituencyOverview
 								? false
-								: isConstituencyMode
-									? emdSggCode != null && emdSggCode === selectedCode
-									: (selectedCode === region.code || searchHighlightCode === region.code);
+								: (selectedCode === region.code || searchHighlightCode === region.code);
 
 							if (!isHovered && !isSelected) return null;
 
@@ -845,22 +832,33 @@ export function KoreaAdminMap({
 							);
 						},
 					)}
-					{/* Layer 4: 선거구 경계 오버레이 (개요 모드에서만) */}
-					{constituencyBoundaryPaths.map(({ pathD, sggCode }) => {
+					{/* Layer 4: 선거구 경계 오버레이 (개요 모드) — clip-path로 외곽선만 표시 */}
+					{constituencyOverlayPaths.map(({ sggCode, combinedPathD }) => {
 						const isHovered = sggCode === hoveredConstituencyCode;
 						const isSelected = sggCode === selectedCode;
 						if (!isHovered && !isSelected) return null;
+						const clipId = `const-outer-${sggCode}`;
 						return (
-							<path
-								key={`constituency-${sggCode}`}
-								d={pathD}
-								fill="none"
-								stroke={mapColors.strokeHover}
-								strokeWidth={3}
-								vectorEffect="non-scaling-stroke"
-								pointerEvents="none"
-								style={{ transition: "stroke 150ms ease-out" }}
-							/>
+							<g key={`constituency-${sggCode}`}>
+								<defs>
+									<clipPath id={clipId}>
+										<path
+											d={`M0,0 L${width},0 L${width},${height} L0,${height} Z ${combinedPathD}`}
+											clipRule="evenodd"
+										/>
+									</clipPath>
+								</defs>
+								<path
+									d={combinedPathD}
+									fill="none"
+									stroke={mapColors.strokeHover}
+									strokeWidth={6}
+									vectorEffect="non-scaling-stroke"
+									pointerEvents="none"
+									clipPath={`url(#${clipId})`}
+									style={{ transition: "stroke 150ms ease-out" }}
+								/>
+							</g>
 						);
 					})}
 				</g>
@@ -888,7 +886,7 @@ export function KoreaAdminMap({
 				hovered={tooltip}
 				data={
 					tooltip
-						? (isConstituencyMode && constituencyTooltipData
+						? (isConstituencyMode && !selectedConstituency && constituencyTooltipData
 							? constituencyTooltipData[tooltip.region.code]
 							: tooltipDataProvider?.(tooltip.region.code))
 						: undefined
