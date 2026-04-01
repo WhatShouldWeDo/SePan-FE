@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import * as topojson from "topojson-client";
+import type { ConstituencyInfo } from "@/types/map";
 
 /** TopoJSON 오브젝트명 (시도) */
 const SIDO_TOPOJSON_OBJECT_KEY = "2024_22_Elec_simplify";
@@ -13,6 +14,9 @@ const SIGUNGU_TOPOJSON_OBJECT_KEY = "sigungu";
 /** 읍면동 TopoJSON 오브젝트명 */
 const EMD_TOPOJSON_OBJECT_KEY = "emd";
 
+/** 선거구 TopoJSON 오브젝트명 */
+const CONSTITUENCY_TOPOJSON_OBJECT_KEY = "2024_22_Elec_simplify";
+
 interface TopoJsonDataState {
 	/** 시도 GeoJSON FeatureCollection */
 	sidoFeatures: GeoJSON.FeatureCollection | null;
@@ -22,6 +26,8 @@ interface TopoJsonDataState {
 	sigunguFeatures: GeoJSON.FeatureCollection | null;
 	/** 읍면동 GeoJSON FeatureCollection */
 	emdFeatures: GeoJSON.FeatureCollection | null;
+	/** 선거구 SGG_Code → ConstituencyInfo 매핑 */
+	constituencyInfoMap: Map<string, ConstituencyInfo> | null;
 	/** 로딩 중 여부 */
 	isLoading: boolean;
 	/** 에러 메시지 */
@@ -36,6 +42,7 @@ interface TopoJsonDataState {
  * - Vite의 dynamic import → 별도 chunk로 분리
  * - 한 번 로드 후 모듈 캐시에 유지 (재요청 없음)
  * - Phase 5.5: 시군 데이터 추가 (4파일 동시 로딩)
+ * - 선거구 속성 데이터 추가 로딩 (geometry 변환 불필요)
  */
 export function useTopoJsonData(): TopoJsonDataState {
 	const [state, setState] = useState<TopoJsonDataState>({
@@ -43,6 +50,7 @@ export function useTopoJsonData(): TopoJsonDataState {
 		sigunFeatures: null,
 		sigunguFeatures: null,
 		emdFeatures: null,
+		constituencyInfoMap: null,
 		isLoading: true,
 		error: null,
 	});
@@ -52,7 +60,7 @@ export function useTopoJsonData(): TopoJsonDataState {
 
 		async function load() {
 			try {
-				const [sidoModule, sigunModule, sigunguModule, emdModule] =
+				const [sidoModule, sigunModule, sigunguModule, emdModule, constituencyModule] =
 					await Promise.all([
 						import("@/features/region/data/sido.topojson.json"),
 						import(
@@ -62,6 +70,7 @@ export function useTopoJsonData(): TopoJsonDataState {
 							"@/features/region/data/sigungu.topojson.json"
 						),
 						import("@/features/region/data/emd.topojson.json"),
+						import("@/features/region/data/constituencies.topojson.json"),
 					]);
 
 				if (cancelled) return;
@@ -95,11 +104,27 @@ export function useTopoJsonData(): TopoJsonDataState {
 					emdTopo.objects[EMD_TOPOJSON_OBJECT_KEY],
 				) as unknown as GeoJSON.FeatureCollection;
 
+				// 선거구 속성 추출 + GeoJSON geometry 변환
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				const constituencyTopo = constituencyModule.default as any;
+				const geoms = constituencyTopo.objects[CONSTITUENCY_TOPOJSON_OBJECT_KEY].geometries;
+				const constituencyInfoMap = new Map<string, ConstituencyInfo>();
+				for (const g of geoms) {
+					const p = g.properties;
+					constituencyInfoMap.set(p.SGG_Code, {
+						sggCode: p.SGG_Code,
+						sgg: p.SGG,
+						sidoSgg: p.SIDO_SGG,
+						sido: p.SIDO,
+					});
+				}
+
 				setState({
 					sidoFeatures,
 					sigunFeatures,
 					sigunguFeatures,
 					emdFeatures,
+					constituencyInfoMap,
 					isLoading: false,
 					error: null,
 				});
@@ -110,6 +135,7 @@ export function useTopoJsonData(): TopoJsonDataState {
 					sigunFeatures: null,
 					sigunguFeatures: null,
 					emdFeatures: null,
+					constituencyInfoMap: null,
 					isLoading: false,
 					error:
 						err instanceof Error

@@ -52,12 +52,15 @@ export const RegionPolygon = React.memo(function RegionPolygon({
 	onHover,
 	onClick,
 }: RegionPolygonProps) {
-	// fill 우선순위: selected > hovered > fillOverride > default
-	const fill = isSelected
-		? mapColors.fillSelected
-		: isHovered
-			? mapColors.fillHover
-			: (fillOverride ?? mapColors.fill);
+	// fill 우선순위: fillOverride > selected > hovered > default
+	// fillOverride가 있으면 항상 우선 (선거구/choropleth 색상 유지)
+	// hover/selected 피드백은 stroke로만 제공
+	const fill = fillOverride
+		?? (isSelected
+			? mapColors.fillSelected
+			: isHovered
+				? mapColors.fillHover
+				: mapColors.fill);
 
 	const strokeColor = isHovered || isSelected
 		? mapColors.strokeHover

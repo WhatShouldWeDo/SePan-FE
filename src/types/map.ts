@@ -59,6 +59,16 @@ export interface HoveredRegion {
 	position: { x: number; y: number };
 }
 
+// --- 선거구 (Constituency) ---
+
+/** 선거구 정보 (SGG_Code → 속성 매핑용) */
+export interface ConstituencyInfo {
+	sggCode: string;   // "2112301"
+	sgg: string;       // "강남갑"
+	sidoSgg: string;   // "서울 강남갑"
+	sido: string;      // "서울"
+}
+
 // --- Choropleth (Phase 3-C) ---
 
 /** Choropleth 지도에 사용할 데이터 */

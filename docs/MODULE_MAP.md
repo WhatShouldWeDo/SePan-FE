@@ -1,6 +1,6 @@
 # Module Map
 
-> 최종 업데이트: 2026-03-19
+> 최종 업데이트: 2026-04-01
 
 ---
 
@@ -31,7 +31,7 @@
 ### Region
 
 - **경로**: `src/features/region/`
-- **역할**: 행정구역 지도 시각화, 4단계 드릴다운 (시도→시군→구→읍면동), Choropleth, 검색, 지역분석 결과 표시
+- **역할**: 행정구역 지도 시각화, 4단계 드릴다운 (시도→시군→구→읍면동), 선거구 뷰 모드, Choropleth, 검색, 지역분석 결과 표시
 - **핵심 파일**:
   - `components/map/KoreaAdminMap.tsx` — 메인 지도 컴포넌트 (드릴다운, 줌, choropleth)
   - `components/map/RegionPolygon.tsx` — 개별 폴리곤 (hover/select 상태)
@@ -49,6 +49,7 @@
   - `hooks/useMapTransition.ts` — D3 전환 애니메이션
   - `hooks/useHeatmapMode.ts` — 히트맵 모드 상태 관리 훅 (카테고리 선택 → choropleth 데이터 생성, forcedOff 리셋 로직)
   - `lib/choropleth-utils.ts` — oklch 색상 보간, choropleth 색상 매핑, 범례 생성
+  - `lib/constituency-colors.ts` — 선거구 OKLCH 8색 팔레트 + EMD→선거구 색상 맵 빌드
   - `lib/map-theme.ts` — 지도 CSS 변수 (fill, hover, selected, stroke, strokeHover 등)
   - `lib/sido-utils.ts` — 시도 코드 ↔ 이름 매핑
   - `lib/sigun-utils.ts` — 시군 유틸리티
@@ -61,12 +62,13 @@
   - `data/categories.ts` — 분석 지표 카테고리 정의 (9개 카테고리 + 서브카테고리 + Figma 아이콘 에셋 경로)
   - `data/heatmap-configs.ts` — 히트맵 카테고리 설정 (HeatmapCategoryConfig) + mock 데이터 생성 함수
   - `data/mock-comparison.ts` — 비교분석 Mock 데이터 (내 선거구/선택 지역 메트릭·월별추이, 비교 해석 텍스트, 인사이트 카드, 하단 메트릭)
-  - `data/*.topojson.json` — 시도/시군/시군구/읍면동 지리 데이터
+  - `data/mock-constituency-tooltip.ts` — 선거구별 mock 툴팁 데이터 (Proxy 기반 lazy 생성)
+  - `data/*.topojson.json` — 시도/시군/시군구/읍면동/선거구 지리 데이터
 - **의존하는 모듈**: `types/map`, `lib/utils`, `components/ui`, `components/icons` (WantedCaretUp, WantedMagicWand, WantedFillMessage)
 - **외부 의존성**: d3-geo, d3-zoom, d3-transition, d3-selection, topojson-client
 - **관련 ADR**: [ADR-003](decisions/003-map-rendering-stack.md), [ADR-004](decisions/004-pointer-events-migration.md), [ADR-005](decisions/005-topojson-dynamic-import.md), [ADR-006](decisions/006-hangul-chosung-search.md), [ADR-007](decisions/007-oklch-choropleth.md), [ADR-008](decisions/008-d3-transition-reversal.md), [ADR-011](decisions/011-constituency-to-admin-code.md), [ADR-012](decisions/012-conditional-4level-drilldown.md)
 - **상세 문서**: [`docs/architecture/region.md`](architecture/region.md)
-- **상태**: RegionResultPage Figma R.2.0 퍼블리싱 완료 + 비교 추이 차트 Figma 반영 완료 + 지도 auto-fit zoom 적용, 데이터는 하드코딩 (API 연동 전)
+- **상태**: RegionResultPage Figma R.2.0 퍼블리싱 완료 + 비교 추이 차트 Figma 반영 완료 + 지도 auto-fit zoom 적용 + 선거구 뷰 모드 (22대 국회의원 선거구 색상/드릴다운/외곽선 오버레이) 구현 완료, 데이터는 하드코딩 (API 연동 전)
 
 ### Dashboard
 
@@ -307,7 +309,7 @@
 |------|------|
 | `api.ts` | `ApiResponse<T>`, `ApiSuccessResponse`, `ApiErrorResponse`, Login/Signup 타입 |
 | `common.ts` | `User`, `UserRole`, `Region`, `PaginationParams`, `PaginatedResponse` |
-| `map.ts` | `MapLevel`, `MapRegion`, `SearchSelectedRegion`, `MapConfig`, `ChoroplethData/Config`, `LegendItem` |
+| `map.ts` | `MapLevel`, `MapRegion`, `ConstituencyInfo`, `SearchSelectedRegion`, `MapConfig`, `ChoroplethData/Config`, `LegendItem` |
 | `chart.ts` | `ChartData`, `ChartDataPoint`, `ChartSeriesConfig`, `ChartConfig` (barSize/barGap/barRadius 포함), `ChartFormatter` |
 
 ---

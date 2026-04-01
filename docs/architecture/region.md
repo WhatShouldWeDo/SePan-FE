@@ -1,12 +1,12 @@
 # Region 모듈 상세 구조
 
-> 최종 업데이트: 2026-03-19
+> 최종 업데이트: 2026-04-01
 
 ---
 
 ## 개요
 
-`src/features/region/` — 행정구역 지도 시각화, 4단계 드릴다운, 검색, 지역분석 결과 표시.
+`src/features/region/` — 행정구역 지도 시각화, 4단계 드릴다운, 선거구 뷰 모드, 검색, 지역분석 결과 표시.
 
 ---
 
@@ -16,10 +16,10 @@
 features/region/
 ├── components/
 │   ├── map/                      # 지도 관련 컴포넌트
-│   │   ├── KoreaAdminMap.tsx     #   메인 지도 (드릴다운, 줌, choropleth)
+│   │   ├── KoreaAdminMap.tsx     #   메인 지도 (드릴다운, 줌, choropleth, 선거구 뷰)
 │   │   ├── RegionPolygon.tsx     #   개별 폴리곤 (hover/select)
 │   │   ├── MapTooltip.tsx        #   호버 툴팁
-│   │   ├── MapBreadcrumb.tsx     #   드릴다운 경로
+│   │   ├── MapBreadcrumb.tsx     #   드릴다운 경로 (선거구 드릴다운 포함)
 │   │   ├── RegionSearch.tsx      #   검색 자동완성
 │   │   ├── MapZoomControls.tsx   #   줌 +/- 컨트롤
 │   │   ├── MapLegend.tsx         #   Choropleth 범례
@@ -37,6 +37,7 @@ features/region/
 │   └── useHeatmapMode.ts        # 히트맵 모드 상태 관리 (카테고리→choropleth)
 ├── lib/
 │   ├── choropleth-utils.ts       # oklch 색상 보간, 범례 생성
+│   ├── constituency-colors.ts    # 선거구 OKLCH 8색 팔레트 + EMD→선거구 색상 맵 빌드
 │   ├── map-theme.ts              # 지도 CSS 변수 (fill, hover, stroke, strokeHover)
 │   ├── sido-utils.ts             # 시도 코드 ↔ 이름
 │   ├── sigun-utils.ts            # 시군 유틸리티
@@ -46,11 +47,12 @@ features/region/
     ├── categories.ts             # 9개 카테고리 + 서브카테고리 + 아이콘 에셋
     ├── heatmap-configs.ts        # 히트맵 카테고리 설정 + mock 데이터 생성 함수
     ├── mock-comparison.ts        # 비교분석 Mock 데이터
+    ├── mock-constituency-tooltip.ts  # 선거구별 mock 툴팁 데이터 (Proxy 기반)
     ├── sido.topojson.json
-    ├── constituencies.topojson.json
+    ├── constituencies.topojson.json  # 22대 국회의원 선거구 경계 (254개, SGG_Code 속성)
     ├── sigun.topojson.json
     ├── sigungu.topojson.json
-    └── emd.topojson.json
+    └── emd.topojson.json             # 읍면동 경계 (3,558개, SGG_Code로 선거구 매핑)
 ```
 
 ---
@@ -101,19 +103,21 @@ AI 분석 결과 표시. `WantedMagicWand` 아이콘 + primary 배경.
 - CSS 변수: `--map-stroke-hover` (Light: `oklch(0.45 0.2 250)`, Dark: `oklch(0.7 0.2 250)`)
 - 전환 애니메이션: `transition: fill 150ms, stroke 150ms, stroke-width 150ms`
 
-### SVG 3-layer 렌더링 (z-index 대체)
+### SVG 4-layer 렌더링 (z-index 대체)
 
-SVG는 CSS z-index가 아닌 DOM 순서로 렌더링 우선순위가 결정됨. `KoreaAdminMap`에서 `regionData.map()`을 세 번 순회:
+SVG는 CSS z-index가 아닌 DOM 순서로 렌더링 우선순위가 결정됨. `KoreaAdminMap`에서 `regionData.map()`을 세 번 순회 + 선거구 오버레이:
 
 1. **Layer 1**: 비활성 폴리곤 `<path>`만 렌더링 (`showLabel={false}`)
 2. **Layer 2**: 비활성 폴리곤 `<text>` label만 렌더링 — 모든 path 위에 그려져 인접 폴리곤에 가리지 않음
 3. **Layer 3**: hover/selected 폴리곤 `<path>` + `<text>` 함께 렌더링 (최상위)
+4. **Layer 4**: 선거구 경계 오버레이 (선거구 개요 모드에서만) — SVG `clipPath` + `evenodd` 규칙으로 외곽선만 표시
 
 Layer 2의 `<text>`는 `mapColors.label` 색상, `fontSize={10}`, `pointerEvents="none"` — `RegionPolygon` 내부 label과 동일 스타일.
 
 이를 통해:
 - 모든 label이 인접 폴리곤 fill 위에 표시됨
 - hover된 폴리곤의 3px stroke가 다른 폴리곤 위에 항상 표시됨
+- 선거구 외곽선만 두껍게 표시됨 (내부 행정동 경계 제외)
 
 ### Auto-fit Zoom (동적 컨테이너 크기 감지)
 
@@ -124,6 +128,71 @@ Layer 2의 `<text>`는 `mapColors.label` 색상, `fontSize={10}`, `pointerEvents
 - 레벨 변경 시 `smoothZoomReset()`으로 identity 리셋 → projection 재계산과 함께 새 피처가 뷰포트를 최대한 채움
 - 줌 범위: 1x ~ 8x (MIN_ZOOM ~ MAX_ZOOM)
 - 컨테이너 측정 전 fallback: `config.width ?? 600`, `config.height ?? 800`
+
+### 선거구 뷰 모드
+
+읍면동 레벨에서 22대 국회의원 선거구 단위로 행정동을 그룹화하여 시각화하는 모드.
+
+#### 데이터 흐름
+
+```
+constituencies.topojson.json → useTopoJsonData
+  → constituencyInfoMap (SGG_Code → { sgg, sidoSgg, sido })
+
+emd.topojson.json의 SGG_Code 속성
+  → buildConstituencyColorMap() → EMD_CD → { sggCode, base, hover } 색상 맵
+```
+
+- 모든 3,558개 EMD에 `SGG_Code` 속성이 존재 (매핑 누락 0건)
+- 254개 선거구 (22대 국회의원선거 2024 기준)
+
+#### 상태 관리
+
+| 상태 | 타입 | 초기값 | 용도 |
+|------|------|--------|------|
+| `isConstituencyMode` | `boolean` | `true` | 선거구 뷰 ON/OFF |
+| `selectedConstituency` | `string \| null` | `null` | 선거구 드릴다운 시 SGG_Code |
+| `selectedConstituencyName` | `string \| null` | `null` | 선거구명 (브레드크럼용) |
+
+#### 2가지 모드
+
+1. **선거구 개요** (`isConstituencyMode && !selectedConstituency`)
+   - 같은 선거구의 EMD는 동일 색상 (OKLCH 8색 팔레트, 최대 hue 분리)
+   - 개별 EMD hover 비활성, 선거구 단위로 hover/select
+   - hover 시 Layer 4 외곽선 오버레이: SVG compound path + `clipPath(evenodd)` → 외곽선만 표시
+   - 클릭 시 선거구 드릴다운 전환
+
+2. **선거구 드릴다운** (`isConstituencyMode && selectedConstituency`)
+   - 해당 선거구의 EMD만 `effectiveFeatureCollection`으로 필터
+   - `useProjection`이 필터된 EMD에 자동 fit → 선거구 영역 확대
+   - 개별 EMD hover/select 활성 (일반 모드와 동일)
+   - 토글 스위치 숨김, 브레드크럼에 선거구명 추가
+
+#### SVG 외곽선 오버레이 (clip-path 기법)
+
+```
+선거구의 EMD pathD 합치기 → compound SVG path
+  ↓
+clipPath: 전체 뷰포트 rect + compound path (evenodd)
+  → 클립 영역 = 선거구 외부만
+  ↓
+compound path에 strokeWidth=6 적용 + clipPath 적용
+  → 외부 절반(3px)만 표시, 내부 EMD 경계 완전 제거
+```
+
+#### 자동 리셋 조건
+
+- 레벨이 `eupMyeonDong`이 아닐 때 → OFF
+- `searchNavigation` 변경 시 → ON으로 리셋
+- `choroplethData` 활성 시 → OFF (상호 배타)
+
+#### RegionPolygon fill 우선순위
+
+```
+fillOverride > isSelected > isHovered > default
+```
+
+`fillOverride`가 있으면 항상 우선 (선거구/choropleth 색상 유지). hover/selected 피드백은 stroke로만 제공.
 
 ---
 
@@ -209,7 +278,7 @@ default ──(지도 타 지역 클릭)──→ preview
 
 ### 지도 초기 드릴다운
 
-`KoreaAdminMap`에 `searchNavigation={MY_REGION_NAV}`를 전달하여 페이지 로딩 시 기본 선거구(강남구) 읍면동 레벨로 자동 드릴다운.
+`KoreaAdminMap`에 `searchNavigation={MY_REGION_NAV}`를 전달하여 페이지 로딩 시 기본 선거구(강남구) 읍면동 레벨로 자동 드릴다운. 선거구 뷰 모드는 기본 ON (`isConstituencyMode` 초기값 `true`).
 
 ### 데이터
 
@@ -230,12 +299,13 @@ RegionResultPage
 ├── DataTable (components/tables) — 표 보기 탭
 ├── Badge (components/ui)
 ├── BarChart (components/charts) — barSize/barGap/barRadius
-├── KoreaAdminMap (region/components/map) — hover stroke 3px, auto-fit zoom
+├── KoreaAdminMap (region/components/map) — hover stroke 3px, auto-fit zoom, 선거구 뷰
 ├── MetricListRow (region/components)
 ├── AiAnalysisBox (region/components)
 ├── MetricActionButtons (region/components)
 ├── CATEGORIES, SUBCATEGORIES (region/data/categories)
-└── mock-comparison.ts (region/data)
+├── mock-comparison.ts (region/data)
+└── CONSTITUENCY_TOOLTIP_MOCK (region/data/mock-constituency-tooltip)
 ```
 
 ---
