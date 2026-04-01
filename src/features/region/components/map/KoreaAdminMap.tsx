@@ -207,12 +207,6 @@ export function KoreaAdminMap({
 		}
 	}, [searchNavigation, enableDrillDown, navigateToSearchResult, triggerTransition, gRef]);
 
-	// 레벨 전환 시 줌 리셋 (부드러운 전환)
-	useEffect(() => {
-		smoothZoomReset();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [level, selectedSido, selectedCity, selectedGu, selectedConstituency]);
-
 	// --- 레거시 모드 (enableDrillDown=false) ---
 	const legacyFeatureCollection = useMemo(() => {
 		if (enableDrillDown || !sigunguFeatures) return null;
@@ -298,6 +292,12 @@ export function KoreaAdminMap({
 			),
 		};
 	}, [featureCollection, selectedConstituency, currentLevel]);
+
+	// 레벨 전환 시 줌 리셋 (부드러운 전환)
+	useEffect(() => {
+		smoothZoomReset();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [level, selectedSido, selectedCity, selectedGu, selectedConstituency]);
 
 	// 선거구 모드 OFF 시 드릴다운도 리셋
 	useEffect(() => {
