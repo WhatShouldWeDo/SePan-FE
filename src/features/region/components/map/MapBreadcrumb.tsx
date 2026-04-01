@@ -7,9 +7,13 @@ interface MapBreadcrumbProps {
 	selectedSido: string | null;
 	selectedCityName: string | null;
 	selectedGuName: string | null;
+	/** 선거구 드릴다운 시 선거구 이름 (예: "강남갑") */
+	selectedConstituencyName?: string | null;
 	onBackToNational: () => void;
 	onBackToSido: () => void;
 	onBackToSigun: () => void;
+	/** 선거구 드릴다운에서 선거구 목록으로 복귀 */
+	onBackToConstituencyOverview?: () => void;
 }
 
 const btnClass =
@@ -44,9 +48,11 @@ export function MapBreadcrumb({
 	selectedSido,
 	selectedCityName,
 	selectedGuName,
+	selectedConstituencyName,
 	onBackToNational,
 	onBackToSido,
 	onBackToSigun,
+	onBackToConstituencyOverview,
 }: MapBreadcrumbProps) {
 	const sidoFullName = selectedSido ? getSidoFullName(selectedSido) : "";
 
@@ -110,15 +116,49 @@ export function MapBreadcrumb({
 										{selectedCityName ?? ""}
 									</button>
 									<Separator />
-									<span className={textClass}>
-										{selectedGuName}
-									</span>
+									{selectedConstituencyName ? (
+										/* 선거구 드릴다운: 시도 > 시 > 구 > 선거구(현재) */
+										<>
+											<button
+												type="button"
+												onClick={onBackToConstituencyOverview}
+												className={btnClass}
+											>
+												{selectedGuName}
+											</button>
+											<Separator />
+											<span className={textClass}>
+												{selectedConstituencyName}
+											</span>
+										</>
+									) : (
+										<span className={textClass}>
+											{selectedGuName}
+										</span>
+									)}
 								</>
 							) : (
 								/* 3단계: 시도 > 시군구(현재) */
-								<span className={textClass}>
-									{selectedCityName ?? ""}
-								</span>
+								selectedConstituencyName ? (
+									/* 선거구 드릴다운: 시도 > 시군구 > 선거구(현재) */
+									<>
+										<button
+											type="button"
+											onClick={onBackToConstituencyOverview}
+											className={btnClass}
+										>
+											{selectedCityName ?? ""}
+										</button>
+										<Separator />
+										<span className={textClass}>
+											{selectedConstituencyName}
+										</span>
+									</>
+								) : (
+									<span className={textClass}>
+										{selectedCityName ?? ""}
+									</span>
+								)
 							)}
 						</>
 					)}

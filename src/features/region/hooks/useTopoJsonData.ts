@@ -28,6 +28,8 @@ interface TopoJsonDataState {
 	emdFeatures: GeoJSON.FeatureCollection | null;
 	/** 선거구 SGG_Code → ConstituencyInfo 매핑 */
 	constituencyInfoMap: Map<string, ConstituencyInfo> | null;
+	/** 선거구 GeoJSON FeatureCollection (경계 오버레이 렌더링용) */
+	constituencyFeatures: GeoJSON.FeatureCollection | null;
 	/** 로딩 중 여부 */
 	isLoading: boolean;
 	/** 에러 메시지 */
@@ -51,6 +53,7 @@ export function useTopoJsonData(): TopoJsonDataState {
 		sigunguFeatures: null,
 		emdFeatures: null,
 		constituencyInfoMap: null,
+		constituencyFeatures: null,
 		isLoading: true,
 		error: null,
 	});
@@ -104,7 +107,7 @@ export function useTopoJsonData(): TopoJsonDataState {
 					emdTopo.objects[EMD_TOPOJSON_OBJECT_KEY],
 				) as unknown as GeoJSON.FeatureCollection;
 
-				// 선거구 속성 추출 (geometry 변환 불필요 — properties만 사용)
+				// 선거구 속성 추출 + GeoJSON geometry 변환
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				const constituencyTopo = constituencyModule.default as any;
 				const geoms = constituencyTopo.objects[CONSTITUENCY_TOPOJSON_OBJECT_KEY].geometries;
@@ -119,12 +122,19 @@ export function useTopoJsonData(): TopoJsonDataState {
 					});
 				}
 
+				// 선거구 경계 오버레이용 GeoJSON FeatureCollection
+				const constituencyFeatures = topojson.feature(
+					constituencyTopo,
+					constituencyTopo.objects[CONSTITUENCY_TOPOJSON_OBJECT_KEY],
+				) as unknown as GeoJSON.FeatureCollection;
+
 				setState({
 					sidoFeatures,
 					sigunFeatures,
 					sigunguFeatures,
 					emdFeatures,
 					constituencyInfoMap,
+					constituencyFeatures,
 					isLoading: false,
 					error: null,
 				});
@@ -136,6 +146,7 @@ export function useTopoJsonData(): TopoJsonDataState {
 					sigunguFeatures: null,
 					emdFeatures: null,
 					constituencyInfoMap: null,
+					constituencyFeatures: null,
 					isLoading: false,
 					error:
 						err instanceof Error
