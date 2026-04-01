@@ -256,18 +256,19 @@ export function KoreaAdminMap({
 	const selectedConstituencyRef = useRef<string | null>(null);
 	selectedConstituencyRef.current = selectedConstituency;
 
-	// 레벨 변경 시 자동 리셋
+	// 레벨 변경 시 자동 리셋 — 읍면동 이외에서는 OFF, 읍면동 진입 시 기본 ON
 	useEffect(() => {
 		if (currentLevel !== "eupMyeonDong") {
-			setIsConstituencyMode(true);
+			setIsConstituencyMode(false);
 			setSelectedConstituency(null);
 			setSelectedConstituencyName(null);
+		} else {
+			setIsConstituencyMode(true);
 		}
 	}, [currentLevel]);
 
 	// searchNavigation 변경 시 자동 리셋
 	useEffect(() => {
-		setIsConstituencyMode(true);
 		setSelectedConstituency(null);
 		setSelectedConstituencyName(null);
 	}, [searchNavigation]);
