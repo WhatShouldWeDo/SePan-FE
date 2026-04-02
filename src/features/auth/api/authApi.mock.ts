@@ -73,6 +73,7 @@ export async function getMe(): Promise<ApiResponse<User>> {
 
 export async function checkUsername(
 	username: string,
+	_signal?: AbortSignal,
 ): Promise<ApiResponse<{ available: boolean }>> {
 	await delay(500);
 
