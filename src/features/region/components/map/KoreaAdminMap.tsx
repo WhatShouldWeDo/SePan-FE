@@ -11,7 +11,6 @@ import {
 import { useTopoJsonData } from "@/features/region/hooks/useTopoJsonData";
 import { useMapZoom } from "@/features/region/hooks/useMapZoom";
 import { useMapTransition } from "@/features/region/hooks/useMapTransition";
-import { useConstituencyMode } from "@/features/region/hooks/useConstituencyMode";
 import { useLongPress } from "@/hooks/useLongPress";
 import { useContainerSize } from "@/hooks/useContainerSize";
 import { RegionPolygon } from "./RegionPolygon";
@@ -254,22 +253,62 @@ export function KoreaAdminMap({
 	}, [isAtHome, onHomeStateChange]);
 
 	// --- 선거구 뷰 모드 ---
-	// --- 선거구 모드 (useConstituencyMode 훅으로 추출) ---
-	const {
-		isConstituencyMode,
-		setIsConstituencyMode,
-		selectedConstituency,
-		setSelectedConstituency,
-		selectedConstituencyName,
-		setSelectedConstituencyName,
-		selectedConstituencyRef,
-		effectiveFeatureCollection,
-	} = useConstituencyMode({
-		currentLevel,
-		searchNavigation,
-		choroplethData,
-		featureCollection,
-	});
+	const [isConstituencyMode, setIsConstituencyMode] = useState(true);
+
+	// --- 선거구 드릴다운 ---
+	const [selectedConstituency, setSelectedConstituency] = useState<string | null>(null);
+	const [selectedConstituencyName, setSelectedConstituencyName] = useState<string | null>(null);
+	const selectedConstituencyRef = useRef<string | null>(null);
+	useEffect(() => { selectedConstituencyRef.current = selectedConstituency; }, [selectedConstituency]);
+
+	// 레벨 변경 시 자동 리셋 — 읍면동 이외에서는 OFF, 읍면동 진입 시 기본 ON
+	// 이하 4개 effect는 외부 상태 변화에 따라 constituency 상태를 동기화하는 표준 패턴.
+	// React Compiler가 set-state-in-effect를 경고하나 의도적인 cascading이 아님.
+	/* eslint-disable react-hooks/set-state-in-effect */
+	useEffect(() => {
+		if (currentLevel !== "eupMyeonDong") {
+			setIsConstituencyMode(false);
+			setSelectedConstituency(null);
+			setSelectedConstituencyName(null);
+		} else {
+			setIsConstituencyMode(true);
+		}
+	}, [currentLevel]);
+
+	// searchNavigation 변경 시 자동 리셋
+	useEffect(() => {
+		setSelectedConstituency(null);
+		setSelectedConstituencyName(null);
+	}, [searchNavigation]);
+
+	// 히트맵 활성 시 자동 리셋
+	useEffect(() => {
+		if (choroplethData) {
+			setIsConstituencyMode(false);
+			setSelectedConstituency(null);
+			setSelectedConstituencyName(null);
+		}
+	}, [choroplethData]);
+
+	// 선거구 모드 OFF 시 드릴다운도 리셋
+	useEffect(() => {
+		if (!isConstituencyMode) {
+			setSelectedConstituency(null);
+			setSelectedConstituencyName(null);
+		}
+	}, [isConstituencyMode]);
+	/* eslint-enable react-hooks/set-state-in-effect */
+
+	// 선거구 드릴다운 시: 해당 선거구의 EMD만 필터
+	const effectiveFeatureCollection = useMemo(() => {
+		if (!selectedConstituency || currentLevel !== "eupMyeonDong") return featureCollection;
+		return {
+			type: "FeatureCollection" as const,
+			features: featureCollection.features.filter(
+				(f) => f.properties?.SGG_Code === selectedConstituency,
+			),
+		};
+	}, [featureCollection, selectedConstituency, currentLevel]);
 
 	// 레벨 전환 시 줌 리셋 (부드러운 전환)
 	useEffect(() => {
@@ -373,14 +412,15 @@ export function KoreaAdminMap({
 	}, [isConstituencyMode, currentLevel, featureCollection]);
 
 	// Ref 패턴 — stale closure 방지 (RegionPolygon의 arePropsEqual이 onHover/onClick 제외)
+	// React Compiler: ref.current는 렌더 중 직접 할당 금지 → useEffect에서 갱신
 	const constituencyColorMapRef = useRef(constituencyColorMap);
-	constituencyColorMapRef.current = constituencyColorMap;
+	useEffect(() => { constituencyColorMapRef.current = constituencyColorMap; }, [constituencyColorMap]);
 
 	const constituencyInfoMapRef = useRef(constituencyInfoMap);
-	constituencyInfoMapRef.current = constituencyInfoMap;
+	useEffect(() => { constituencyInfoMapRef.current = constituencyInfoMap; }, [constituencyInfoMap]);
 
 	const isConstituencyModeRef = useRef(isConstituencyMode);
-	isConstituencyModeRef.current = isConstituencyMode;
+	useEffect(() => { isConstituencyModeRef.current = isConstituencyMode; }, [isConstituencyMode]);
 
 	// hover / tooltip 상태
 	const [hoveredCode, setHoveredCode] = useState<string | null>(null);
@@ -462,6 +502,13 @@ export function KoreaAdminMap({
 		},
 		[],
 	);
+
+	// O(1) 룩업용 code → region Map (I-MAP-5: Long Press 히트 디텍션 최적화)
+	const regionByCode = useMemo(() => {
+		const map = new Map<string, (typeof regionData)[0]["region"]>();
+		for (const { region } of regionData) map.set(region.code, region);
+		return map;
+	}, [regionData]);
 
 	// 롱프레스로 터치 툴팁 표시 (Phase 3-E) — data-code 속성으로 O(1) 룩업
 	const handleLongPressCallback = useCallback(
@@ -570,13 +617,6 @@ export function KoreaAdminMap({
 		if (!choroplethData || !choroplethConfig) return [];
 		return buildLegendItems(choroplethData, choroplethConfig);
 	}, [choroplethData, choroplethConfig]);
-
-	// O(1) 룩업용 code → region Map (I-MAP-5: Long Press 히트 디텍션 최적화)
-	const regionByCode = useMemo(() => {
-		const map = new Map<string, (typeof regionData)[0]["region"]>();
-		for (const { region } of regionData) map.set(region.code, region);
-		return map;
-	}, [regionData]);
 
 	// 검색 결과 하이라이트 코드
 	const searchHighlightCode = useMemo(() => {
