@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react"
 import { Chip } from "@/components/ui/chip"
+import { useDropdown } from "@/hooks/useDropdown"
 import type { ElectionType } from "@/features/pledges/data/region-data"
 
 interface ElectionTypeFilterProps {
@@ -15,35 +15,14 @@ export function ElectionTypeFilter({
 	onTypeChange,
 	disabled = false,
 }: ElectionTypeFilterProps) {
-	const [isOpen, setIsOpen] = useState(false)
-	const containerRef = useRef<HTMLDivElement>(null)
-
-	useEffect(() => {
-		if (!isOpen) return
-		function handleClickOutside(e: PointerEvent) {
-			if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-				setIsOpen(false)
-			}
-		}
-		document.addEventListener("pointerdown", handleClickOutside)
-		return () => document.removeEventListener("pointerdown", handleClickOutside)
-	}, [isOpen])
-
-	useEffect(() => {
-		if (!isOpen) return
-		function handleKeyDown(e: KeyboardEvent) {
-			if (e.key === "Escape") setIsOpen(false)
-		}
-		document.addEventListener("keydown", handleKeyDown)
-		return () => document.removeEventListener("keydown", handleKeyDown)
-	}, [isOpen])
+	const { isOpen, toggle, close, containerRef } = useDropdown()
 
 	const selectedLabel =
 		types.find((t) => t.value === selectedType)?.label ?? "선거종류"
 
 	function handleSelect(value: string | null) {
 		onTypeChange(value)
-		setIsOpen(false)
+		close()
 	}
 
 	return (
@@ -53,7 +32,7 @@ export function ElectionTypeFilter({
 				size="medium"
 				state={disabled ? "disabled" : selectedType !== null ? "active" : "default"}
 				isOpen={isOpen}
-				onClick={() => !disabled && setIsOpen((prev) => !prev)}
+				onClick={() => !disabled && toggle()}
 			/>
 
 			{isOpen && (

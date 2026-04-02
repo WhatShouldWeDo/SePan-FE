@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, MapPin, X } from "lucide-react";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { TextArea } from "@/components/ui/text-area";
 import { TextField } from "@/components/ui/text-field";
+import { useDropdown } from "@/hooks/useDropdown";
 import { CATEGORIES } from "@/features/region/data/categories";
 import type { MyPledge, PledgeStatus } from "@/features/policy/data/mock-policy";
 import {
@@ -53,9 +54,9 @@ const CATEGORY_DISPLAY_LABELS: Record<string, string> = {
 	education: "교육",
 };
 
-/* ── CategoryIcon ── */
+/* ── LocalCategoryIcon (modal-specific, uses categoryId lookup + custom size) ── */
 
-function CategoryIcon({
+function LocalCategoryIcon({
 	categoryId,
 	size,
 	color,
@@ -96,38 +97,10 @@ function StatusDropdown({
 	value: PledgeStatus;
 	onChange: (status: PledgeStatus) => void;
 }) {
-	const [isOpen, setIsOpen] = useState(false);
-	const containerRef = useRef<HTMLDivElement>(null);
+	const { isOpen, toggle, close, containerRef } = useDropdown();
 
 	const currentLabel =
 		STATUS_OPTIONS.find((o) => o.value === value)?.label ?? "작성중";
-
-	// 외부 클릭 감지
-	useEffect(() => {
-		if (!isOpen) return;
-
-		function handlePointerDown(e: PointerEvent) {
-			if (
-				containerRef.current &&
-				!containerRef.current.contains(e.target as Node)
-			) {
-				setIsOpen(false);
-			}
-		}
-
-		function handleKeyDown(e: KeyboardEvent) {
-			if (e.key === "Escape") {
-				setIsOpen(false);
-			}
-		}
-
-		document.addEventListener("pointerdown", handlePointerDown);
-		document.addEventListener("keydown", handleKeyDown);
-		return () => {
-			document.removeEventListener("pointerdown", handlePointerDown);
-			document.removeEventListener("keydown", handleKeyDown);
-		};
-	}, [isOpen]);
 
 	return (
 		<div ref={containerRef} className="relative">
@@ -137,7 +110,7 @@ function StatusDropdown({
 				state="default"
 				variant="outlined"
 				isOpen={isOpen}
-				onClick={() => setIsOpen((prev) => !prev)}
+				onClick={toggle}
 			/>
 
 			{isOpen && (
@@ -157,7 +130,7 @@ function StatusDropdown({
 									)}
 									onClick={() => {
 										onChange(option.value);
-										setIsOpen(false);
+										close();
 									}}
 								>
 									<span className="text-[16px] font-semibold leading-[1.3]">
@@ -317,7 +290,7 @@ function PledgeFormModal({
 											key={catId}
 											className="inline-flex items-center gap-1 text-[14px] font-semibold text-label-alternative"
 										>
-											<CategoryIcon
+											<LocalCategoryIcon
 												categoryId={catId}
 												size={16}
 											/>
@@ -445,7 +418,7 @@ function PledgeFormModal({
 												toggleCategory(cat.id)
 											}
 										>
-											<CategoryIcon
+											<LocalCategoryIcon
 												categoryId={cat.id}
 												size={16}
 												color={

@@ -1,5 +1,6 @@
 import { MapPin } from "lucide-react";
 
+import { CategoryIcon } from "@/components/ui/category-icon";
 import {
   CATEGORIES,
   type CategoryItem,
@@ -42,20 +43,11 @@ export function RegionInfoBar({
               style={{ backgroundColor: `${category?.iconColor ?? "#888"}1A` }}
             >
               {category?.iconAsset && (
-                <span
-                  className="inline-block size-4 shrink-0"
-                  style={{
-                    backgroundColor: category.iconColor,
-                    maskImage: `url('${category.iconAsset}')`,
-                    maskMode: "luminance",
-                    maskSize: "contain",
-                    maskPosition: "center",
-                    maskRepeat: "no-repeat",
-                    WebkitMaskImage: `url('${category.iconAsset}')`,
-                    WebkitMaskSize: "contain",
-                    WebkitMaskPosition: "center",
-                    WebkitMaskRepeat: "no-repeat",
-                  }}
+                <CategoryIcon
+                  iconUrl={category.iconAsset}
+                  color={category.iconColor}
+                  size="md"
+                  className="size-4"
                 />
               )}
               <span className="text-label-4 font-medium text-label-normal">

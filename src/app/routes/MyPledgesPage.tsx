@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Plus, Pencil, Clock, CircleCheck, ShieldCheck } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -7,6 +7,7 @@ import { useBreadcrumb } from "@/contexts/useNavigation";
 import { ChipTag } from "@/components/ui/chip-tag";
 import { Chip } from "@/components/ui/chip";
 import { Pagination } from "@/components/ui/pagination";
+import { useDropdown } from "@/hooks/useDropdown";
 import { MyPledgeCard } from "@/features/policy/components/MyPledgeCard";
 import { PledgeFormModal } from "@/features/policy/components/PledgeFormModal";
 import type { PledgeFormData } from "@/features/policy/schemas/pledgeFormSchema";
@@ -51,29 +52,14 @@ export function MyPledgesPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("recent");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [isSortOpen, setIsSortOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPledge, setEditingPledge] = useState<MyPledge | null>(null);
 
-  const sortRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!isSortOpen) return;
-    const handlePointerDown = (e: PointerEvent) => {
-      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
-        setIsSortOpen(false);
-      }
-    };
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsSortOpen(false);
-    };
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isSortOpen]);
+  const {
+    isOpen: isSortOpen,
+    setIsOpen: setIsSortOpen,
+    containerRef: sortRef,
+  } = useDropdown();
 
   const filtered = useMemo(
     () =>

@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import { CardSectionHeader } from "@/components/ui/card-section-header";
 import { SummaryCard } from "@/components/ui/summary-card";
 import { PressOverlay } from "@/components/ui/press-overlay";
-import { PledgeRow } from "./PledgeRow";
+import { MyPledgeRow } from "./PledgeRow";
 import type { PledgeSummary, MyPledge } from "@/features/policy/data/mock-policy";
 
 interface MyPledgesSectionProps {
@@ -83,7 +83,7 @@ export function MyPledgesSection({ summary, pledges }: MyPledgesSectionProps) {
 				{/* 테이블 바디 */}
 				<div>
 					{pledges.map((pledge) => (
-						<PledgeRow
+						<MyPledgeRow
 							key={pledge.id}
 							categoryIds={pledge.categoryIds}
 							title={pledge.title}

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react"
 import { Chip } from "@/components/ui/chip"
+import { useDropdown } from "@/hooks/useDropdown"
 
 const COLS = 5
 const BTN_W = 150
@@ -18,34 +18,13 @@ export function RegionSidoFilter({
 	onSidoChange,
 	disabled = false,
 }: RegionSidoFilterProps) {
-	const [isOpen, setIsOpen] = useState(false)
-	const containerRef = useRef<HTMLDivElement>(null)
-
-	useEffect(() => {
-		if (!isOpen) return
-		function handleClickOutside(e: PointerEvent) {
-			if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-				setIsOpen(false)
-			}
-		}
-		document.addEventListener("pointerdown", handleClickOutside)
-		return () => document.removeEventListener("pointerdown", handleClickOutside)
-	}, [isOpen])
-
-	useEffect(() => {
-		if (!isOpen) return
-		function handleKeyDown(e: KeyboardEvent) {
-			if (e.key === "Escape") setIsOpen(false)
-		}
-		document.addEventListener("keydown", handleKeyDown)
-		return () => document.removeEventListener("keydown", handleKeyDown)
-	}, [isOpen])
+	const { isOpen, toggle, close, containerRef } = useDropdown()
 
 	const chipLabel = selectedSido ?? "지역"
 
 	function handleSelect(sido: string) {
 		onSidoChange(sido)
-		setIsOpen(false)
+		close()
 	}
 
 	const gridWidth = COLS * BTN_W + (COLS - 1) * GAP
@@ -57,7 +36,7 @@ export function RegionSidoFilter({
 				size="medium"
 				state={disabled ? "disabled" : selectedSido !== null ? "active" : "default"}
 				isOpen={isOpen}
-				onClick={() => !disabled && setIsOpen((prev) => !prev)}
+				onClick={() => !disabled && toggle()}
 			/>
 
 			{isOpen && (

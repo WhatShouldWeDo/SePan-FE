@@ -1,14 +1,15 @@
 import { ChevronDown } from "lucide-react"
 import type { CandidatePledge } from "../data/mock-candidate-detail"
 import { CATEGORIES } from "@/features/region/data/categories"
+import { CategoryIcon } from "@/components/ui/category-icon"
 
-interface PledgeRowProps {
+interface CandidatePledgeRowProps {
 	pledge: CandidatePledge
 	isOpen: boolean
 	onToggle: () => void
 }
 
-export function PledgeRow({ pledge, isOpen, onToggle }: PledgeRowProps) {
+export function CandidatePledgeRow({ pledge, isOpen, onToggle }: CandidatePledgeRowProps) {
 	const categoryData = pledge.categoryId
 		? CATEGORIES.find((c) => c.id === pledge.categoryId)
 		: undefined
@@ -37,25 +38,11 @@ export function PledgeRow({ pledge, isOpen, onToggle }: PledgeRowProps) {
 							style={badgeStyle}
 						>
 							{categoryData?.iconAsset && (
-								<span
-									className="relative inline-block size-3.5 shrink-0 overflow-hidden rounded-[3px]"
-								>
-									<span
-										className="absolute inset-0"
-										style={{
-											backgroundColor: badgeColor,
-											maskImage: `url('${categoryData.iconAsset}')`,
-											maskMode: "luminance",
-											maskSize: "11px 11px",
-											maskPosition: "1.5px 1.5px",
-											maskRepeat: "no-repeat",
-											WebkitMaskImage: `url('${categoryData.iconAsset}')`,
-											WebkitMaskSize: "11px 11px",
-											WebkitMaskPosition: "1.5px 1.5px",
-											WebkitMaskRepeat: "no-repeat",
-										}}
-									/>
-								</span>
+								<CategoryIcon
+									iconUrl={categoryData.iconAsset}
+									color={badgeColor}
+									size="sm"
+								/>
 							)}
 							{pledge.category}
 						</span>
