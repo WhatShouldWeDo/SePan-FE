@@ -78,7 +78,7 @@ export function LoginForm() {
 					{/* Eye toggle - 입력 필드 우측에 절대 위치 */}
 					<button
 						type="button"
-						className="absolute right-4 top-[42px] text-label-alternative hover:text-label-neutral"
+						className="absolute right-4 top-[42px] flex h-11 w-11 items-center justify-center text-label-alternative hover:text-label-neutral"
 						onClick={() => setShowPassword((prev) => !prev)}
 						tabIndex={-1}
 						aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}

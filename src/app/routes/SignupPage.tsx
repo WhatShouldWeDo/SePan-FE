@@ -100,7 +100,7 @@ export function SignupPage() {
 				<CardTitle className="text-2xl">회원가입</CardTitle>
 				<CardDescription>새 계정을 만들어 서비스를 시작하세요</CardDescription>
 			</CardHeader>
-			<CardContent>
+			<CardContent className="relative">
 				<SignupStepper currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
 				{/* 제출 오류 표시 */}
