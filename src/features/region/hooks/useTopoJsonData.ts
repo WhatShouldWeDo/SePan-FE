@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import * as topojson from "topojson-client";
+import type { Topology } from "topojson-specification";
 import type { ConstituencyInfo } from "@/types/map";
 
 /** TopoJSON 오브젝트명 (시도) */
@@ -75,14 +76,10 @@ export function useTopoJsonData(): TopoJsonDataState {
 
 				if (cancelled) return;
 
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const sidoTopo = sidoModule.default as any;
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const sigunTopo = sigunModule.default as any;
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const sigunguTopo = sigunguModule.default as any;
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const emdTopo = emdModule.default as any;
+				const sidoTopo = sidoModule.default as unknown as Topology;
+				const sigunTopo = sigunModule.default as unknown as Topology;
+				const sigunguTopo = sigunguModule.default as unknown as Topology;
+				const emdTopo = emdModule.default as unknown as Topology;
 
 				const sidoFeatures = topojson.feature(
 					sidoTopo,
@@ -105,8 +102,7 @@ export function useTopoJsonData(): TopoJsonDataState {
 				) as unknown as GeoJSON.FeatureCollection;
 
 				// 선거구 속성 추출 + GeoJSON geometry 변환
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const constituencyTopo = constituencyModule.default as any;
+				const constituencyTopo = constituencyModule.default as unknown as Topology;
 				const geoms = constituencyTopo.objects[CONSTITUENCY_TOPOJSON_OBJECT_KEY].geometries;
 				const constituencyInfoMap = new Map<string, ConstituencyInfo>();
 				for (const g of geoms) {

@@ -4,22 +4,6 @@
 import { getSidoFullName } from "@/features/region/lib/sido-utils";
 import type { MapRegion } from "@/types/map";
 
-/**
- * EMD_KOR_NM의 두 번째 토큰에서 도시명 추출
- *
- * @example
- * extractCityName("수원시장안구") → "수원시"
- * extractCityName("의정부시") → "의정부시"
- * extractCityName("종로구") → "종로구"
- */
-export function extractCityName(sguToken: string): string {
-	const si = sguToken.indexOf("시");
-	const gu = sguToken.lastIndexOf("구");
-	if (si >= 0 && gu > si) {
-		return sguToken.substring(0, si + 1);
-	}
-	return sguToken;
-}
 
 /**
  * sigun feature의 properties → MapRegion 변환

@@ -5,19 +5,8 @@
  * 추후 서버 API로 교체될 수 있도록 타입과 이름을 유지한다.
  */
 
-export interface CategoryItem {
-	id: string;
-	label: string;
-	iconColor: string;
-	/** CSS mask-image용 아이콘 에셋 경로 (PNG) */
-	iconAsset?: string;
-}
-
-export interface SubcategoryItem {
-	id: string;
-	label: string;
-	categoryId: string;
-}
+// 타입은 src/types/categories.ts로 이동. 하위 호환성을 위해 re-export
+export type { CategoryItem, SubcategoryItem } from "@/types/categories";
 
 import voterIcon from "@/assets/category-icons/voter.png";
 import economyIcon from "@/assets/category-icons/economy.png";
