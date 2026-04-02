@@ -27,7 +27,8 @@ export function PledgeMetricsCard({ data }: PledgeMetricsCardProps) {
           <button
             type="button"
             className="rounded-xl border border-line-neutral px-5 py-3 text-label-3 font-semibold text-label-normal"
-            onClick={() => {}}
+            disabled
+            title="준비 중"
           >
             버튼
           </button>

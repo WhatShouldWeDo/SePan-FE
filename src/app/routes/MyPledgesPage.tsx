@@ -70,7 +70,14 @@ export function MyPledgesPage() {
   );
 
   const sorted = useMemo(
-    () => (sortOrder === "recent" ? [...filtered] : [...filtered].reverse()),
+    () =>
+      sortOrder === "recent"
+        ? [...filtered].sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          )
+        : [...filtered].sort(
+            (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+          ),
     [filtered, sortOrder],
   );
 
