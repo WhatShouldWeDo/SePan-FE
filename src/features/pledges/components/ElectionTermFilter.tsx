@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react"
 import { Chip } from "@/components/ui/chip"
+import { useDropdown } from "@/hooks/useDropdown"
 import type { ElectionTerm } from "@/features/pledges/data/mock-candidates"
 
 interface ElectionTermFilterProps {
@@ -13,45 +13,14 @@ export function ElectionTermFilter({
 	selectedTerm,
 	onTermChange,
 }: ElectionTermFilterProps) {
-	const [isOpen, setIsOpen] = useState(false)
-	const containerRef = useRef<HTMLDivElement>(null)
-
-	// 외부 클릭 시 닫기
-	useEffect(() => {
-		if (!isOpen) return
-
-		function handleClickOutside(e: PointerEvent) {
-			if (
-				containerRef.current &&
-				!containerRef.current.contains(e.target as Node)
-			) {
-				setIsOpen(false)
-			}
-		}
-
-		document.addEventListener("pointerdown", handleClickOutside)
-		return () =>
-			document.removeEventListener("pointerdown", handleClickOutside)
-	}, [isOpen])
-
-	// Escape 키로 닫기
-	useEffect(() => {
-		if (!isOpen) return
-
-		function handleKeyDown(e: KeyboardEvent) {
-			if (e.key === "Escape") setIsOpen(false)
-		}
-
-		document.addEventListener("keydown", handleKeyDown)
-		return () => document.removeEventListener("keydown", handleKeyDown)
-	}, [isOpen])
+	const { isOpen, toggle, close, containerRef } = useDropdown()
 
 	const selectedLabel =
 		terms.find((t) => t.value === selectedTerm)?.label ?? "선거회차"
 
 	function handleSelect(value: number | null) {
 		onTermChange(value)
-		setIsOpen(false)
+		close()
 	}
 
 	return (
@@ -61,7 +30,7 @@ export function ElectionTermFilter({
 				size="medium"
 				state={selectedTerm !== null ? "active" : "default"}
 				isOpen={isOpen}
-				onClick={() => setIsOpen((prev) => !prev)}
+				onClick={toggle}
 			/>
 
 			{isOpen && (

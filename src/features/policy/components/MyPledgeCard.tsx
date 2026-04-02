@@ -1,6 +1,7 @@
 import { MapPin, Pencil } from "lucide-react";
 
 import { PressOverlay } from "@/components/ui/press-overlay";
+import { CategoryIcon } from "@/components/ui/category-icon";
 import { CATEGORIES } from "@/features/region/data/categories";
 import type { MyPledge, PledgeStatus } from "@/features/policy/data/mock-policy";
 import { getCategoryLabel } from "@/features/policy/data/mock-policy";
@@ -71,23 +72,11 @@ function MyPledgeCard({ pledge, onEdit }: MyPledgeCardProps) {
 							style={badgeStyle}
 						>
 							{categoryData?.iconAsset && (
-								<span className="relative inline-block size-3.5 shrink-0 overflow-hidden rounded-[3px]">
-									<span
-										className="absolute inset-0"
-										style={{
-											backgroundColor: badgeColor,
-											maskImage: `url('${categoryData.iconAsset}')`,
-											maskMode: "luminance",
-											maskSize: "11px 11px",
-											maskPosition: "1.5px 1.5px",
-											maskRepeat: "no-repeat",
-											WebkitMaskImage: `url('${categoryData.iconAsset}')`,
-											WebkitMaskSize: "11px 11px",
-											WebkitMaskPosition: "1.5px 1.5px",
-											WebkitMaskRepeat: "no-repeat",
-										}}
-									/>
-								</span>
+								<CategoryIcon
+									iconUrl={categoryData.iconAsset}
+									color={badgeColor}
+									size="sm"
+								/>
 							)}
 							{categoryLabel}
 						</span>

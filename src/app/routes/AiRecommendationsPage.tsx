@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 import { useBreadcrumb } from "@/contexts/useNavigation";
 import { Chip } from "@/components/ui/chip";
+import { useDropdown } from "@/hooks/useDropdown";
 import { RegionInfoBar } from "@/features/policy/components/RegionInfoBar";
 import { RecommendationCard } from "@/features/policy/components/RecommendationCard";
 import { RecommendationDetailModal } from "@/features/policy/components/RecommendationDetailModal";
@@ -22,7 +23,11 @@ export function AiRecommendationsPage() {
   useBreadcrumb([{ label: "정책개발" }, { label: "AI 추천 공약" }]);
 
   const [sortBy, setSortBy] = useState<SortOption>("matchRate");
-  const [sortOpen, setSortOpen] = useState(false);
+  const {
+    isOpen: sortOpen,
+    setIsOpen: setSortOpen,
+    containerRef: sortRef,
+  } = useDropdown();
   const [adoptedIds, setAdoptedIds] = useState<Set<string>>(
     () => new Set(
       mockRecommendationDetails
@@ -33,19 +38,6 @@ export function AiRecommendationsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [focusedIndex, setFocusedIndex] = useState(-1);
-
-  // 정렬 드롭다운 외부 클릭 닫기
-  const sortRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!sortOpen) return;
-    function handlePointerDown(e: PointerEvent) {
-      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
-        setSortOpen(false);
-      }
-    }
-    document.addEventListener("pointerdown", handlePointerDown);
-    return () => document.removeEventListener("pointerdown", handlePointerDown);
-  }, [sortOpen]);
 
   // 드롭다운 키보드 네비게이션
   const handleMenuKeyDown = useCallback(
@@ -76,7 +68,7 @@ export function AiRecommendationsPage() {
           break;
       }
     },
-    [focusedIndex]
+    [focusedIndex, setSortOpen]
   );
 
   // 정렬된 데이터

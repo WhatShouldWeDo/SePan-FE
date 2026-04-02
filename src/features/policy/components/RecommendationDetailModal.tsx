@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { CategoryIcon } from "@/components/ui/category-icon";
 import { WantedMagicWand, CircleCheckFill } from "@/components/icons";
 import {
   CATEGORIES,
@@ -44,20 +45,11 @@ export function RecommendationDetailModal({
               style={{ backgroundColor: `${category?.iconColor ?? "#888"}1A` }}
             >
               {category?.iconAsset && (
-                <span
-                  className="inline-block size-8"
-                  style={{
-                    backgroundColor: category.iconColor,
-                    maskImage: `url('${category.iconAsset}')`,
-                    maskMode: "luminance",
-                    maskSize: "contain",
-                    maskPosition: "center",
-                    maskRepeat: "no-repeat",
-                    WebkitMaskImage: `url('${category.iconAsset}')`,
-                    WebkitMaskSize: "contain",
-                    WebkitMaskPosition: "center",
-                    WebkitMaskRepeat: "no-repeat",
-                  }}
+                <CategoryIcon
+                  iconUrl={category.iconAsset}
+                  color={category.iconColor}
+                  size="md"
+                  className="size-8"
                 />
               )}
             </div>

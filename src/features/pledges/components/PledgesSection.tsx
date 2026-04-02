@@ -5,7 +5,7 @@ import { Chip } from "@/components/ui/chip"
 
 import type { CandidateDetail } from "../data/mock-candidate-detail"
 import { PledgeDonutChart } from "./PledgeDonutChart"
-import { PledgeRow } from "./PledgeRow"
+import { CandidatePledgeRow } from "./PledgeRow"
 
 interface PledgesSectionProps {
 	candidate: CandidateDetail
@@ -45,7 +45,7 @@ export function PledgesSection({ candidate }: PledgesSectionProps) {
 			{pledges.length > 0 ? (
 				<div className="flex flex-col">
 					{pledges.map((pledge) => (
-						<PledgeRow
+						<CandidatePledgeRow
 							key={pledge.id}
 							pledge={pledge}
 							isOpen={openPledges.has(pledge.id)}

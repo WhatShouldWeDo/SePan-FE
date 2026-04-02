@@ -1,9 +1,12 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { select } from "d3-selection";
 import "d3-transition"; // Selection.prototype.transition() 활성화
 
 /** 전환 애니메이션 전체 시간 (fade-out 200ms + fade-in 200ms) */
 const TRANSITION_DURATION = 200;
+
+/** 트랜지션 잠김 방지용 최대 대기 시간 (ms) */
+const TRANSITION_TIMEOUT = 2000;
 
 interface UseMapTransitionReturn {
 	/** 전환 중 여부 (클릭 방지용) */
@@ -27,6 +30,28 @@ interface UseMapTransitionReturn {
 export function useMapTransition(): UseMapTransitionReturn {
 	const [isTransitioning, setIsTransitioning] = useState(false);
 	const transitionRef = useRef(false);
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	/** 트랜지션 잠금 해제 (중복 호출 안전) */
+	const resetTransition = useCallback(() => {
+		transitionRef.current = false;
+		setIsTransitioning(false);
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current);
+			timeoutRef.current = null;
+		}
+	}, []);
+
+	// 언마운트 시 트랜지션 상태 정리
+	useEffect(() => {
+		return () => {
+			transitionRef.current = false;
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+				timeoutRef.current = null;
+			}
+		};
+	}, []);
 
 	const triggerTransition = useCallback(
 		(gElement: SVGGElement | null, onMidpoint: () => void) => {
@@ -42,6 +67,19 @@ export function useMapTransition(): UseMapTransitionReturn {
 			transitionRef.current = true;
 			setIsTransitioning(true);
 
+			// 타임아웃 안전장치: 트랜지션이 영구 잠김 방지
+			timeoutRef.current = setTimeout(() => {
+				if (transitionRef.current) {
+					resetTransition();
+					// opacity 복원
+					try {
+						select(gElement).style("opacity", 1);
+					} catch {
+						// gElement가 이미 제거되었을 수 있음
+					}
+				}
+			}, TRANSITION_TIMEOUT);
+
 			return new Promise<void>((resolve) => {
 				const g = select(gElement);
 
@@ -49,6 +87,12 @@ export function useMapTransition(): UseMapTransitionReturn {
 				g.transition()
 					.duration(TRANSITION_DURATION)
 					.style("opacity", 0)
+					.on("interrupt", () => {
+						// fade-out 중 인터럽트 시 잠금 해제 + opacity 복원
+						resetTransition();
+						g.style("opacity", 1);
+						resolve();
+					})
 					.on("end", () => {
 						// 중간 지점: 상태 변경 (새 데이터로 교체)
 						onMidpoint();
@@ -58,16 +102,21 @@ export function useMapTransition(): UseMapTransitionReturn {
 							g.transition()
 								.duration(TRANSITION_DURATION)
 								.style("opacity", 1)
+								.on("interrupt", () => {
+									// fade-in 중 인터럽트 시 잠금 해제 + opacity 복원
+									resetTransition();
+									g.style("opacity", 1);
+									resolve();
+								})
 								.on("end", () => {
-									transitionRef.current = false;
-									setIsTransitioning(false);
+									resetTransition();
 									resolve();
 								});
 						});
 					});
 			});
 		},
-		[],
+		[resetTransition],
 	);
 
 	return { isTransitioning, triggerTransition };

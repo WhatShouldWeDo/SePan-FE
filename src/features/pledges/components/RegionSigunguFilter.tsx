@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react"
 import { Chip } from "@/components/ui/chip"
+import { useDropdown } from "@/hooks/useDropdown"
 
 const MAX_COLS = 5
 const BTN_W = 130
@@ -18,28 +18,7 @@ export function RegionSigunguFilter({
 	onSigunguChange,
 	disabled = false,
 }: RegionSigunguFilterProps) {
-	const [isOpen, setIsOpen] = useState(false)
-	const containerRef = useRef<HTMLDivElement>(null)
-
-	useEffect(() => {
-		if (!isOpen) return
-		function handleClickOutside(e: PointerEvent) {
-			if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-				setIsOpen(false)
-			}
-		}
-		document.addEventListener("pointerdown", handleClickOutside)
-		return () => document.removeEventListener("pointerdown", handleClickOutside)
-	}, [isOpen])
-
-	useEffect(() => {
-		if (!isOpen) return
-		function handleKeyDown(e: KeyboardEvent) {
-			if (e.key === "Escape") setIsOpen(false)
-		}
-		document.addEventListener("keydown", handleKeyDown)
-		return () => document.removeEventListener("keydown", handleKeyDown)
-	}, [isOpen])
+	const { isOpen, toggle, containerRef } = useDropdown()
 
 	function getChipLabel(): string {
 		if (selectedSigungu.length === 0) return "시/군/구"
@@ -72,7 +51,7 @@ export function RegionSigunguFilter({
 				size="medium"
 				state={disabled ? "disabled" : selectedSigungu.length > 0 ? "active" : "default"}
 				isOpen={isOpen}
-				onClick={() => !disabled && setIsOpen((prev) => !prev)}
+				onClick={() => !disabled && toggle()}
 			/>
 
 			{isOpen && (

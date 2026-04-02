@@ -29,8 +29,13 @@ export async function request<T>(
   const { body, headers: customHeaders, ...restOptions } = options
 
   const headers: HeadersInit = {
-    "Content-Type": "application/json",
     ...customHeaders,
+  }
+
+  // body가 있고 FormData가 아닌 경우에만 Content-Type 설정
+  // FormData는 브라우저가 boundary를 포함한 Content-Type을 자동 설정
+  if (body && !(body instanceof FormData)) {
+    ;(headers as Record<string, string>)["Content-Type"] = "application/json"
   }
 
   // 인증 토큰 자동 첨부
@@ -42,7 +47,7 @@ export async function request<T>(
   const config: RequestInit = {
     ...restOptions,
     headers,
-    body: body ? JSON.stringify(body) : undefined,
+    body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined,
   }
 
   const url = `${API_BASE_URL}${endpoint}`

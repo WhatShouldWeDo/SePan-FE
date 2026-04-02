@@ -5,6 +5,26 @@ import type {
 } from "@/types/map";
 
 /**
+ * Record의 값에서 min/max를 안전하게 계산 (Math.min/max spread 대신 루프 사용)
+ *
+ * @description
+ * - Math.min(...array)는 배열이 크면 (3,500+ eupMyeonDong) 콜 스택 초과 위험
+ * - 루프 기반으로 안전하게 계산
+ */
+function computeMinMax(values: Record<string, number>): {
+	min: number;
+	max: number;
+} {
+	let min = Infinity;
+	let max = -Infinity;
+	for (const v of Object.values(values)) {
+		if (v < min) min = v;
+		if (v > max) max = v;
+	}
+	return { min, max };
+}
+
+/**
  * OKLCH 색상 보간
  *
  * @description
@@ -49,9 +69,9 @@ export function getChoroplethColor(
 	const value = data.values[code];
 	if (value === undefined) return null;
 
-	const values = Object.values(data.values);
-	const min = data.min ?? Math.min(...values);
-	const max = data.max ?? Math.max(...values);
+	const computed = data.min != null && data.max != null ? null : computeMinMax(data.values);
+	const min = data.min ?? computed!.min;
+	const max = data.max ?? computed!.max;
 
 	if (max === min) return interpolateOklch(config.colorMin, config.colorMax, 0.5);
 
@@ -70,9 +90,9 @@ export function buildLegendItems(
 	data: ChoroplethData,
 	config: ChoroplethConfig,
 ): LegendItem[] {
-	const values = Object.values(data.values);
-	const min = data.min ?? Math.min(...values);
-	const max = data.max ?? Math.max(...values);
+	const computed = data.min != null && data.max != null ? null : computeMinMax(data.values);
+	const min = data.min ?? computed!.min;
+	const max = data.max ?? computed!.max;
 	const steps = config.legendSteps ?? 5;
 
 	const items: LegendItem[] = [];

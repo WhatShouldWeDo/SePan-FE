@@ -179,12 +179,8 @@ export function useApiMutation<TData, TVariables>(
       onSuccess?.(data, variables, onMutateResult, context)
     },
     onError: (error, variables, onMutateResult, context) => {
-      // 에러 Toast는 mutationFn에서 이미 처리되었지만,
-      // fetch 에러 등 ApiResponse가 아닌 에러는 여기서 처리
-      if (showErrorToast && !(error instanceof Error && error.message)) {
-        toastError(error)
-      }
-      // 사용자 정의 onError 콜백 호출
+      // 에러 Toast는 mutationFn 래퍼에서 이미 처리됨 (ApiResponse.success === false)
+      // 네트워크 에러 등 예외적 케이스는 사용자 정의 onError 콜백에서 처리
       onError?.(error, variables, onMutateResult, context)
     },
   })

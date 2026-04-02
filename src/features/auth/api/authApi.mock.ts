@@ -27,12 +27,12 @@ export async function login(
 	await delay(800);
 
 	if (data.username === "test" && data.password === "test1234") {
-		const token = `mock_token_${Date.now()}`;
 		return {
 			success: true,
 			data: {
+				accessToken: `mock_access_token_${Date.now()}`,
+				refreshToken: `mock_refresh_token_${Date.now()}`,
 				user: MOCK_USER,
-				token,
 			},
 		};
 	}
