@@ -1,10 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { DuoWallet } from "@/components/icons";
-import type {
-	CategoryItem,
-	SubcategoryItem,
-} from "@/features/region/data/categories";
+import type { CategoryItem, SubcategoryItem } from "@/types/categories";
 
 /* ─── Types ─── */
 
