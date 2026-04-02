@@ -519,7 +519,7 @@ export function KoreaAdminMap({
 			const pathElem = elem.closest("path");
 			if (!pathElem) return;
 
-			const code = (pathElem as HTMLElement).dataset.code;
+			const code = (pathElem as SVGElement).dataset.code;
 			const region = code ? regionByCode.get(code) : undefined;
 			if (region) {
 				setTooltip({ region, position: { x, y } });

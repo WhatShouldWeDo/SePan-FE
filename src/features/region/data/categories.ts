@@ -7,6 +7,7 @@
 
 // 타입은 src/types/categories.ts로 이동. 하위 호환성을 위해 re-export
 export type { CategoryItem, SubcategoryItem } from "@/types/categories";
+import type { CategoryItem, SubcategoryItem } from "@/types/categories";
 
 import voterIcon from "@/assets/category-icons/voter.png";
 import economyIcon from "@/assets/category-icons/economy.png";

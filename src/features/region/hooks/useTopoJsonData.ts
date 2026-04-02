@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import * as topojson from "topojson-client";
-import type { Topology } from "topojson-specification";
+import type { Topology, GeometryCollection } from "topojson-specification";
 import type { ConstituencyInfo } from "@/types/map";
 
 /** TopoJSON 오브젝트명 (시도) */
@@ -103,7 +103,7 @@ export function useTopoJsonData(): TopoJsonDataState {
 
 				// 선거구 속성 추출 + GeoJSON geometry 변환
 				const constituencyTopo = constituencyModule.default as unknown as Topology;
-				const geoms = constituencyTopo.objects[CONSTITUENCY_TOPOJSON_OBJECT_KEY].geometries;
+				const geoms = (constituencyTopo.objects[CONSTITUENCY_TOPOJSON_OBJECT_KEY] as GeometryCollection).geometries;
 				const constituencyInfoMap = new Map<string, ConstituencyInfo>();
 				for (const g of geoms) {
 					const p = g.properties;
