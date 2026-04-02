@@ -8,11 +8,12 @@
 
 | 심각도 | 전체 | 해결됨 | 부분 해결 | 미해결 | 핵심 영역 |
 |--------|------|--------|----------|--------|-----------|
-| CRITICAL | 12 | 11 | 0 | 1 | API 레이어, 인증 토큰 처리, 성능/안전성 |
-| IMPORTANT | 41 | 24 | 3 | 14 | 컴포넌트 복잡도, 코드 중복, 타입 안전성, 데드 코드 |
+| CRITICAL | 12 | 11 | 0 | 0 (1 무효) | API 레이어, 인증 토큰 처리, 성능/안전성 |
+| IMPORTANT | 41 | 26 | 1 | 14 | 컴포넌트 복잡도, 코드 중복, 타입 안전성, 데드 코드 |
 | SUGGESTION | 36 | — | — | 36 | 일관성, 테스트 커버리지, UX 가드레일 |
 
-> **해결 범위**: CRITICAL 전체 + IMPORTANT 중 24건 (PR #81 `refactor-code-quality` 브랜치)
+> **해결 범위**: CRITICAL 전체 + IMPORTANT 중 26건 (PR #81 `refactor-code-quality` 브랜치)
+> **C-API-1**: `query-core@5.90.20`이 실제 4-parameter 콜백 사용 → 이슈 무효 처리.
 > **미해결 IMPORTANT**: I-PLG-6 (테스트), I-UI-9 (포매팅) → Phase 4 예정. 나머지 14건은 초기 리뷰 이후 SUGGESTION 수준으로 재분류.
 
 ---
@@ -25,7 +26,7 @@
 - **파일**: `src/lib/api/hooks.ts:173,181`
 - **문제**: React Query v5의 콜백은 `(data, variables, context)` 3개 파라미터인데 4개를 사용. `onMutateResult`라는 파라미터는 존재하지 않으며, 실제 `context` 값이 3번째 인자로 들어오고 4번째는 항상 `undefined`. 컨슈머가 `onSuccess(data, variables, context)`에 의존하면 잘못된 값을 받게 됨.
 - **수정**: 파라미터를 3개로 수정 `(data, variables, context)`
-- > ❌ **미해결** — `onMutateResult` 파라미터명 오류 및 4번째 인자 전달 문제 미수정. TypeScript는 여분의 파라미터를 허용하므로 컴파일 에러는 없으나 잘못된 값이 전달될 수 있음.
+- > ✅ **이슈 무효** — `@tanstack/query-core@5.90.20`은 실제로 `onSuccess(data, variables, onMutateResult, context)` 4-parameter 콜백을 사용. 기존 코드가 정확하며 수정 불필요. 초기 리뷰 시 구버전 React Query v5 문서 기반으로 작성된 오류.
 
 #### C-API-2. `useApiMutation`에서 ApiResponse 에러 시 토스트 로직 혼란
 - **파일**: `src/lib/api/hooks.ts:160-167,180-188`
@@ -99,7 +100,7 @@
 - **파일**: `src/features/auth/components/SignupStep1.tsx:43-61`
 - **문제**: API 실패 시 silent failure. 빠른 tab in/out 시 race condition.
 - **수정**: 에러 핸들링 추가, 디바운스 또는 AbortController 적용
-- > ⚠️ **부분 해결** (PR #81) — `"error"` 상태 추가 및 에러 메시지 UI 표시. **디바운스/AbortController 미적용** → race condition 가능성 잔존.
+- > ✅ **해결됨** (PR #81 + commit `55ba81b`) — `"error"` 상태 추가 및 에러 메시지 UI 표시. 300ms `setTimeout` 디바운스 + `AbortController` 적용으로 race condition 해결. React Compiler 호환: `register` onBlur 옵션 대신 직접 onBlur 합성.
 
 #### I-AUTH-6. 테스트 힌트가 프로덕션 빌드에 포함됨
 - **파일**: `src/features/auth/components/SignupStep2.tsx:169-171`, `SignupStep3.tsx:94-96`
@@ -131,7 +132,7 @@
 - **파일**: `src/features/region/components/map/KoreaAdminMap.tsx`
 - **문제**: 7개 상태, 5+ 커스텀 훅, 4개 렌더링 레이어, 15+ useEffect/useMemo/useCallback.
 - **수정**: 선거구 모드 → `useConstituencyMode` 훅, SVG 레이어 → `MapLayerRenderer` 서브 컴포넌트, 코로플레스 색상 계산 → choropleth-utils로 이동
-- > ⚠️ **부분 해결** (PR #81) — ref 패턴 적용, pre-split 최적화, 데드 코드 제거로 복잡도 감소. **`useConstituencyMode` 훅 추출 시도 → React Compiler `setState-in-effect` 오류로 롤백**. 전체 분해는 향후 과제.
+- > ✅ **해결됨** (PR #81 + commit `3bb7624`) — 912줄 → 778줄. `useConstituencyMode` 훅 추출 (render-time state reset 패턴으로 React Compiler 호환), SVG 4-layer를 `MapBaseLayer`/`MapLabelLayer`/`MapSelectedLayer`/`MapHoverOverlay`/`MapConstituencyOverlay` 5개 서브컴포넌트로 분해. `eslint-disable react-compiler` 블록 제거.
 
 #### I-MAP-2. JSX에서 `regionData` 3회 반복 순회
 - **파일**: `src/features/region/components/map/KoreaAdminMap.tsx:706,751,793`
@@ -297,7 +298,7 @@
 ### Phase 1: 즉시 수정 (버그/안전성) — 완료
 | 항목 | 영향 범위 | 상태 |
 |------|-----------|------|
-| C-API-1. useApiMutation 콜백 시그니처 수정 | 전체 API 호출 | ❌ 미해결 |
+| C-API-1. useApiMutation 콜백 시그니처 수정 | 전체 API 호출 | ✅ 이슈 무효 (query-core@5.90.20은 4-parameter 정상) |
 | C-API-3. Content-Type 조건부 설정 | 전체 API 호출 | ✅ 완료 |
 | C-MAP-1. getChoroplethColor min/max 사전 계산 | 지도 성능 | ✅ 완료 |
 | C-MAP-2. transition interrupt 핸들링 | 지도 인터랙션 | ✅ 완료 |
@@ -319,7 +320,7 @@
 ### Phase 3: 아키텍처 개선 — 완료
 | 항목 | 영향 범위 | 상태 |
 |------|-----------|------|
-| I-MAP-1. KoreaAdminMap 분해 (898줄) | 지도 전체 | ⚠️ 부분 완료 |
+| I-MAP-1. KoreaAdminMap 분해 (912→778줄) | 지도 전체 | ✅ 완료 |
 | I-MAP-2. regionData 순회 최적화 | 지도 성능 | ✅ 완료 |
 | C-AUTH-4. Top-level await 제거 | 빌드/트리쉐이킹 | ✅ 완료 |
 | I-AUTH-3. 토큰 만료/401 인터셉터 | 전체 인증 | ✅ 완료 |
@@ -328,6 +329,7 @@
 ### Phase 4: 품질 향상 — 진행 중
 | 항목 | 영향 범위 | 상태 |
 |------|-----------|------|
+| I-AUTH-5. SignupStep1 디바운스/AbortController | race condition | ✅ 완료 |
 | I-PLG-6. pledges/policy 테스트 작성 | 안정성 | ❌ 미착수 |
 | I-AUTH-4. GuestRoute 추가 | UX | ✅ 완료 |
 | I-AUTH-6. 테스트 힌트 DEV 가드 | 보안 | ✅ 완료 |

@@ -1,6 +1,6 @@
 # Module Map
 
-> 최종 업데이트: 2026-04-01
+> 최종 업데이트: 2026-04-02
 
 ---
 
@@ -33,7 +33,12 @@
 - **경로**: `src/features/region/`
 - **역할**: 행정구역 지도 시각화, 4단계 드릴다운 (시도→시군→구→읍면동), 선거구 뷰 모드, Choropleth, 검색, 지역분석 결과 표시
 - **핵심 파일**:
-  - `components/map/KoreaAdminMap.tsx` — 메인 지도 컴포넌트 (드릴다운, 줌, choropleth)
+  - `components/map/KoreaAdminMap.tsx` — 메인 지도 컴포넌트 (드릴다운, 줌, choropleth). 778줄, SVG 레이어는 서브컴포넌트로 분해
+  - `components/map/MapBaseLayer.tsx` — SVG Layer 1: 비선택 폴리곤 렌더링 (React.memo)
+  - `components/map/MapLabelLayer.tsx` — SVG Layer 2: 비선택 폴리곤 라벨 (React.memo)
+  - `components/map/MapSelectedLayer.tsx` — SVG Layer 3: 선택/하이라이트 폴리곤 + 라벨 (React.memo)
+  - `components/map/MapHoverOverlay.tsx` — hover 폴리곤 오버레이 (React.memo, O(1) lookup)
+  - `components/map/MapConstituencyOverlay.tsx` — SVG Layer 4: 선거구 외곽선 오버레이 (React.memo)
   - `components/map/RegionPolygon.tsx` — 개별 폴리곤 (hover/select 상태)
   - `components/map/MapTooltip.tsx` — 호버 시 지역 정보 툴팁
   - `components/map/MapBreadcrumb.tsx` — 드릴다운 경로 표시
@@ -41,13 +46,14 @@
   - `components/map/MapZoomControls.tsx` — 줌 컨트롤
   - `components/map/MapLegend.tsx` — Choropleth 범례
   - `components/map/MapSkeleton.tsx` — 로딩 스켈레톤
-  - `components/map/index.ts` — 컴포넌트 re-export
+  - `components/map/index.ts` — 컴포넌트 + RegionDataItem 타입 re-export
   - `hooks/useMapDrillDown.ts` — 4단계 드릴다운 상태 관리 + 지역 변환 함수
   - `hooks/useTopoJsonData.ts` — TopoJSON 동적 import + GeoJSON 변환
   - `hooks/useProjection.ts` — D3 geoMercator 프로젝션 (fitExtent 전체 영역 자동 스케일링)
   - `hooks/useMapZoom.ts` — D3 줌 동작 관리 (identity 리셋, 1x~8x)
   - `hooks/useMapTransition.ts` — D3 전환 애니메이션
   - `hooks/useHeatmapMode.ts` — 히트맵 모드 상태 관리 훅 (카테고리 선택 → choropleth 데이터 생성, forcedOff 리셋 로직)
+  - `hooks/useConstituencyMode.ts` — 선거구 뷰 모드 상태 관리 훅 (render-time state reset 패턴, React Compiler 호환)
   - `lib/choropleth-utils.ts` — oklch 색상 보간, choropleth 색상 매핑, 범례 생성
   - `lib/constituency-colors.ts` — 선거구 OKLCH 8색 팔레트 + EMD→선거구 색상 맵 빌드
   - `lib/map-theme.ts` — 지도 CSS 변수 (fill, hover, selected, stroke, strokeHover 등)

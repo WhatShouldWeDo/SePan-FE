@@ -51,8 +51,9 @@ function CategoryIcon() {
 }
 
 export function PledgeDonutChart({ stats }: PledgeDonutChartProps) {
-	const topKeyword = stats.reduce((max, s) =>
-		s.percentage > max.percentage ? s : max,
+	const topKeyword = stats.reduce(
+		(max, s) => (s.percentage > max.percentage ? s : max),
+		stats[0],
 	)
 
 	return (

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, X, Loader2 } from "lucide-react";
@@ -39,25 +39,45 @@ export function SignupStep1({ defaultValues, onComplete }: SignupStep1Props) {
 		},
 	});
 
-	// 아이디 중복 체크 (blur 이벤트)
+	const debounceTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+	const abortControllerRef = useRef<AbortController>(undefined);
+
+	useEffect(() => {
+		return () => {
+			clearTimeout(debounceTimerRef.current);
+			abortControllerRef.current?.abort();
+		};
+	}, []);
+
 	const handleUsernameBlur = async () => {
 		const username = getValues("username");
 
-		// 필드 유효성 검증 먼저
+		if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+		if (abortControllerRef.current) abortControllerRef.current.abort();
+
 		const isValid = await trigger("username");
 		if (!isValid || !username) {
 			setUsernameStatus("invalid");
 			return;
 		}
 
-		setUsernameStatus("checking");
+		const controller = new AbortController();
+		abortControllerRef.current = controller;
 
-		const result = await checkUsername(username);
-		if (result.success && result.data) {
-			setUsernameStatus(result.data.available ? "available" : "taken");
-		} else {
-			setUsernameStatus("error");
-		}
+		debounceTimerRef.current = setTimeout(async () => {
+			setUsernameStatus("checking");
+			try {
+				const result = await checkUsername(username, controller.signal);
+				if (result.success && result.data) {
+					setUsernameStatus(result.data.available ? "available" : "taken");
+				} else {
+					setUsernameStatus("error");
+				}
+			} catch (e) {
+				if (e instanceof DOMException && e.name === "AbortError") return;
+				setUsernameStatus("error");
+			}
+		}, 300);
 	};
 
 	const onSubmit = (data: Step1FormData) => {
@@ -70,6 +90,8 @@ export function SignupStep1({ defaultValues, onComplete }: SignupStep1Props) {
 
 	const isUsernameDisabled =
 		usernameStatus === "taken" || usernameStatus === "checking";
+
+	const usernameField = register("username");
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -85,9 +107,11 @@ export function SignupStep1({ defaultValues, onComplete }: SignupStep1Props) {
 						disabled={isSubmitting}
 						aria-invalid={!!errors.username || usernameStatus === "taken"}
 						aria-describedby="username-status"
-						{...register("username", {
-							onBlur: handleUsernameBlur,
-						})}
+						{...usernameField}
+						onBlur={(e) => {
+							usernameField.onBlur(e);
+							handleUsernameBlur();
+						}}
 						className={cn(
 							usernameStatus === "available" && "border-green-500 pr-10",
 							usernameStatus === "taken" && "border-destructive pr-10",

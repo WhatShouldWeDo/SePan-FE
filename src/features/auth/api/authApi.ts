@@ -24,9 +24,11 @@ export async function getMe(): Promise<ApiResponse<User>> {
 
 export async function checkUsername(
 	username: string,
+	signal?: AbortSignal,
 ): Promise<ApiResponse<{ available: boolean }>> {
 	return api.get<ApiResponse<{ available: boolean }>>(
 		`/auth/check-username?username=${encodeURIComponent(username)}`,
+		{ signal },
 	);
 }
 
