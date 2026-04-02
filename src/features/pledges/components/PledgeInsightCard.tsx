@@ -33,7 +33,8 @@ export function PledgeInsightCard({ data }: PledgeInsightCardProps) {
           <button
             type="button"
             className="flex items-center gap-1 text-label-3 font-semibold text-label-normal"
-            onClick={() => {}}
+            disabled
+            title="준비 중"
           >
             바로가기
             <span aria-hidden="true">&gt;</span>
@@ -48,7 +49,8 @@ export function PledgeInsightCard({ data }: PledgeInsightCardProps) {
             <button
               type="button"
               className="whitespace-nowrap text-label-4 font-semibold text-primary"
-              onClick={() => {}}
+              disabled
+              title="준비 중"
             >
               {data.bannerActionLabel} &gt;
             </button>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -14,14 +14,9 @@ interface SectionAnchorNavProps {
 
 export function SectionAnchorNav({ sections }: SectionAnchorNavProps) {
   const [activeId, setActiveId] = useState<string>(sections[0]?.id ?? "")
-  const sectionsRef = useRef(sections)
 
   useEffect(() => {
-    sectionsRef.current = sections
-  })
-
-  useEffect(() => {
-    const elements = sectionsRef.current
+    const elements = sections
       .map((s) => s.ref.current)
       .filter(Boolean) as HTMLDivElement[]
 
@@ -43,7 +38,7 @@ export function SectionAnchorNav({ sections }: SectionAnchorNavProps) {
     }
 
     return () => observer.disconnect()
-  }, [])
+  }, [sections])
 
   function handleClick(section: Section) {
     section.ref.current?.scrollIntoView({ behavior: "smooth" })
