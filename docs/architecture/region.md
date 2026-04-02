@@ -1,6 +1,6 @@
 # Region 모듈 상세 구조
 
-> 최종 업데이트: 2026-04-01
+> 최종 업데이트: 2026-04-02
 
 ---
 
@@ -15,16 +15,21 @@
 ```
 features/region/
 ├── components/
-│   ├── map/                      # 지도 관련 컴포넌트
-│   │   ├── KoreaAdminMap.tsx     #   메인 지도 (드릴다운, 줌, choropleth, 선거구 뷰)
-│   │   ├── RegionPolygon.tsx     #   개별 폴리곤 (hover/select)
-│   │   ├── MapTooltip.tsx        #   호버 툴팁
-│   │   ├── MapBreadcrumb.tsx     #   드릴다운 경로 (선거구 드릴다운 포함)
-│   │   ├── RegionSearch.tsx      #   검색 자동완성
-│   │   ├── MapZoomControls.tsx   #   줌 +/- 컨트롤
-│   │   ├── MapLegend.tsx         #   Choropleth 범례
-│   │   ├── MapSkeleton.tsx       #   로딩 스켈레톤
-│   │   └── index.ts              #   re-export
+│   ├── map/                          # 지도 관련 컴포넌트
+│   │   ├── KoreaAdminMap.tsx         #   메인 지도 (778줄, 드릴다운/줌/choropleth/선거구 뷰)
+│   │   ├── MapBaseLayer.tsx          #   SVG Layer 1: 비선택 폴리곤 (React.memo)
+│   │   ├── MapLabelLayer.tsx         #   SVG Layer 2: 비선택 라벨 (React.memo)
+│   │   ├── MapSelectedLayer.tsx      #   SVG Layer 3: 선택/하이라이트 (React.memo)
+│   │   ├── MapHoverOverlay.tsx       #   hover 오버레이 (React.memo, O(1) lookup)
+│   │   ├── MapConstituencyOverlay.tsx #  SVG Layer 4: 선거구 외곽선 (React.memo)
+│   │   ├── RegionPolygon.tsx         #   개별 폴리곤 (hover/select)
+│   │   ├── MapTooltip.tsx            #   호버 툴팁
+│   │   ├── MapBreadcrumb.tsx         #   드릴다운 경로 (선거구 드릴다운 포함)
+│   │   ├── RegionSearch.tsx          #   검색 자동완성
+│   │   ├── MapZoomControls.tsx       #   줌 +/- 컨트롤
+│   │   ├── MapLegend.tsx             #   Choropleth 범례
+│   │   ├── MapSkeleton.tsx           #   로딩 스켈레톤
+│   │   └── index.ts                  #   re-export + RegionDataItem 타입
 │   ├── MetricListRow.tsx         # 지표 행 (라벨, 값, 단위, 델타 뱃지)
 │   ├── AiAnalysisBox.tsx         # AI 기본 분석 결과 박스
 │   └── MetricActionButtons.tsx   # 분석 결과 보기 액션 버튼 (preview 모드)
@@ -34,7 +39,8 @@ features/region/
 │   ├── useProjection.ts          # D3 geoMercator (fitExtent 전체 영역)
 │   ├── useMapZoom.ts             # D3 줌 동작 (identity 리셋, 1x~8x)
 │   ├── useMapTransition.ts       # D3 전환 애니메이션
-│   └── useHeatmapMode.ts        # 히트맵 모드 상태 관리 (카테고리→choropleth)
+│   ├── useHeatmapMode.ts         # 히트맵 모드 상태 관리 (카테고리→choropleth)
+│   └── useConstituencyMode.ts   # 선거구 뷰 모드 상태 관리 (render-time state reset)
 ├── lib/
 │   ├── choropleth-utils.ts       # oklch 색상 보간, 범례 생성
 │   ├── constituency-colors.ts    # 선거구 OKLCH 8색 팔레트 + EMD→선거구 색상 맵 빌드
@@ -103,16 +109,19 @@ AI 분석 결과 표시. `WantedMagicWand` 아이콘 + primary 배경.
 - CSS 변수: `--map-stroke-hover` (Light: `oklch(0.45 0.2 250)`, Dark: `oklch(0.7 0.2 250)`)
 - 전환 애니메이션: `transition: fill 150ms, stroke 150ms, stroke-width 150ms`
 
-### SVG 4-layer 렌더링 (z-index 대체)
+### SVG 5-layer 렌더링 (서브컴포넌트 분해)
 
-SVG는 CSS z-index가 아닌 DOM 순서로 렌더링 우선순위가 결정됨. `KoreaAdminMap`에서 `regionData.map()`을 세 번 순회 + 선거구 오버레이:
+SVG는 CSS z-index가 아닌 DOM 순서로 렌더링 우선순위가 결정됨. 각 레이어는 독립 서브컴포넌트로 분해되어 `React.memo`로 래핑됨:
 
-1. **Layer 1**: 비활성 폴리곤 `<path>`만 렌더링 (`showLabel={false}`)
-2. **Layer 2**: 비활성 폴리곤 `<text>` label만 렌더링 — 모든 path 위에 그려져 인접 폴리곤에 가리지 않음
-3. **Layer 3**: hover/selected 폴리곤 `<path>` + `<text>` 함께 렌더링 (최상위)
-4. **Layer 4**: 선거구 경계 오버레이 (선거구 개요 모드에서만) — SVG `clipPath` + `evenodd` 규칙으로 외곽선만 표시
+1. **`MapBaseLayer`** (Layer 1): 비선택 폴리곤 `<path>`만 렌더링 (`showLabel={false}`)
+2. **`MapLabelLayer`** (Layer 2): 비선택 폴리곤 `<text>` label — 모든 path 위에 그려져 인접 폴리곤에 가리지 않음
+3. **`MapSelectedLayer`** (Layer 3): 선택/하이라이트 폴리곤 `<path>` + `<text>` 함께 렌더링
+4. **`MapHoverOverlay`**: hover 폴리곤 오버레이 (선택 상태가 아닌 경우만, O(1) lookup)
+5. **`MapConstituencyOverlay`** (Layer 4): 선거구 경계 오버레이 (선거구 개요 모드에서만) — SVG `clipPath` + `evenodd` 규칙으로 외곽선만 표시
 
-Layer 2의 `<text>`는 `mapColors.label` 색상, `fontSize={10}`, `pointerEvents="none"` — `RegionPolygon` 내부 label과 동일 스타일.
+`KoreaAdminMap`은 `useMemo`로 `selectedRegions`/`unselectedRegions`를 pre-split하여 각 레이어에 전달. `regionDataByCode` Map으로 O(1) hover 아이템 조회.
+
+공유 타입 `RegionDataItem`은 `MapBaseLayer.tsx`에서 정의, `index.ts`를 통해 re-export.
 
 이를 통해:
 - 모든 label이 인접 폴리곤 fill 위에 표시됨
@@ -146,13 +155,17 @@ emd.topojson.json의 SGG_Code 속성
 - 모든 3,558개 EMD에 `SGG_Code` 속성이 존재 (매핑 누락 0건)
 - 254개 선거구 (22대 국회의원선거 2024 기준)
 
-#### 상태 관리
+#### 상태 관리 (`useConstituencyMode` 훅)
+
+`src/features/region/hooks/useConstituencyMode.ts`로 추출됨. render-time state reset 패턴 사용 (React Compiler 호환, `useHeatmapMode`와 동일 패턴).
 
 | 상태 | 타입 | 초기값 | 용도 |
 |------|------|--------|------|
 | `isConstituencyMode` | `boolean` | `true` | 선거구 뷰 ON/OFF |
 | `selectedConstituency` | `string \| null` | `null` | 선거구 드릴다운 시 SGG_Code |
 | `selectedConstituencyName` | `string \| null` | `null` | 선거구명 (브레드크럼용) |
+
+훅 반환값: 위 상태 + `constituencyColorMap` + `enterConstituencyDrillDown`/`resetConstituencyDrillDown` 콜백.
 
 #### 2가지 모드
 
