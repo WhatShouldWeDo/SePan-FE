@@ -124,35 +124,3 @@ export interface ApiError {
   errors?: Record<string, string[]>
 }
 
-// 인증 관련
-export interface LoginRequest {
-  username: string
-  password: string
-}
-
-export interface LoginResponse {
-  accessToken: string
-  refreshToken: string
-  user: {
-    id: string
-    username: string
-    name: string
-    role: string
-  }
-}
-
-export interface SignupRequest {
-  username: string
-  password: string
-  name: string
-  phone: string
-  verificationCode: string
-  approvalCode: string
-  role: string
-  regionId: string
-}
-
-export interface SignupResponse {
-  success: boolean
-  message: string
-}

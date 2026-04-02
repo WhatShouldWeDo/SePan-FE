@@ -44,7 +44,8 @@ export function useAuth() {
       const result = await authApi.login({ username, password })
 
       if (result.success) {
-        localStorage.setItem("auth_token", result.data.token)
+        localStorage.setItem("auth_token", result.data.accessToken)
+        localStorage.setItem("refresh_token", result.data.refreshToken)
         queryClient.setQueryData([...AUTH_QUERY_KEY], result.data.user)
         navigate("/")
         return { success: true }
@@ -58,6 +59,7 @@ export function useAuth() {
   const logout = useCallback(async () => {
     await authApi.logout()
     localStorage.removeItem("auth_token")
+    localStorage.removeItem("refresh_token")
     queryClient.setQueryData([...AUTH_QUERY_KEY], null)
     queryClient.removeQueries({ queryKey: [...AUTH_QUERY_KEY] })
     navigate("/login")

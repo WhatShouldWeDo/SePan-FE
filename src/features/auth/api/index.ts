@@ -4,9 +4,10 @@ export type { LoginRequest, LoginResponse, SignupRequest, SignupResponse } from 
 // VITE_USE_MOCK이 설정되지 않았거나 'true'이면 Mock 사용 (개발 기본값)
 const useMock = import.meta.env.VITE_USE_MOCK !== "false";
 
-const api = useMock
-	? await import("./authApi.mock")
-	: await import("./authApi");
+import * as realApi from "./authApi";
+import * as mockApi from "./authApi.mock";
+
+const api = useMock ? mockApi : realApi;
 
 export const {
 	login,

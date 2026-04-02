@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { TextField } from "@/components/ui/text-field";
 import { Spinner } from "@/components/ui/spinner";
 import { loginSchema, type LoginFormData } from "../schemas/loginSchema";
-import { login } from "../api";
-import { useApiMutation } from "@/lib/api/hooks";
+import { useAuth } from "../hooks/useAuth";
 
 export function LoginForm() {
-	const navigate = useNavigate();
 	const [showPassword, setShowPassword] = useState(false);
+	const [loginError, setLoginError] = useState<string | null>(null);
+	const [isPending, setIsPending] = useState(false);
+	const { login } = useAuth();
 
 	const {
 		register,
@@ -22,20 +22,31 @@ export function LoginForm() {
 		mode: "onBlur",
 	});
 
-	const { mutate: loginMutation, isPending } = useApiMutation({
-		mutationFn: (data: LoginFormData) => login(data),
-		onSuccess: (data) => {
-			localStorage.setItem("auth_token", data.token);
-			navigate("/");
-		},
-	});
+	const onSubmit = async (data: LoginFormData) => {
+		setIsPending(true);
+		setLoginError(null);
 
-	const onSubmit = (data: LoginFormData) => {
-		loginMutation(data);
+		const result = await login(data.username, data.password);
+
+		setIsPending(false);
+
+		if (!result.success) {
+			setLoginError(result.error ?? "로그인에 실패했습니다");
+		}
 	};
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+			{/* 로그인 오류 표시 */}
+			{loginError && (
+				<div
+					role="alert"
+					className="rounded-md bg-destructive/10 p-3 text-sm text-destructive"
+				>
+					{loginError}
+				</div>
+			)}
+
 			{/* 아이디 필드 */}
 			<TextField
 				label="아이디"
