@@ -96,7 +96,7 @@ function Checkbox({
 					style={{
 						backgroundColor: isCheckedOrIndeterminate
 							? "var(--label-normal)"
-							: "var(--label-normal)",
+							: "var(--label-alternative)",
 					}}
 					aria-hidden="true"
 				/>

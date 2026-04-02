@@ -19,67 +19,67 @@ import type {
 	Step2FormData,
 	Step3FormData,
 	Step4FormData,
-	SignupFormData,
 } from "@/features/auth/schemas/signupSchema";
 
 const TOTAL_STEPS = 4;
 
 export function SignupPage() {
 	const [currentStep, setCurrentStep] = useState(1);
-	const [formData, setFormData] = useState<Partial<SignupFormData>>({});
+	const [step1Data, setStep1Data] = useState<Step1FormData | null>(null);
+	const [step2Data, setStep2Data] = useState<Step2FormData | null>(null);
+	const [step3Data, setStep3Data] = useState<Step3FormData | null>(null);
 	const [isComplete, setIsComplete] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [submitError, setSubmitError] = useState<string | null>(null);
 
 	const handleStep1Complete = (data: Step1FormData) => {
-		setFormData((prev) => ({ ...prev, ...data }));
+		setStep1Data(data);
 		setCurrentStep(2);
 	};
 
 	const handleStep2Complete = (data: Step2FormData) => {
-		setFormData((prev) => ({ ...prev, ...data }));
+		setStep2Data(data);
 		setCurrentStep(3);
 	};
 
 	const handleStep3Complete = (data: Step3FormData) => {
-		setFormData((prev) => ({ ...prev, ...data }));
+		setStep3Data(data);
 		setCurrentStep(4);
 	};
 
 	const handleStep4Complete = async (data: Step4FormData) => {
+		if (!step1Data || !step2Data || !step3Data) {
+			setSubmitError("이전 단계 데이터가 누락되었습니다. 처음부터 다시 시도해주세요.");
+			return;
+		}
+
 		setIsSubmitting(true);
 		setSubmitError(null);
 
-		// 전체 데이터 조합
-		const finalData: SignupFormData = {
-			...formData,
-			...data,
-		} as SignupFormData;
+		try {
+			const result = await signup({
+				username: step1Data.username,
+				password: step1Data.password,
+				name: step1Data.name,
+				phone: step2Data.phone,
+				approvalCode: step3Data.approvalCode,
+				role: data.role,
+				sidoId: data.sidoId,
+				constituencyId: data.constituencyId,
+				additionalInfo: data.additionalInfo,
+			});
 
-		// 회원가입 API 호출
-		const result = await signup({
-			username: finalData.username,
-			password: finalData.password,
-			name: finalData.name,
-			phone: finalData.phone,
-			approvalCode: finalData.approvalCode,
-			role: finalData.role,
-			sidoId: finalData.sidoId,
-			constituencyId: finalData.constituencyId,
-			additionalInfo: finalData.additionalInfo,
-		});
-
-		setIsSubmitting(false);
-
-		if (result.success) {
-			// 토큰 저장 (자동 로그인)
-			localStorage.setItem("auth_token", result.data.accessToken);
-			localStorage.setItem("refresh_token", result.data.refreshToken);
-
-			// 완료 화면으로 전환
-			setIsComplete(true);
-		} else {
-			setSubmitError(result.error.message ?? "회원가입에 실패했습니다");
+			if (result.success) {
+				localStorage.setItem("auth_token", result.data.accessToken);
+				localStorage.setItem("refresh_token", result.data.refreshToken);
+				setIsComplete(true);
+			} else {
+				setSubmitError(result.error.message ?? "회원가입에 실패했습니다");
+			}
+		} catch {
+			setSubmitError("네트워크 오류가 발생했습니다. 다시 시도해주세요.");
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
 
@@ -88,7 +88,7 @@ export function SignupPage() {
 		return (
 			<Card>
 				<CardContent className="pt-6">
-					<SignupComplete userName={formData.name ?? "회원"} />
+					<SignupComplete userName={step1Data?.name ?? "회원"} />
 				</CardContent>
 			</Card>
 		);
@@ -115,14 +115,14 @@ export function SignupPage() {
 
 				{currentStep === 1 && (
 					<SignupStep1
-						defaultValues={formData}
+						defaultValues={step1Data ?? undefined}
 						onComplete={handleStep1Complete}
 					/>
 				)}
 
 				{currentStep === 2 && (
 					<SignupStep2
-						defaultValues={formData}
+						defaultValues={step2Data ?? undefined}
 						onComplete={handleStep2Complete}
 						onBack={() => setCurrentStep(1)}
 					/>
@@ -130,7 +130,7 @@ export function SignupPage() {
 
 				{currentStep === 3 && (
 					<SignupStep3
-						defaultValues={formData}
+						defaultValues={step3Data ?? undefined}
 						onComplete={handleStep3Complete}
 						onBack={() => setCurrentStep(2)}
 					/>
@@ -138,7 +138,7 @@ export function SignupPage() {
 
 				{currentStep === 4 && (
 					<SignupStep4
-						defaultValues={formData}
+						defaultValues={undefined}
 						onComplete={handleStep4Complete}
 						onBack={() => setCurrentStep(3)}
 					/>

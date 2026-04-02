@@ -55,6 +55,14 @@ export async function request<T>(
   const response = await fetch(url, config)
 
   if (!response.ok) {
+    // 401 Unauthorized → 토큰 클리어 및 로그인 리다이렉트
+    if (response.status === 401) {
+      localStorage.removeItem("auth_token")
+      localStorage.removeItem("refresh_token")
+      window.location.href = "/login"
+      throw new ApiClientError("인증이 만료되었습니다", 401, "UNAUTHORIZED")
+    }
+
     let errorMessage = "요청 처리 중 오류가 발생했습니다"
     let errorCode: string | undefined
 

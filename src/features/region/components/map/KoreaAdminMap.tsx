@@ -158,6 +158,11 @@ export function KoreaAdminMap({
 	// --- 줌/팬 (Phase 3-D) ---
 	const { svgRef, gRef, zoomLevel, zoomIn, zoomOut, smoothZoomReset } =
 		useMapZoom();
+	// ref로 최신 함수 참조 유지 (exhaustive-deps 억제 없이 사용하기 위함)
+	const smoothZoomResetRef = useRef(smoothZoomReset);
+	useEffect(() => {
+		smoothZoomResetRef.current = smoothZoomReset;
+	}, [smoothZoomReset]);
 
 	// --- 전환 애니메이션 (Phase 4-D) ---
 	const { isTransitioning, triggerTransition } = useMapTransition();
@@ -254,9 +259,12 @@ export function KoreaAdminMap({
 	const [selectedConstituency, setSelectedConstituency] = useState<string | null>(null);
 	const [selectedConstituencyName, setSelectedConstituencyName] = useState<string | null>(null);
 	const selectedConstituencyRef = useRef<string | null>(null);
-	selectedConstituencyRef.current = selectedConstituency;
+	useEffect(() => { selectedConstituencyRef.current = selectedConstituency; }, [selectedConstituency]);
 
 	// 레벨 변경 시 자동 리셋 — 읍면동 이외에서는 OFF, 읍면동 진입 시 기본 ON
+	// 이하 4개 effect는 외부 상태 변화에 따라 constituency 상태를 동기화하는 표준 패턴.
+	// React Compiler가 set-state-in-effect를 경고하나 의도적인 cascading이 아님.
+	/* eslint-disable react-hooks/set-state-in-effect */
 	useEffect(() => {
 		if (currentLevel !== "eupMyeonDong") {
 			setIsConstituencyMode(false);
@@ -282,6 +290,15 @@ export function KoreaAdminMap({
 		}
 	}, [choroplethData]);
 
+	// 선거구 모드 OFF 시 드릴다운도 리셋
+	useEffect(() => {
+		if (!isConstituencyMode) {
+			setSelectedConstituency(null);
+			setSelectedConstituencyName(null);
+		}
+	}, [isConstituencyMode]);
+	/* eslint-enable react-hooks/set-state-in-effect */
+
 	// 선거구 드릴다운 시: 해당 선거구의 EMD만 필터
 	const effectiveFeatureCollection = useMemo(() => {
 		if (!selectedConstituency || currentLevel !== "eupMyeonDong") return featureCollection;
@@ -295,17 +312,8 @@ export function KoreaAdminMap({
 
 	// 레벨 전환 시 줌 리셋 (부드러운 전환)
 	useEffect(() => {
-		smoothZoomReset();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		smoothZoomResetRef.current();
 	}, [level, selectedSido, selectedCity, selectedGu, selectedConstituency]);
-
-	// 선거구 모드 OFF 시 드릴다운도 리셋
-	useEffect(() => {
-		if (!isConstituencyMode) {
-			setSelectedConstituency(null);
-			setSelectedConstituencyName(null);
-		}
-	}, [isConstituencyMode]);
 
 	// 선거구 드릴다운 복귀 핸들러
 	const handleBackToConstituencyOverview = useCallback(() => {
@@ -404,14 +412,15 @@ export function KoreaAdminMap({
 	}, [isConstituencyMode, currentLevel, featureCollection]);
 
 	// Ref 패턴 — stale closure 방지 (RegionPolygon의 arePropsEqual이 onHover/onClick 제외)
+	// React Compiler: ref.current는 렌더 중 직접 할당 금지 → useEffect에서 갱신
 	const constituencyColorMapRef = useRef(constituencyColorMap);
-	constituencyColorMapRef.current = constituencyColorMap;
+	useEffect(() => { constituencyColorMapRef.current = constituencyColorMap; }, [constituencyColorMap]);
 
 	const constituencyInfoMapRef = useRef(constituencyInfoMap);
-	constituencyInfoMapRef.current = constituencyInfoMap;
+	useEffect(() => { constituencyInfoMapRef.current = constituencyInfoMap; }, [constituencyInfoMap]);
 
 	const isConstituencyModeRef = useRef(isConstituencyMode);
-	isConstituencyModeRef.current = isConstituencyMode;
+	useEffect(() => { isConstituencyModeRef.current = isConstituencyMode; }, [isConstituencyMode]);
 
 	// hover / tooltip 상태
 	const [hoveredCode, setHoveredCode] = useState<string | null>(null);
@@ -494,7 +503,14 @@ export function KoreaAdminMap({
 		[],
 	);
 
-	// 롱프레스로 터치 툴팁 표시 (Phase 3-E)
+	// O(1) 룩업용 code → regionData item Map (I-MAP-5: Long Press + hover 최적화)
+	const regionDataByCode = useMemo(() => {
+		const map = new Map<string, (typeof regionData)[0]>();
+		for (const item of regionData) map.set(item.region.code, item);
+		return map;
+	}, [regionData]);
+
+	// 롱프레스로 터치 툴팁 표시 (Phase 3-E) — data-code 속성으로 O(1) 룩업
 	const handleLongPressCallback = useCallback(
 		(x: number, y: number) => {
 			const elem = document.elementFromPoint(x, y);
@@ -503,17 +519,14 @@ export function KoreaAdminMap({
 			const pathElem = elem.closest("path");
 			if (!pathElem) return;
 
-			const d = pathElem.getAttribute("d") ?? "";
-			const matched = regionData.find((r) => r.pathD === d);
-			if (matched) {
-				setTooltip({
-					region: matched.region,
-					position: { x, y },
-				});
+			const code = (pathElem as SVGElement).dataset.code;
+			const item = code ? regionDataByCode.get(code) : undefined;
+			if (item) {
+				setTooltip({ region: item.region, position: { x, y } });
 				setTimeout(() => setTooltip(null), 3000);
 			}
 		},
-		[regionData],
+		[regionDataByCode],
 	);
 
 	const longPress = useLongPress(handleLongPressCallback);
@@ -623,6 +636,25 @@ export function KoreaAdminMap({
 		return null;
 	}, [enableDrillDown, currentLevel, searchNavigation]);
 
+	// regionData를 selected/unselected로 pre-split (I-MAP-2: 3회 순회 → 1회로 최적화)
+	// hoveredCode는 빈번하게 변경되므로 deps에서 제외 — hover 아이템은 Layer 3에서 별도 렌더링
+	const { selectedRegions, unselectedRegions } = useMemo(() => {
+		const isConstituencyOverview = isConstituencyMode && !selectedConstituency;
+		const selected: typeof regionData = [];
+		const unselected: typeof regionData = [];
+		for (const item of regionData) {
+			const isSelected = isConstituencyOverview
+				? false
+				: selectedCode === item.region.code || searchHighlightCode === item.region.code;
+			if (isSelected) {
+				selected.push(item);
+			} else {
+				unselected.push(item);
+			}
+		}
+		return { selectedRegions: selected, unselectedRegions: unselected };
+	}, [regionData, isConstituencyMode, selectedConstituency, selectedCode, searchHighlightCode]);
+
 	// --- 선거구 fillOverride 헬퍼 ---
 	const getConstituencyFill = (code: string, hovered: boolean, selected: boolean): string | null => {
 		if (!constituencyColorMap) return null;
@@ -702,137 +734,119 @@ export function KoreaAdminMap({
 				onPointerCancel={longPress.onPointerUp}
 			>
 				<g ref={gRef}>
-					{/* Layer 1: 비활성 폴리곤 path만 — label을 분리하여 인접 폴리곤에 가리지 않도록 함 */}
-					{regionData.map(
-						({ region, pathD, centroid }) => {
-							const emdSggCode = constituencyColorMap?.get(region.code)?.sggCode;
-							// 선거구 개요 모드: EMD는 항상 비활성 (경계는 오버레이로 렌더)
-							const isConstituencyOverview = isConstituencyMode && !selectedConstituency;
-
-							const isHovered = isConstituencyOverview
-								? false
-								: hoveredCode === region.code;
-
-							const isSelected = isConstituencyOverview
-								? false
-								: (selectedCode === region.code || searchHighlightCode === region.code);
-
-							const isActive = isHovered || isSelected;
-							if (isActive) return null;
-
-							// 선거구 개요 모드: hover/selected 상태에 따라 fillOverride 변경
-							let fillOverride: string | null =
-								choroplethColorMap?.[region.code] ?? null;
-							if (!fillOverride && isConstituencyOverview && emdSggCode) {
-								const isConstHovered = emdSggCode === hoveredConstituencyCode;
-								const isConstSelected = emdSggCode === selectedCode;
-								fillOverride = getConstituencyFill(region.code, isConstHovered, isConstSelected);
-							} else if (!fillOverride) {
-								fillOverride = getConstituencyFill(region.code, false, false);
-							}
-
-							return (
-								<RegionPolygon
-									key={region.code}
-									pathD={pathD}
-									centroid={centroid}
-									region={region}
-									isHovered={false}
-									isSelected={false}
-									showLabel={false}
-									fillOverride={fillOverride}
-									onHover={handleHover}
-									onClick={handleClick}
-								/>
-							);
-						},
-					)}
-					{/* Layer 2: 비활성 폴리곤 label — 모든 path 위에 렌더링 */}
-					{regionData.map(
-						({ region, centroid, showLabel, area }) => {
-							const isConstituencyOverview = isConstituencyMode && !selectedConstituency;
-
-							const isHovered = isConstituencyOverview
-								? false
-								: hoveredCode === region.code;
-
-							const isSelected = isConstituencyOverview
-								? false
-								: (selectedCode === region.code || searchHighlightCode === region.code);
-
-							const isActive = isHovered || isSelected;
-							if (isActive) return null;
-
-							const zoomAdjustedShowLabel =
-								showLabel ||
-								(showLabels &&
-									zoomLevel >= ZOOM_LABEL_THRESHOLD &&
-									area >
-										effectiveThreshold /
-											(zoomLevel * zoomLevel));
-
-							if (!zoomAdjustedShowLabel) return null;
-
-							return (
-								<text
-									key={region.code}
-									x={centroid[0]}
-									y={centroid[1]}
-									textAnchor="middle"
-									dominantBaseline="central"
-									fill={mapColors.label}
-									fontSize={10}
-									pointerEvents="none"
-								>
-									{region.name}
-								</text>
-							);
-						},
-					)}
+					{/* Layer 1: 비선택 폴리곤 path만 — label을 분리하여 인접 폴리곤에 가리지 않도록 함 */}
+					{unselectedRegions.map(({ region, pathD, centroid }) => {
+						const emdSggCode = constituencyColorMap?.get(region.code)?.sggCode;
+						const isConstituencyOverview = isConstituencyMode && !selectedConstituency;
+						let fillOverride: string | null = choroplethColorMap?.[region.code] ?? null;
+						if (!fillOverride && isConstituencyOverview && emdSggCode) {
+							const isConstHovered = emdSggCode === hoveredConstituencyCode;
+							const isConstSelected = emdSggCode === selectedCode;
+							fillOverride = getConstituencyFill(region.code, isConstHovered, isConstSelected);
+						} else if (!fillOverride) {
+							fillOverride = getConstituencyFill(region.code, false, false);
+						}
+						return (
+							<RegionPolygon
+								key={region.code}
+								pathD={pathD}
+								centroid={centroid}
+								region={region}
+								isHovered={false}
+								isSelected={false}
+								showLabel={false}
+								fillOverride={fillOverride}
+								onHover={handleHover}
+								onClick={handleClick}
+							/>
+						);
+					})}
+					{/* Layer 2: 비선택 폴리곤 label — 모든 path 위에 렌더링 */}
+					{unselectedRegions.map(({ region, centroid, showLabel, area }) => {
+						const zoomAdjustedShowLabel =
+							showLabel ||
+							(showLabels &&
+								zoomLevel >= ZOOM_LABEL_THRESHOLD &&
+								area >
+									effectiveThreshold /
+										(zoomLevel * zoomLevel));
+						if (!zoomAdjustedShowLabel) return null;
+						return (
+							<text
+								key={region.code}
+								x={centroid[0]}
+								y={centroid[1]}
+								textAnchor="middle"
+								dominantBaseline="central"
+								fill={mapColors.label}
+								fontSize={10}
+								pointerEvents="none"
+							>
+								{region.name}
+							</text>
+						);
+					})}
 					{/* Layer 3: hover/selected 폴리곤 — path + label 최상위 렌더링 */}
-					{regionData.map(
-						({ region, pathD, centroid, showLabel, area }) => {
-							const isConstituencyOverview = isConstituencyMode && !selectedConstituency;
-
-							const isHovered = isConstituencyOverview
-								? false
-								: hoveredCode === region.code;
-
-							const isSelected = isConstituencyOverview
-								? false
-								: (selectedCode === region.code || searchHighlightCode === region.code);
-
-							if (!isHovered && !isSelected) return null;
-
-							const zoomAdjustedShowLabel =
-								showLabel ||
-								(showLabels &&
-									zoomLevel >= ZOOM_LABEL_THRESHOLD &&
-									area >
-										effectiveThreshold /
-											(zoomLevel * zoomLevel));
-
-							const fillOverride =
-								choroplethColorMap?.[region.code]
-								?? getConstituencyFill(region.code, isHovered, isSelected)
-								?? null;
-
-							return (
-								<RegionPolygon
-									key={region.code}
-									pathD={pathD}
-									centroid={centroid}
-									region={region}
-									isHovered={isHovered}
-									isSelected={isSelected}
-									showLabel={zoomAdjustedShowLabel}
-									fillOverride={fillOverride}
-									onHover={handleHover}
-									onClick={handleClick}
-								/>
-							);
-						},
-					)}
+					{selectedRegions.map(({ region, pathD, centroid, showLabel, area }) => {
+						const isHovered = hoveredCode === region.code;
+						const isSelected = true;
+						const zoomAdjustedShowLabel =
+							showLabel ||
+							(showLabels &&
+								zoomLevel >= ZOOM_LABEL_THRESHOLD &&
+								area >
+									effectiveThreshold /
+										(zoomLevel * zoomLevel));
+						const fillOverride =
+							choroplethColorMap?.[region.code]
+							?? getConstituencyFill(region.code, isHovered, isSelected)
+							?? null;
+						return (
+							<RegionPolygon
+								key={region.code}
+								pathD={pathD}
+								centroid={centroid}
+								region={region}
+								isHovered={isHovered}
+								isSelected={isSelected}
+								showLabel={zoomAdjustedShowLabel}
+								fillOverride={fillOverride}
+								onHover={handleHover}
+								onClick={handleClick}
+							/>
+						);
+					})}
+					{/* Hovered 폴리곤 (선택되지 않은 경우) — O(1) 룩업으로 성능 최적화 */}
+					{hoveredCode && hoveredCode !== selectedCode && hoveredCode !== searchHighlightCode && (() => {
+						const item = regionDataByCode.get(hoveredCode);
+						if (!item) return null;
+						const { region, pathD, centroid, showLabel, area } = item;
+						const zoomAdjustedShowLabel =
+							showLabel ||
+							(showLabels &&
+								zoomLevel >= ZOOM_LABEL_THRESHOLD &&
+								area >
+									effectiveThreshold /
+										(zoomLevel * zoomLevel));
+						const fillOverride =
+							choroplethColorMap?.[region.code]
+							?? getConstituencyFill(region.code, true, false)
+							?? null;
+						return (
+							<RegionPolygon
+								key={`hover-${region.code}`}
+								pathD={pathD}
+								centroid={centroid}
+								region={region}
+								isHovered={true}
+								isSelected={false}
+								showLabel={zoomAdjustedShowLabel}
+								fillOverride={fillOverride}
+								onHover={handleHover}
+								onClick={handleClick}
+							/>
+						);
+					})()}
 					{/* Layer 4: 선거구 경계 오버레이 (개요 모드) — clip-path로 외곽선만 표시 */}
 					{constituencyOverlayPaths.map(({ sggCode, combinedPathD }) => {
 						const isHovered = sggCode === hoveredConstituencyCode;

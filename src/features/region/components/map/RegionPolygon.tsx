@@ -70,6 +70,7 @@ export const RegionPolygon = React.memo(function RegionPolygon({
 		<g>
 			<path
 				d={pathD}
+				data-code={region.code}
 				fill={fill}
 				stroke={strokeColor}
 				strokeWidth={isHovered || isSelected ? 3 : 0.5}

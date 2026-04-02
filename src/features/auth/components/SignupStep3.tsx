@@ -91,9 +91,11 @@ export function SignupStep3({
 						{errors.approvalCode.message}
 					</p>
 				)}
-				<p className="text-sm text-muted-foreground">
-					테스트: CAMP2026으로 시작하는 코드 입력 (예: CAMP2026ABC)
-				</p>
+				{import.meta.env.DEV && (
+					<p className="text-sm text-muted-foreground">
+						테스트: CAMP2026으로 시작하는 코드 입력 (예: CAMP2026ABC)
+					</p>
+				)}
 			</div>
 
 			{/* 도움말 박스 */}

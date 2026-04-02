@@ -27,7 +27,7 @@ export function MapZoomControls({
 			<button
 				type="button"
 				onClick={onZoomIn}
-				className="inline-flex h-10 w-10 items-center justify-center rounded-md text-foreground hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+				className="inline-flex h-11 w-11 items-center justify-center rounded-md text-foreground hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
 				aria-label="확대"
 			>
 				<Plus className="h-5 w-5" />
@@ -38,7 +38,7 @@ export function MapZoomControls({
 			<button
 				type="button"
 				onClick={onZoomOut}
-				className="inline-flex h-10 w-10 items-center justify-center rounded-md text-foreground hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+				className="inline-flex h-11 w-11 items-center justify-center rounded-md text-foreground hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
 				aria-label="축소"
 			>
 				<Minus className="h-5 w-5" />
@@ -47,7 +47,7 @@ export function MapZoomControls({
 			<button
 				type="button"
 				onClick={onZoomReset}
-				className="inline-flex h-10 w-10 items-center justify-center rounded-md text-foreground hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+				className="inline-flex h-11 w-11 items-center justify-center rounded-md text-foreground hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
 				aria-label="줌 리셋"
 			>
 				<RotateCcw className="h-4 w-4" />

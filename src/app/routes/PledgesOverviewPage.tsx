@@ -17,7 +17,7 @@ const ELECTION_TYPES: ElectionTypeItem[] = [
 		to: "/pledges/presidential",
 		title: "대통령 선거",
 		description: "대통령 선거",
-		image: "/image/presidental.png",
+		image: "/image/presidential.png",
 	},
 	{
 		to: "/pledges/parliamentary",
