@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { ChartCardSkeleton } from '@/components/DashboardCardSkeleton'
+import { getChartColor } from '@/lib/chart-theme'
 import type { ChartData, ChartConfig, ChartFormatter } from '@/types/chart'
 
 export interface LineChartProps {
@@ -123,13 +124,13 @@ export function LineChart({
         {showLegend && <Legend wrapperStyle={{ fontSize: '14px' }} />}
 
         {/* 라인 시리즈 */}
-        {series.map((s) => (
+        {series.map((s, idx) => (
           <Line
             key={s.key}
             type="monotone"
             dataKey={s.key}
             name={s.label}
-            stroke={s.color || 'hsl(var(--primary))'}
+            stroke={s.color || getChartColor(idx)}
             strokeWidth={2}
             strokeDasharray={s.strokeDasharray}
             dot={{ r: 4 }}

@@ -44,7 +44,7 @@ export const router = createBrowserRouter([
 					{ path: "/pledges/local", element: <LocalElectionPledgesPage /> },
 					{ path: "/pledges/:electionType/:candidateId", element: <CandidateDetailPage /> },
 					{ path: "/pledges/:type", element: <PledgesPlaceholderPage /> },
-					{ path: "/test", element: <TestPage /> },
+					...(import.meta.env.DEV ? [{ path: "/test", element: <TestPage /> }] : []),
 				],
 			},
 		],

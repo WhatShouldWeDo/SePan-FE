@@ -100,6 +100,41 @@ function SidebarNavItem({
   )
 }
 
+/* ─── SidebarBottomSection (공유 하단 섹션: divider + utility nav + logo) ─── */
+
+function SidebarBottomSection({
+  isCollapsed,
+  showLogo,
+  isItemActive,
+}: {
+  isCollapsed: boolean
+  showLogo: boolean
+  isItemActive: (item: NavItem) => boolean
+}) {
+  return (
+    <>
+      <hr className="border-line-normal" />
+      <nav className="flex flex-col gap-1">
+        {utilityNavItems.map((item) => (
+          <SidebarNavItem
+            key={item.label}
+            item={item}
+            isActive={isItemActive(item)}
+            isCollapsed={isCollapsed}
+          />
+        ))}
+      </nav>
+      {showLogo && (
+        <div className="px-4">
+          <span className="text-label-3 font-bold text-label-inverse">
+            DemocraSee
+          </span>
+        </div>
+      )}
+    </>
+  )
+}
+
 /* ─── Sidebar ─── */
 
 export function Sidebar({
@@ -148,29 +183,11 @@ export function Sidebar({
 
       {/* Bottom */}
       <div className="flex flex-col gap-6">
-        {/* Divider */}
-        <hr className="border-line-normal" />
-
-        {/* 유틸리티 아이템 */}
-        <nav className="flex flex-col gap-1">
-          {utilityNavItems.map((item) => (
-            <SidebarNavItem
-              key={item.label}
-              item={item}
-              isActive={isItemActive(item)}
-              isCollapsed={isCollapsed}
-            />
-          ))}
-        </nav>
-
-        {/* 로고 (펼친 상태에서만 표시) */}
-        {!isCollapsed && (
-          <div className="px-4">
-            <span className="text-label-3 font-bold text-label-inverse">
-              DemocraSee
-            </span>
-          </div>
-        )}
+        <SidebarBottomSection
+          isCollapsed={isCollapsed}
+          showLogo={!isCollapsed}
+          isItemActive={isItemActive}
+        />
       </div>
     </div>
   )
@@ -231,24 +248,13 @@ export function Sidebar({
             </nav>
           </div>
 
-          {/* Bottom */}
+          {/* Bottom (공유 하단 섹션) */}
           <div className="flex flex-col gap-6">
-            <hr className="border-line-normal" />
-            <nav className="flex flex-col gap-1">
-              {utilityNavItems.map((item) => (
-                <SidebarNavItem
-                  key={item.label}
-                  item={item}
-                  isActive={isItemActive(item)}
-                  isCollapsed={false}
-                />
-              ))}
-            </nav>
-            <div className="px-4">
-              <span className="text-label-3 font-bold text-label-inverse">
-                DemocraSee
-              </span>
-            </div>
+            <SidebarBottomSection
+              isCollapsed={false}
+              showLogo={true}
+              isItemActive={isItemActive}
+            />
           </div>
         </div>
       </aside>

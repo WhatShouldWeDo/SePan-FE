@@ -116,11 +116,4 @@ export interface ApiErrorResponse {
  */
 export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse
 
-// 레거시 호환용 (점진적 마이그레이션)
-export interface ApiError {
-  success: false
-  message: string
-  code?: string
-  errors?: Record<string, string[]>
-}
 
