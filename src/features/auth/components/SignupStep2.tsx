@@ -166,9 +166,11 @@ export function SignupStep2({
 							인증 시간이 만료되었습니다. 재발송 버튼을 눌러주세요.
 						</p>
 					)}
-					<p className="text-sm text-muted-foreground">
-						테스트: 인증번호 123456 입력
-					</p>
+					{import.meta.env.DEV && (
+						<p className="text-sm text-muted-foreground">
+							테스트: 인증번호 123456 입력
+						</p>
+					)}
 				</div>
 			)}
 

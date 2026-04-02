@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { AuthLayout } from "@/app/layouts/AuthLayout";
 import { RootLayout } from "@/app/layouts/RootLayout";
 import { ProtectedRoute } from "@/app/layouts/ProtectedRoute";
+import { GuestRoute } from "@/app/layouts/GuestRoute";
 import { LoginPage } from "@/app/routes/LoginPage";
 import { SignupPage } from "@/app/routes/SignupPage";
 import { DashboardPage } from "@/app/routes/DashboardPage";
@@ -19,12 +20,16 @@ import { NotFoundPage } from "@/app/routes/NotFoundPage";
 import TestPage from "./routes/TestPage";
 
 export const router = createBrowserRouter([
-	// 로그인 (자체 레이아웃)
-	{ path: "/login", element: <LoginPage /> },
-	// 회원가입 (AuthLayout)
+	// 비인증 전용 라우트 (로그인 상태에서 접근 차단)
 	{
-		element: <AuthLayout />,
-		children: [{ path: "/signup", element: <SignupPage /> }],
+		element: <GuestRoute />,
+		children: [
+			{ path: "/login", element: <LoginPage /> },
+			{
+				element: <AuthLayout />,
+				children: [{ path: "/signup", element: <SignupPage /> }],
+			},
+		],
 	},
 	// 인증 필요 라우트
 	{

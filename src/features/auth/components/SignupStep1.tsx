@@ -15,7 +15,7 @@ interface SignupStep1Props {
 	onComplete: (data: Step1FormData) => void;
 }
 
-type UsernameStatus = "idle" | "checking" | "available" | "taken" | "invalid";
+type UsernameStatus = "idle" | "checking" | "available" | "taken" | "invalid" | "error";
 
 export function SignupStep1({ defaultValues, onComplete }: SignupStep1Props) {
 	const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>(
@@ -56,7 +56,7 @@ export function SignupStep1({ defaultValues, onComplete }: SignupStep1Props) {
 		if (result.success && result.data) {
 			setUsernameStatus(result.data.available ? "available" : "taken");
 		} else {
-			setUsernameStatus("idle");
+			setUsernameStatus("error");
 		}
 	};
 
@@ -116,6 +116,10 @@ export function SignupStep1({ defaultValues, onComplete }: SignupStep1Props) {
 				) : usernameStatus === "taken" ? (
 					<p id="username-status" className="text-sm text-destructive">
 						이미 사용 중인 아이디입니다
+					</p>
+				) : usernameStatus === "error" ? (
+					<p id="username-status" className="text-sm text-destructive">
+						중복 확인 중 오류가 발생했습니다. 다시 시도해 주세요.
 					</p>
 				) : null}
 			</div>
