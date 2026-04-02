@@ -60,6 +60,7 @@ export async function request<T>(
       localStorage.removeItem("auth_token")
       localStorage.removeItem("refresh_token")
       window.location.href = "/login"
+      throw new ApiClientError("인증이 만료되었습니다", 401, "UNAUTHORIZED")
     }
 
     let errorMessage = "요청 처리 중 오류가 발생했습니다"
