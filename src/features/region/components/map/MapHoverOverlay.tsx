@@ -20,10 +20,8 @@ export interface MapHoverOverlayProps {
 	showLabels: boolean;
 	/** 줌 레벨 */
 	zoomLevel: number;
-	/** 면적 임계값 */
+	/** 투영 면적 임계값 (px²) */
 	effectiveThreshold: number;
-	/** 줌 라벨 임계값 */
-	zoomLabelThreshold: number;
 	/** polylabel 위치 맵 (code → [svgX, svgY]) */
 	labelPositions: Map<string, [number, number]> | null;
 	/** 라벨 계산 중 여부 (전환 애니메이션 포함) */
@@ -47,7 +45,6 @@ export const MapHoverOverlay = React.memo(function MapHoverOverlay({
 	showLabels,
 	zoomLevel,
 	effectiveThreshold,
-	zoomLabelThreshold,
 	labelPositions,
 	isComputingLabels,
 	onHover,
@@ -64,8 +61,7 @@ export const MapHoverOverlay = React.memo(function MapHoverOverlay({
 	const zoomAdjustedShowLabel =
 		showLabel ||
 		(showLabels &&
-			zoomLevel >= zoomLabelThreshold &&
-			area > effectiveThreshold / (zoomLevel * zoomLevel));
+			area * zoomLevel * zoomLevel > effectiveThreshold);
 	const fillOverride =
 		choroplethColorMap?.[region.code]
 		?? getConstituencyFill(region.code, true, false)

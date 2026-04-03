@@ -1,5 +1,4 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import { geoArea } from "d3-geo";
 import { useProjection } from "@/features/region/hooks/useProjection";
 import { usePolylabelPositions } from "@/features/region/hooks/usePolylabelPositions";
 import {
@@ -73,20 +72,8 @@ export interface KoreaAdminMapProps {
 	className?: string;
 }
 
-/** 시도 레벨 라벨 면적 임계값 */
-const SIDO_LABEL_AREA_THRESHOLD = 1e-5;
-
-/** 시군 레벨 라벨 면적 임계값 */
-const SIGUN_LABEL_AREA_THRESHOLD = 5e-7;
-
-/** 구 레벨 라벨 면적 임계값 */
-const GU_LABEL_AREA_THRESHOLD = 5e-7;
-
-/** 읍면동 레벨 라벨 면적 임계값 */
-const EMD_LABEL_AREA_THRESHOLD = 1e-7;
-
-/** 줌 레벨 2x 이상에서만 작은 라벨 표시 */
-const ZOOM_LABEL_THRESHOLD = 2;
+/** 라벨 표시 최소 투영 면적 (px²) — 약 28×28px 이상 폴리곤에 라벨 표시 */
+const LABEL_AREA_THRESHOLD_PX = 800;
 
 /**
  * 행정구역 폴리곤 지도 (시도 → 시군 → 구(조건부) → 읍면동 4단계 드릴다운)
@@ -299,16 +286,7 @@ export function KoreaAdminMap({
 		});
 	}, [isTransitioning, triggerTransition, gRef, resetConstituencyDrillDown]);
 
-	// 레벨별 라벨 면적 임계값
-	const effectiveThreshold =
-		labelAreaThreshold ??
-		(currentLevel === "sido"
-			? SIDO_LABEL_AREA_THRESHOLD
-			: currentLevel === "sigun"
-				? SIGUN_LABEL_AREA_THRESHOLD
-				: currentLevel === "gu"
-					? GU_LABEL_AREA_THRESHOLD
-					: EMD_LABEL_AREA_THRESHOLD);
+	const effectiveThreshold = labelAreaThreshold ?? LABEL_AREA_THRESHOLD_PX;
 
 	// D3 projection + path generator (선거구 드릴다운 시 필터된 컬렉션 사용)
 	const { projection, pathGenerator } = useProjection(
@@ -366,7 +344,7 @@ export function KoreaAdminMap({
 					});
 				}
 
-				const area = geoArea(f);
+				const area = pathGenerator.area(f);
 
 				return {
 					pathD: pathGenerator(f) ?? "",
@@ -711,7 +689,6 @@ export function KoreaAdminMap({
 						showLabels={showLabels}
 						zoomLevel={zoomLevel}
 						effectiveThreshold={effectiveThreshold}
-						zoomLabelThreshold={ZOOM_LABEL_THRESHOLD}
 						labelPositions={labelPositions}
 						isComputingLabels={isComputingLabels}
 					/>
@@ -724,7 +701,6 @@ export function KoreaAdminMap({
 						showLabels={showLabels}
 						zoomLevel={zoomLevel}
 						effectiveThreshold={effectiveThreshold}
-						zoomLabelThreshold={ZOOM_LABEL_THRESHOLD}
 						labelPositions={labelPositions}
 						isComputingLabels={isComputingLabels}
 						onHover={handleHover}
@@ -741,7 +717,6 @@ export function KoreaAdminMap({
 						showLabels={showLabels}
 						zoomLevel={zoomLevel}
 						effectiveThreshold={effectiveThreshold}
-						zoomLabelThreshold={ZOOM_LABEL_THRESHOLD}
 						labelPositions={labelPositions}
 						isComputingLabels={isComputingLabels}
 						onHover={handleHover}
