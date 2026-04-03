@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { geoArea } from "d3-geo";
 import { useProjection } from "@/features/region/hooks/useProjection";
+import { usePolylabelPositions } from "@/features/region/hooks/usePolylabelPositions";
 import {
 	useMapDrillDown,
 	sidoPropsToMapRegion,
@@ -310,12 +311,18 @@ export function KoreaAdminMap({
 					: EMD_LABEL_AREA_THRESHOLD);
 
 	// D3 projection + path generator (선거구 드릴다운 시 필터된 컬렉션 사용)
-	const { pathGenerator } = useProjection(
+	const { projection, pathGenerator } = useProjection(
 		effectiveFeatureCollection,
 		width,
 		height,
 		padding,
 	);
+
+	// polylabel 라벨 위치 계산 (Web Worker, 비동기)
+	const { labelPositions, isComputing: isComputingPolylabel } =
+		usePolylabelPositions(effectiveFeatureCollection, projection);
+	// 라벨 표시 조건: 전환 애니메이션 + polylabel 계산 모두 완료
+	const isComputingLabels = isTransitioning || isComputingPolylabel;
 
 	// sigun 레벨에서 HAS_GU 판별용 맵 (CITY_CD → boolean)
 	const sigunHasGuMap = useMemo(() => {
@@ -705,6 +712,8 @@ export function KoreaAdminMap({
 						zoomLevel={zoomLevel}
 						effectiveThreshold={effectiveThreshold}
 						zoomLabelThreshold={ZOOM_LABEL_THRESHOLD}
+						labelPositions={labelPositions}
+						isComputingLabels={isComputingLabels}
 					/>
 					{/* Layer 3: hover/selected 폴리곤 */}
 					<MapSelectedLayer
@@ -716,6 +725,8 @@ export function KoreaAdminMap({
 						zoomLevel={zoomLevel}
 						effectiveThreshold={effectiveThreshold}
 						zoomLabelThreshold={ZOOM_LABEL_THRESHOLD}
+						labelPositions={labelPositions}
+						isComputingLabels={isComputingLabels}
 						onHover={handleHover}
 						onClick={handleClick}
 					/>
@@ -731,6 +742,8 @@ export function KoreaAdminMap({
 						zoomLevel={zoomLevel}
 						effectiveThreshold={effectiveThreshold}
 						zoomLabelThreshold={ZOOM_LABEL_THRESHOLD}
+						labelPositions={labelPositions}
+						isComputingLabels={isComputingLabels}
 						onHover={handleHover}
 						onClick={handleClick}
 					/>

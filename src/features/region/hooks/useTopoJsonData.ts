@@ -106,7 +106,8 @@ export function useTopoJsonData(): TopoJsonDataState {
 				const geoms = (constituencyTopo.objects[CONSTITUENCY_TOPOJSON_OBJECT_KEY] as GeometryCollection).geometries;
 				const constituencyInfoMap = new Map<string, ConstituencyInfo>();
 				for (const g of geoms) {
-					const p = g.properties;
+					const p = g.properties as Record<string, string> | undefined;
+					if (!p?.SGG_Code) continue;
 					constituencyInfoMap.set(p.SGG_Code, {
 						sggCode: p.SGG_Code,
 						sgg: p.SGG,
