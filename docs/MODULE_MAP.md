@@ -192,6 +192,7 @@
 | `ConfirmDialog.tsx` | 확인/취소 다이얼로그 | `ui/dialog` |
 | `DdayBadge.tsx` | 선거일 D-day 배지 | — |
 | `DashboardCardSkeleton.tsx` | 대시보드 스켈레톤 로더 | `ui/skeleton` |
+| `ChunkErrorBoundary.tsx` | React.lazy() 청크 로드 실패 에러 바운더리 (청크 에러/렌더 에러 구분 표시) | — |
 | `PolicyStatusBadge.tsx` | 공약 상태 배지 (확정/초안/발행) | `ui/badge` |
 
 #### UI 프리미티브 (`ui/`)

@@ -36,7 +36,8 @@ export default defineConfig({
           // React core
           if (id.includes("/react-dom/")) return "vendor-react";
           if (id.includes("/react/")) return "vendor-react";
-          if (id.includes("/react-router")) return "vendor-react";
+          if (id.includes("/react-router-dom/") || id.includes("/react-router/"))
+            return "vendor-react";
           if (id.includes("/@tanstack/react-query/")) return "vendor-react";
         },
       },

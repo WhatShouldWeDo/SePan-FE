@@ -247,3 +247,14 @@ Form (react-hook-form) → Zod 검증 → useApiMutation → API 호출
 - `pnpm run build` → `tsc -b && vite build`
 - `tsc --noEmit`은 정상 동작 (타입 체크용)
 - 환경 변수: `VITE_API_BASE_URL` (기본값 `/api`)
+
+### 코드 스플리팅
+
+- **Route-level**: 모든 페이지 컴포넌트(`*Page.tsx`)는 `React.lazy()`로 동적 import. 레이아웃 컴포넌트는 static import 유지.
+- **Vendor chunks** (`vite.config.ts` `manualChunks`):
+  - `vendor-react`: react, react-dom, react-router-dom, @tanstack/react-query
+  - `vendor-ui`: radix-ui, lucide-react, class-variance-authority, clsx, tailwind-merge, sonner
+  - `vendor-charts`: recharts (+ 내부 d3 의존성) — 차트 페이지만 로드
+  - `vendor-geo`: d3-geo, d3-selection, d3-transition, d3-zoom, topojson-client — 지역분석 페이지만 로드
+- **에러 처리**: `ChunkErrorBoundary`로 청크 로드 실패 시 새로고침 안내 (렌더 에러와 구분 표시)
+- **TopoJSON 데이터**: `useTopoJsonData` 훅에서 동적 import로 이미 분리됨
