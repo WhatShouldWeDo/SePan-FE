@@ -32,15 +32,37 @@ export function usePolylabelPositions(
   // Worker 완료 시 업데이트 트리거용 (geoCache는 ref이므로 렌더링 트리거 안 됨)
   const [cacheVersion, setCacheVersion] = useState(0);
 
-  // Worker 초기화 + 정리
+  // Worker 초기화 + 메시지 핸들러 등록 + 정리
   useEffect(() => {
-    workerRef.current = new Worker(
+    const worker = new Worker(
       new URL("../workers/polylabel.worker.ts", import.meta.url),
       { type: "module" },
     );
+    workerRef.current = worker;
+
+    worker.onmessage = (e: MessageEvent<PolylabelResponse>) => {
+      const { requestId, labels } = e.data;
+
+      // stale 응답 무시
+      if (requestId !== String(requestIdRef.current)) return;
+
+      // 결과를 geoCache에 저장
+      const cache = geoCacheRef.current;
+      for (const label of labels) {
+        cache.set(label.code, label.point);
+      }
+
+      setCacheVersion((v) => v + 1);
+      setIsComputing(false);
+    };
+
+    worker.onerror = () => {
+      // Worker 에러 시 graceful degradation (D3 centroid fallback)
+      setIsComputing(false);
+    };
 
     return () => {
-      workerRef.current?.terminate();
+      worker.terminate();
       workerRef.current = null;
     };
   }, []);
@@ -90,30 +112,6 @@ export function usePolylabelPositions(
         features: uncached,
       };
 
-      workerRef.current.onmessage = (
-        e: MessageEvent<PolylabelResponse>,
-      ) => {
-        const { requestId, labels } = e.data;
-
-        // stale 응답 무시
-        if (requestId !== String(requestIdRef.current)) return;
-
-        // 결과를 geoCache에 저장
-        for (const label of labels) {
-          cache.set(label.code, label.point);
-        }
-
-        setCacheVersion((v) => v + 1);
-        setIsComputing(false);
-      };
-
-      workerRef.current.onerror = () => {
-        // Worker 에러 시 graceful degradation (D3 centroid fallback)
-        if (String(currentId) === String(requestIdRef.current)) {
-          setIsComputing(false);
-        }
-      };
-
       workerRef.current.postMessage(request);
     },
     [],
@@ -150,7 +148,8 @@ export function usePolylabelPositions(
 
 /**
  * GeoJSON feature의 properties에서 지역 코드를 추출.
- * 레벨별로 다른 속성명 사용: SIDO, CITY_CD, SGU_CD, EMD_CD
+ * 가장 세분화된 코드 우선: EMD_CD > SGU_CD > CITY_CD > SIDO
+ * (읍면동 feature에는 모든 속성이 있으므로 세분화된 것부터 확인)
  */
 function getFeatureCode(
   properties: Record<string, unknown> | null,

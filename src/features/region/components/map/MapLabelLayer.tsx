@@ -32,10 +32,8 @@ export const MapLabelLayer = React.memo(function MapLabelLayer({
 	labelPositions,
 	isComputingLabels,
 }: MapLabelLayerProps) {
-	if (isComputingLabels) return null;
-
 	return (
-		<g style={{ transition: "opacity 200ms ease-in", opacity: 1 }}>
+		<g style={{ transition: "opacity 200ms ease-in", opacity: isComputingLabels ? 0 : 1 }}>
 			{regions.map(({ region, centroid, showLabel, area }) => {
 				const zoomAdjustedShowLabel =
 					showLabel ||
