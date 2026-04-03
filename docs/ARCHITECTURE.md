@@ -258,3 +258,12 @@ Form (react-hook-form) → Zod 검증 → useApiMutation → API 호출
   - `vendor-geo`: d3-geo, d3-selection, d3-transition, d3-zoom, topojson-client — 지역분석 페이지만 로드
 - **에러 처리**: `ChunkErrorBoundary`로 청크 로드 실패 시 새로고침 안내 (렌더 에러와 구분 표시)
 - **TopoJSON 데이터**: `useTopoJsonData` 훅에서 동적 import로 이미 분리됨
+- **Web Worker**: `polylabel.worker.ts`가 별도 청크로 빌드됨. `@mapbox/polylabel`은 Worker 청크에만 포함
+
+### 라벨 위치 최적화
+
+- D3 `centroid()`(기하학적 중심) 대신 **polylabel**(Pole of Inaccessibility)로 라벨 위치 계산
+- Web Worker에서 비동기 계산 → 메인 스레드 논블로킹
+- 지리 좌표 캐시: featureCollection 변경 시에만 재계산, projection 변경(리사이즈/줌)은 좌표 변환만
+- 라벨 표시 조건: `isTransitioning === false && isComputing === false` (이중 조건)
+- Worker 에러 시 D3 centroid로 자동 fallback

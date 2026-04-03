@@ -20,6 +20,10 @@ export interface MapSelectedLayerProps {
 	effectiveThreshold: number;
 	/** 줌 라벨 임계값 */
 	zoomLabelThreshold: number;
+	/** polylabel 위치 맵 (code → [svgX, svgY]) */
+	labelPositions: Map<string, [number, number]> | null;
+	/** 라벨 계산 중 여부 (전환 애니메이션 포함) */
+	isComputingLabels: boolean;
 	/** hover 콜백 */
 	onHover: (region: MapRegion | null, e: React.PointerEvent) => void;
 	/** 클릭 콜백 */
@@ -38,6 +42,8 @@ export const MapSelectedLayer = React.memo(function MapSelectedLayer({
 	zoomLevel,
 	effectiveThreshold,
 	zoomLabelThreshold,
+	labelPositions,
+	isComputingLabels,
 	onHover,
 	onClick,
 }: MapSelectedLayerProps) {
@@ -55,15 +61,16 @@ export const MapSelectedLayer = React.memo(function MapSelectedLayer({
 					choroplethColorMap?.[region.code]
 					?? getConstituencyFill(region.code, isHovered, isSelected)
 					?? null;
+				const effectiveCentroid = labelPositions?.get(region.code) ?? centroid;
 				return (
 					<RegionPolygon
 						key={region.code}
 						pathD={pathD}
-						centroid={centroid}
+						centroid={effectiveCentroid}
 						region={region}
 						isHovered={isHovered}
 						isSelected={isSelected}
-						showLabel={zoomAdjustedShowLabel}
+						showLabel={isComputingLabels ? false : zoomAdjustedShowLabel}
 						fillOverride={fillOverride}
 						onHover={onHover}
 						onClick={onClick}

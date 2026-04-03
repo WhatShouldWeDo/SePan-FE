@@ -24,6 +24,10 @@ export interface MapHoverOverlayProps {
 	effectiveThreshold: number;
 	/** 줌 라벨 임계값 */
 	zoomLabelThreshold: number;
+	/** polylabel 위치 맵 (code → [svgX, svgY]) */
+	labelPositions: Map<string, [number, number]> | null;
+	/** 라벨 계산 중 여부 (전환 애니메이션 포함) */
+	isComputingLabels: boolean;
 	/** hover 콜백 */
 	onHover: (region: MapRegion | null, e: React.PointerEvent) => void;
 	/** 클릭 콜백 */
@@ -44,6 +48,8 @@ export const MapHoverOverlay = React.memo(function MapHoverOverlay({
 	zoomLevel,
 	effectiveThreshold,
 	zoomLabelThreshold,
+	labelPositions,
+	isComputingLabels,
 	onHover,
 	onClick,
 }: MapHoverOverlayProps) {
@@ -64,16 +70,17 @@ export const MapHoverOverlay = React.memo(function MapHoverOverlay({
 		choroplethColorMap?.[region.code]
 		?? getConstituencyFill(region.code, true, false)
 		?? null;
+	const effectiveCentroid = labelPositions?.get(region.code) ?? centroid;
 
 	return (
 		<RegionPolygon
 			key={`hover-${region.code}`}
 			pathD={pathD}
-			centroid={centroid}
+			centroid={effectiveCentroid}
 			region={region}
 			isHovered={true}
 			isSelected={false}
-			showLabel={zoomAdjustedShowLabel}
+			showLabel={isComputingLabels ? false : zoomAdjustedShowLabel}
 			fillOverride={fillOverride}
 			onHover={onHover}
 			onClick={onClick}

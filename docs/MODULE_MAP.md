@@ -54,6 +54,9 @@
   - `hooks/useMapTransition.ts` — D3 전환 애니메이션
   - `hooks/useHeatmapMode.ts` — 히트맵 모드 상태 관리 훅 (카테고리 선택 → choropleth 데이터 생성, forcedOff 리셋 로직)
   - `hooks/useConstituencyMode.ts` — 선거구 뷰 모드 상태 관리 훅 (render-time state reset 패턴, React Compiler 호환)
+  - `hooks/usePolylabelPositions.ts` — Web Worker 기반 polylabel 라벨 위치 계산 + 지리 좌표 캐싱 + projection 변환
+  - `workers/polylabel.worker.ts` — polylabel 알고리즘 Web Worker (Pole of Inaccessibility 계산)
+  - `types/polylabel.ts` — Worker 메시지 프로토콜 타입 (PolylabelRequest/Response)
   - `lib/choropleth-utils.ts` — oklch 색상 보간, choropleth 색상 매핑, 범례 생성
   - `lib/constituency-colors.ts` — 선거구 OKLCH 8색 팔레트 + EMD→선거구 색상 맵 빌드
   - `lib/map-theme.ts` — 지도 CSS 변수 (fill, hover, selected, stroke, strokeHover 등)
