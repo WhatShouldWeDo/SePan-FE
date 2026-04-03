@@ -62,12 +62,15 @@ export function useHeatmapMode(
 		setForcedOff(true);
 	}, []);
 
-	return {
+	const heatmapLabel = isHeatmapActive && config ? config.label : null;
+	const heatmapUnit = isHeatmapActive && config ? config.unit : null;
+
+	return useMemo(() => ({
 		isHeatmapActive,
 		choroplethData,
 		choroplethConfig,
-		heatmapLabel: isHeatmapActive && config ? config.label : null,
-		heatmapUnit: isHeatmapActive && config ? config.unit : null,
+		heatmapLabel,
+		heatmapUnit,
 		deactivateHeatmap,
-	};
+	}), [isHeatmapActive, choroplethData, choroplethConfig, heatmapLabel, heatmapUnit, deactivateHeatmap]);
 }

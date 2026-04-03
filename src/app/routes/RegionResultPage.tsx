@@ -97,7 +97,7 @@ export function RegionResultPage() {
 				},
 			};
 		},
-		[heatmap.isHeatmapActive, heatmap.choroplethData, heatmap.heatmapLabel, heatmap.heatmapUnit],
+		[heatmap],
 	);
 
 	const handleRegionSelect = useCallback((region: MapRegion) => {

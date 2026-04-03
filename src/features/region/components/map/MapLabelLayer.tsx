@@ -31,6 +31,11 @@ export const MapLabelLayer = React.memo(function MapLabelLayer({
 }: MapLabelLayerProps) {
 	return (
 		<g style={{ transition: "opacity 200ms ease-in", opacity: isComputingLabels ? 0 : 1 }}>
+			<defs>
+				<filter id="label-shadow" x="-50%" y="-50%" width="200%" height="200%">
+					<feDropShadow dx={0} dy={0} stdDeviation={1.5} floodColor="black" floodOpacity={0.7} />
+				</filter>
+			</defs>
 			{regions.map(({ region, centroid, showLabel, area }) => {
 				const zoomAdjustedShowLabel =
 					showLabel ||
@@ -48,6 +53,8 @@ export const MapLabelLayer = React.memo(function MapLabelLayer({
 						dominantBaseline="central"
 						fill={mapColors.label}
 						fontSize={10}
+						fontWeight={600}
+						filter="url(#label-shadow)"
 						pointerEvents="none"
 					>
 						{region.name}
