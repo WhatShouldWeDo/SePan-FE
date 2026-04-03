@@ -267,3 +267,4 @@ Form (react-hook-form) → Zod 검증 → useApiMutation → API 호출
 - 지리 좌표 캐시: featureCollection 변경 시에만 재계산, projection 변경(리사이즈/줌)은 좌표 변환만
 - 라벨 표시 조건: `isTransitioning === false && isComputing === false` (이중 조건)
 - Worker 에러 시 D3 centroid로 자동 fallback
+- **라벨 면적 임계값**: `pathGenerator.area()` 투영 면적(px²) 기반. `fitExtent()` 적용 후 화면에서 충분히 큰 폴리곤에 라벨 표시. 줌 보정: `area × zoomLevel² > 800px²`
