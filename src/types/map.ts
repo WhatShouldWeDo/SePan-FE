@@ -44,7 +44,10 @@ export interface MapConfig {
 	padding?: number;
 	/** 라벨 표시 여부 (기본값: true) */
 	showLabels?: boolean;
-	/** 라벨 최소 면적 임계값 — 이 값 이하인 폴리곤은 라벨 숨김 */
+	/**
+	 * 라벨 최소 투영 면적 임계값 (px²) — 이 값 이하인 폴리곤은 라벨 숨김. 기본값: 800
+	 * @note 단위가 steradians에서 px²로 변경됨 (2026-04-03). 기존에 steradian 값을 전달하던 곳은 px² 단위로 교체 필요.
+	 */
 	labelAreaThreshold?: number;
 	/** 드릴다운 활성화 여부 (기본값: true) */
 	enableDrillDown?: boolean;

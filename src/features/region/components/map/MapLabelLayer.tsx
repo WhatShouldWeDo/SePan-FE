@@ -9,10 +9,8 @@ export interface MapLabelLayerProps {
 	showLabels: boolean;
 	/** 줌 레벨 */
 	zoomLevel: number;
-	/** 면적 임계값 */
+	/** 투영 면적 임계값 (px²) */
 	effectiveThreshold: number;
-	/** 줌 라벨 표시 임계값 */
-	zoomLabelThreshold: number;
 	/** polylabel 위치 맵 (code → [svgX, svgY]) */
 	labelPositions: Map<string, [number, number]> | null;
 	/** 라벨 계산 중 여부 (전환 애니메이션 포함) */
@@ -28,7 +26,6 @@ export const MapLabelLayer = React.memo(function MapLabelLayer({
 	showLabels,
 	zoomLevel,
 	effectiveThreshold,
-	zoomLabelThreshold,
 	labelPositions,
 	isComputingLabels,
 }: MapLabelLayerProps) {
@@ -38,8 +35,7 @@ export const MapLabelLayer = React.memo(function MapLabelLayer({
 				const zoomAdjustedShowLabel =
 					showLabel ||
 					(showLabels &&
-						zoomLevel >= zoomLabelThreshold &&
-						area > effectiveThreshold / (zoomLevel * zoomLevel));
+						area * zoomLevel * zoomLevel > effectiveThreshold);
 				if (!zoomAdjustedShowLabel) return null;
 
 				const pos = labelPositions?.get(region.code) ?? centroid;

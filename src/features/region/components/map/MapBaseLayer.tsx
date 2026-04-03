@@ -6,6 +6,7 @@ export interface RegionDataItem {
 	pathD: string;
 	centroid: [number, number];
 	region: MapRegion;
+	/** 투영 면적 (px², pathGenerator.area() 기준 — d3-zoom 변환 미적용) */
 	area: number;
 	showLabel: boolean;
 }
