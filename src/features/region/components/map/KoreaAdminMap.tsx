@@ -695,7 +695,7 @@ export function KoreaAdminMap({
 					{/* Layer 3: hover/selected 폴리곤 */}
 					<MapSelectedLayer
 						regions={selectedRegions}
-						hoveredCode={hoveredCode}
+						hoveredCode={isConstituencyOverview ? null : hoveredCode}
 						choroplethColorMap={choroplethColorMap}
 						getConstituencyFill={getConstituencyFill}
 						showLabels={showLabels}
@@ -708,7 +708,7 @@ export function KoreaAdminMap({
 					/>
 					{/* Hovered 폴리곤 (선택되지 않은 경우) */}
 					<MapHoverOverlay
-						hoveredCode={hoveredCode}
+						hoveredCode={isConstituencyOverview ? null : hoveredCode}
 						selectedCode={selectedCode}
 						searchHighlightCode={searchHighlightCode}
 						regionDataByCode={regionDataByCode}
