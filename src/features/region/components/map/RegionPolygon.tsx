@@ -90,6 +90,8 @@ export const RegionPolygon = React.memo(function RegionPolygon({
 					dominantBaseline="central"
 					fill={mapColors.label}
 					fontSize={10}
+					fontWeight={600}
+					filter="url(#label-shadow)"
 					pointerEvents="none"
 				>
 					{region.name}

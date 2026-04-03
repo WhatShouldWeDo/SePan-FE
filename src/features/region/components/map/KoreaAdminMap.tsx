@@ -624,6 +624,7 @@ export function KoreaAdminMap({
 					: `${selectedGuName ?? selectedCityName ?? ""} 읍면동 지도`;
 
 	const isConstituencyOverview = isConstituencyMode && !selectedConstituency;
+	const effectiveHoveredCode = isConstituencyOverview ? null : hoveredCode;
 
 	return (
 		<div ref={containerRef} className={cn("relative overflow-hidden", className)}>
@@ -695,7 +696,7 @@ export function KoreaAdminMap({
 					{/* Layer 3: hover/selected 폴리곤 */}
 					<MapSelectedLayer
 						regions={selectedRegions}
-						hoveredCode={isConstituencyOverview ? null : hoveredCode}
+						hoveredCode={effectiveHoveredCode}
 						choroplethColorMap={choroplethColorMap}
 						getConstituencyFill={getConstituencyFill}
 						showLabels={showLabels}
@@ -708,7 +709,7 @@ export function KoreaAdminMap({
 					/>
 					{/* Hovered 폴리곤 (선택되지 않은 경우) */}
 					<MapHoverOverlay
-						hoveredCode={isConstituencyOverview ? null : hoveredCode}
+						hoveredCode={effectiveHoveredCode}
 						selectedCode={selectedCode}
 						searchHighlightCode={searchHighlightCode}
 						regionDataByCode={regionDataByCode}
