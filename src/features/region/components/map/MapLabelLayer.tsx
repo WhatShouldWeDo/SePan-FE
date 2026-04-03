@@ -47,6 +47,9 @@ export const MapLabelLayer = React.memo(function MapLabelLayer({
 						textAnchor="middle"
 						dominantBaseline="central"
 						fill={mapColors.label}
+						stroke="rgba(0,0,0,0.6)"
+						strokeWidth={2}
+						paintOrder="stroke"
 						fontSize={10}
 						pointerEvents="none"
 					>
