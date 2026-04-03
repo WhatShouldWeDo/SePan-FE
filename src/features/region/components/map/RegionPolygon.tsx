@@ -89,9 +89,6 @@ export const RegionPolygon = React.memo(function RegionPolygon({
 					textAnchor="middle"
 					dominantBaseline="central"
 					fill={mapColors.label}
-					stroke="rgba(0,0,0,0.6)"
-					strokeWidth={2}
-					paintOrder="stroke"
 					fontSize={10}
 					pointerEvents="none"
 				>
